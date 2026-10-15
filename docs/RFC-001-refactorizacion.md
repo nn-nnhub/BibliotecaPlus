@@ -25,6 +25,10 @@ La revisión del código, los servicios, los controladores y el flujo de présta
 | IOC-01 | Inversión de Control | Dependencias creadas directamente en el diseño inicial | Recibir dependencias por constructor |
 | IOC-02 | Inversión de Control | Notificador acoplado al servicio | Inyectar un componente de notificación |
 
+## Avance de correcciones
+
+- DRY-01: corregido mediante `ValidadorDatos`, reutilizado por los servicios de usuarios, libros y préstamos.
+
 ## Alcance de la refactorización
 
 El análisis considera duplicación de reglas, concentración de responsabilidades, dependencia de condicionales para extender comportamientos y acoplamiento entre componentes. Estos hallazgos afectan principalmente el mantenimiento, la posibilidad de agregar nuevas reglas y la facilidad para probar cada parte del sistema.
