@@ -15,6 +15,7 @@ public class Prestamo {
     private Long libroId;
     private Long usuarioId;
     private LocalDate fechaPrestamo;
+    private LocalDate fechaVencimiento;
     private LocalDate fechaDevolucion;
     private boolean devuelto;
     private double multa;
@@ -22,10 +23,11 @@ public class Prestamo {
     public Prestamo() {
     }
 
-    public Prestamo(Long libroId, Long usuarioId, LocalDate fechaPrestamo) {
+    public Prestamo(Long libroId, Long usuarioId, LocalDate fechaPrestamo, LocalDate fechaVencimiento) {
         this.libroId = libroId;
         this.usuarioId = usuarioId;
         this.fechaPrestamo = fechaPrestamo;
+        this.fechaVencimiento = fechaVencimiento;
         this.devuelto = false;
         this.multa = 0;
     }
@@ -60,6 +62,14 @@ public class Prestamo {
 
     public LocalDate getFechaDevolucion() {
         return fechaDevolucion;
+    }
+
+    public LocalDate getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
     }
 
     public void setFechaDevolucion(LocalDate fechaDevolucion) {
