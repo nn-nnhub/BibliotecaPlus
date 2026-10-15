@@ -2,21 +2,21 @@ package com.bibliotecaplus.service;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class CalculadorMulta {
+    private final List<TarifaMulta> tarifas;
 
-    public double calcular(String tipoPrestamo, long diasRetraso) {
-        double tarifaDiaria = obtenerTarifa(tipoPrestamo);
-        return diasRetraso * tarifaDiaria;
+    public CalculadorMulta(List<TarifaMulta> tarifas) {
+        this.tarifas = tarifas;
     }
 
-    private double obtenerTarifa(String tipoPrestamo) {
-        if ("ESPECIAL".equalsIgnoreCase(tipoPrestamo)) {
-            return 2.0;
-        }
-        if ("DOMICILIO".equalsIgnoreCase(tipoPrestamo)) {
-            return 1.0;
-        }
-        return 0.5;
+    public double calcular(String tipoPrestamo, long diasRetraso) {
+        return tarifas.stream()
+                .filter(tarifa -> tarifa.aplicaA(tipoPrestamo))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No existe una tarifa configurada"))
+                .valorDiario() * diasRetraso;
     }
 }
