@@ -41,6 +41,8 @@ return tarifas.stream()
         .valorDiario() * diasRetraso;
 ```
 
+La interfaz también expone las tres alternativas: `Domicilio`, `Especial` y `Sala / General`. De esta manera, cada estrategia implementada puede seleccionarse y probarse desde el sistema.
+
 ## Resultado
 
 - Las estrategias existentes no necesitan modificarse para agregar otra tarifa.
