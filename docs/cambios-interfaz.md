@@ -53,6 +53,20 @@ La captura siguiente corresponde al estado anterior del historial:
 
 ![Historial antes de la mejora](capturas/historial-antes.png)
 
+La captura siguiente evidencia el historial después de la mejora:
+
+![Historial después de la mejora](capturas/historial-despues.png)
+
+## Evidencia de la búsqueda
+
+Vista antes de agregar las barras de búsqueda:
+
+![Dashboard antes de la búsqueda](capturas/dashboard-antes-busqueda.png)
+
+Vista después de agregar las barras de búsqueda:
+
+![Dashboard después de la búsqueda](capturas/dashboard-despues-busqueda.png)
+
 ## Archivos involucrados
 
 | Archivo | Responsabilidad |
