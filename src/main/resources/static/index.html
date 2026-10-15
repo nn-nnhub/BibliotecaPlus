@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header class="hero">
-        <div><p class="eyebrow">Gestión de biblioteca</p><h1>BibliotecaPlus</h1><p>Administra libros, usuarios y préstamos desde un solo lugar.</p></div>
-        <button id="btnActualizar" class="secondary-button">Actualizar datos</button>
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="BibliotecaPlus inicio"><span class="brand-mark">▥</span><span><strong>Biblioteca</strong><small>PLUS</small></span></a>
+        <nav class="main-nav" aria-label="Navegación principal"><a href="#inicio">Inicio</a><a href="#libros">Libros</a><a href="#usuarios">Usuarios</a><a href="#prestamos">Préstamos</a></nav>
+        <div class="toolbar"><button class="tool-button" id="btnAccesibilidad" title="Accesibilidad" aria-label="Abrir menú de accesibilidad">◉</button><button class="tool-button" id="btnSesion" title="Sesión activa" aria-label="Ver sesión activa">●</button><button class="tool-button sun-button" id="btnTema" title="Cambiar tema" aria-label="Cambiar tema">☾</button></div>
     </header>
+    <aside class="accessibility-panel" id="panelAccesibilidad" aria-hidden="true"><div class="panel-title"><strong>Menú de accesibilidad</strong><button id="btnCerrarAccesibilidad" aria-label="Cerrar">×</button></div><p class="accessibility-profile">Perfil de accesibilidad</p><button class="access-option" data-a11y="large-text"><strong>V</strong><span>Visión baja<small>Texto y cursor grandes</small></span></button><button class="access-option" data-a11y="dyslexia"><strong>Aa</strong><span>Dislexia<small>Interlineado amigable</small></span></button><button class="access-option" data-a11y="contrast"><strong>◐</strong><span>Contraste<small>Mayor contraste visual</small></span></button><button class="access-option" data-a11y="reading"><strong>▱</strong><span>Máscara de lectura<small>Resalta el contenido</small></span></button><button class="reset-option" id="btnRestablecer">↻ Restablecer</button></aside>
+    <div class="session-toast" id="sessionToast" aria-hidden="true"><strong>Sesión activa</strong><span>Administrador</span><small>BibliotecaPlus</small></div>
+    <main id="inicio" class="container">
+        <section class="welcome"><div><p class="eyebrow">Panel principal</p><h1>Bienvenido, Administrador <span aria-hidden="true">👋</span></h1><p>Selecciona una opción o gestiona tus operaciones de biblioteca.</p></div><button id="btnActualizar" class="secondary-button">Actualizar datos</button></section>
+        <section class="module-grid" aria-label="Módulos del sistema"><a href="#usuarios" class="module-card"><span class="module-icon">♙</span><strong>Usuarios</strong><small>Gestionar lectores</small></a><a href="#libros" class="module-card"><span class="module-icon">▤</span><strong>Libros</strong><small>Ver catálogo</small></a><a href="#prestamos" class="module-card"><span class="module-icon">▣</span><strong>Préstamos</strong><small>Registrar movimientos</small></a><a href="#libros" class="module-card"><span class="module-icon">◫</span><strong>Disponibilidad</strong><small>Consultar inventario</small></a></section>
     <main class="container">
         <section class="summary-grid">
             <article class="summary-card"><span>Libros</span><strong id="totalLibros">0</strong></article>
@@ -18,10 +24,10 @@
             <article class="summary-card"><span>Usuarios</span><strong id="totalUsuarios">0</strong></article>
             <article class="summary-card"><span>Préstamos</span><strong id="totalPrestamos">0</strong></article>
         </section>
-        <section class="panel"><div class="section-heading"><div><p class="eyebrow">Catálogo</p><h2>Libros registrados</h2></div></div><div id="librosEstado" class="message">Cargando libros...</div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Título</th><th>Autor</th><th>ISBN</th><th>Estado</th></tr></thead><tbody id="tablaLibros"></tbody></table></div></section>
+        <section class="panel" id="libros"><div class="section-heading"><div><p class="eyebrow">Catálogo</p><h2>Libros registrados</h2></div></div><div id="librosEstado" class="message">Cargando libros...</div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Título</th><th>Autor</th><th>ISBN</th><th>Estado</th></tr></thead><tbody id="tablaLibros"></tbody></table></div></section>
         <section class="two-columns">
-            <article class="panel"><div class="section-heading"><div><p class="eyebrow">Personas</p><h2>Usuarios registrados</h2></div></div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr></thead><tbody id="tablaUsuarios"></tbody></table></div></article>
-            <article class="panel"><div class="section-heading"><div><p class="eyebrow">Operación</p><h2>Registrar préstamo</h2></div></div><form id="formPrestamo"><label>Libro<select id="libroId" required></select></label><label>Usuario<select id="usuarioId" required></select></label><label>Tipo de préstamo<select id="tipoPrestamo"><option value="DOMICILIO">Domicilio</option><option value="ESPECIAL">Especial</option></select></label><button class="primary-button" type="submit">Registrar préstamo</button></form><p id="prestamoMensaje" class="message"></p></article>
+            <article class="panel" id="usuarios"><div class="section-heading"><div><p class="eyebrow">Personas</p><h2>Usuarios registrados</h2></div></div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr></thead><tbody id="tablaUsuarios"></tbody></table></div></article>
+            <article class="panel" id="prestamos"><div class="section-heading"><div><p class="eyebrow">Operación</p><h2>Registrar préstamo</h2></div></div><form id="formPrestamo"><label>Libro<select id="libroId" required></select></label><label>Usuario<select id="usuarioId" required></select></label><label>Tipo de préstamo<select id="tipoPrestamo"><option value="DOMICILIO">Domicilio</option><option value="ESPECIAL">Especial</option></select></label><button class="primary-button" type="submit">Registrar préstamo</button></form><p id="prestamoMensaje" class="message"></p></article>
         </section>
         <section class="two-columns">
             <article class="panel"><div class="section-heading"><div><p class="eyebrow">Catálogo</p><h2>Registrar libro</h2></div></div><form id="formLibro"><label>Título<input id="tituloLibro" required></label><label>Autor<input id="autorLibro" required></label><label>ISBN<input id="isbnLibro" required></label><button class="primary-button" type="submit">Guardar libro</button></form><p id="libroMensaje" class="message"></p></article>
@@ -31,5 +37,6 @@
     </main>
     <footer>BibliotecaPlus · Sistema académico de evolución y configuración de software</footer>
     <script src="/app.js"></script>
+    <script src="/ui.js"></script>
 </body>
 </html>
