@@ -59,6 +59,8 @@ El cambio de vencimientos y multas está documentado en [RFC-004-vencimientos-y-
 
 La ampliación de datos de usuario está documentada en [RFC-005-informacion-usuario.md](RFC-005-informacion-usuario.md).
 
+Después del RFC-005 se realizó un ajuste de interfaz: la tabla ampliada de usuarios pasó a ocupar todo el ancho disponible para evitar que correo y teléfono quedaran comprimidos junto al formulario de préstamos.
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
