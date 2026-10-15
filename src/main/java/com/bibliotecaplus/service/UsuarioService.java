@@ -26,11 +26,15 @@ public class UsuarioService {
 
     public Usuario guardar(Usuario usuario) {
         validarUsuario(usuario);
+        validarDniDisponible(usuario.getDni());
         return usuarioRepository.save(usuario);
     }
 
     public Usuario actualizar(Long id, Usuario datosUsuario) {
         validarUsuario(datosUsuario);
+        if (usuarioRepository.existsByDniAndIdNot(datosUsuario.getDni(), id)) {
+            throw new IllegalArgumentException("El DNI ya está registrado en otro usuario");
+        }
         Usuario usuario = buscarPorId(id);
         usuario.setNombre(datosUsuario.getNombre());
         usuario.setApellidos(datosUsuario.getApellidos());
@@ -51,6 +55,12 @@ public class UsuarioService {
                 || usuario.getCorreo() == null || usuario.getCorreo().isBlank()
                 || usuario.getTelefono() == null || usuario.getTelefono().isBlank()) {
             throw new IllegalArgumentException("Nombres, apellidos, DNI, correo y teléfono son obligatorios");
+        }
+    }
+
+    private void validarDniDisponible(String dni) {
+        if (usuarioRepository.existsByDni(dni)) {
+            throw new IllegalArgumentException("El DNI ya está registrado en otro usuario");
         }
     }
 }
