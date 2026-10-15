@@ -1,6 +1,7 @@
 package com.bibliotecaplus.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +14,7 @@ public class Usuario {
     private Long id;
     private String nombre;
     private String apellidos;
+    @Column(nullable = false, unique = true, length = 8)
     private String dni;
     private String correo;
     private String telefono;
