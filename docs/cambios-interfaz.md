@@ -47,6 +47,12 @@ Ahora se muestra el título del libro y el nombre del usuario. Los identificador
 - El filtrado se realiza en la interfaz sobre los datos ya cargados, evitando llamadas innecesarias al servidor.
 - La búsqueda se mantiene separada de la lógica Java y se implementa en `app.js`.
 
+### Tablas con muchos registros
+
+La captura `capturas/tablas-antes-desplazamiento.png` evidencia el estado anterior, donde las tablas podían crecer verticalmente sin límite.
+
+Se agregó una altura máxima de 280 píxeles a los contenedores de libros, usuarios e historial. Cada tabla tiene ahora su propia barra desplazadora vertical y sus encabezados permanecen visibles durante el desplazamiento.
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
