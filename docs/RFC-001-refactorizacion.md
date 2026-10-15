@@ -29,6 +29,7 @@ La revisión del código, los servicios, los controladores y el flujo de présta
 
 - DRY-01: corregido mediante `ValidadorDatos`, reutilizado por los servicios de usuarios, libros y préstamos.
 - DRY-02: corregido mediante `CalculadorMulta`, separado de `PrestamoService` y validado con pruebas unitarias.
+- SRP-01/SRP-02: corregidos mediante `ValidadorPrestamo` y `NotificadorPrestamo`.
 
 ## Alcance de la refactorización
 
