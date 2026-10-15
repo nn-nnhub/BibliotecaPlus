@@ -41,7 +41,9 @@ return tarifas.stream()
         .valorDiario() * diasRetraso;
 ```
 
-La interfaz también expone las tres alternativas: `Domicilio`, `Especial` y `Sala / General`. De esta manera, cada estrategia implementada puede seleccionarse y probarse desde el sistema.
+La interfaz también expone las tres alternativas con su tarifa diaria: `Domicilio — S/ 1.00 por día`, `Especial — S/ 2.00 por día` y `Sala / General — S/ 0.50 por día`. De esta manera, cada estrategia implementada puede seleccionarse, comprenderse y probarse desde el sistema.
+
+![Selector de tarifas en la interfaz](capturas/rfc-001-ocp-tarifa-general-interfaz.png)
 
 ## Resultado
 
