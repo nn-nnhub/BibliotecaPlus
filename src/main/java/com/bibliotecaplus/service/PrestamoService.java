@@ -7,7 +7,7 @@ import com.bibliotecaplus.repository.LibroRepository;
 import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.repository.UsuarioRepository;
 import com.bibliotecaplus.validation.ValidadorPrestamo;
-import com.bibliotecaplus.notification.NotificadorPrestamo;
+import com.bibliotecaplus.notification.Notificador;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,20 +22,20 @@ public class PrestamoService {
     private final UsuarioRepository usuarioRepository;
     private final CalculadorMulta calculadorMulta;
     private final ValidadorPrestamo validadorPrestamo;
-    private final NotificadorPrestamo notificadorPrestamo;
+    private final Notificador notificador;
 
     public PrestamoService(PrestamoRepository prestamoRepository,
                            LibroRepository libroRepository,
                            UsuarioRepository usuarioRepository,
                            CalculadorMulta calculadorMulta,
                            ValidadorPrestamo validadorPrestamo,
-                           NotificadorPrestamo notificadorPrestamo) {
+                           Notificador notificador) {
         this.prestamoRepository = prestamoRepository;
         this.libroRepository = libroRepository;
         this.usuarioRepository = usuarioRepository;
         this.calculadorMulta = calculadorMulta;
         this.validadorPrestamo = validadorPrestamo;
-        this.notificadorPrestamo = notificadorPrestamo;
+        this.notificador = notificador;
     }
 
     public List<Prestamo> listarTodos() {
@@ -62,7 +62,7 @@ public class PrestamoService {
         libroRepository.save(libro);
 
         Prestamo prestamoGuardado = prestamoRepository.save(prestamo);
-        notificadorPrestamo.notificarRegistro(usuario);
+        notificador.notificarRegistro(usuario);
         return prestamoGuardado;
     }
 

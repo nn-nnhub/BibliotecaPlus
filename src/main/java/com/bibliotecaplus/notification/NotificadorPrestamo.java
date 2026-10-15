@@ -6,9 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NotificadorPrestamo {
+public class NotificadorPrestamo implements Notificador {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificadorPrestamo.class);
 
+    @Override
     public void notificarRegistro(Usuario usuario) {
         LOGGER.info("Préstamo registrado para {}", usuario.getCorreo());
     }
