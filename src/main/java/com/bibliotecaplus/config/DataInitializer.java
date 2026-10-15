@@ -15,6 +15,9 @@ public class DataInitializer {
     CommandLineRunner cargarDatosIniciales(LibroRepository libroRepository,
                                             UsuarioRepository usuarioRepository) {
         return args -> {
+            if (libroRepository.count() > 0 || usuarioRepository.count() > 0) {
+                return;
+            }
             libroRepository.save(new Libro(
                     "Clean Code",
                     "Robert C. Martin",
