@@ -20,15 +20,18 @@ public class PrestamoService {
     private final LibroRepository libroRepository;
     private final UsuarioRepository usuarioRepository;
     private final ValidadorDatos validadorDatos;
+    private final CalculadorMulta calculadorMulta;
 
     public PrestamoService(PrestamoRepository prestamoRepository,
                            LibroRepository libroRepository,
                            UsuarioRepository usuarioRepository,
-                           ValidadorDatos validadorDatos) {
+                           ValidadorDatos validadorDatos,
+                           CalculadorMulta calculadorMulta) {
         this.prestamoRepository = prestamoRepository;
         this.libroRepository = libroRepository;
         this.usuarioRepository = usuarioRepository;
         this.validadorDatos = validadorDatos;
+        this.calculadorMulta = calculadorMulta;
     }
 
     public List<Prestamo> listarTodos() {
@@ -72,7 +75,7 @@ public class PrestamoService {
         prestamo.setFechaDevolucion(fechaDevolucion);
         prestamo.setDevuelto(true);
         long diasRetraso = Math.max(0, ChronoUnit.DAYS.between(prestamo.getFechaVencimiento(), fechaDevolucion));
-        prestamo.setMulta(calcularMulta(tipoPrestamo, diasRetraso));
+        prestamo.setMulta(calculadorMulta.calcular(tipoPrestamo, diasRetraso));
 
         Libro libro = libroRepository.findById(prestamo.getLibroId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
@@ -89,17 +92,4 @@ public class PrestamoService {
         }
     }
 
-    private double calcularMulta(String tipoPrestamo, long diasRetraso) {
-        double tarifaDiaria;
-
-        if ("ESPECIAL".equalsIgnoreCase(tipoPrestamo)) {
-            tarifaDiaria = 2.0;
-        } else if ("DOMICILIO".equalsIgnoreCase(tipoPrestamo)) {
-            tarifaDiaria = 1.0;
-        } else {
-            tarifaDiaria = 0.5;
-        }
-
-        return diasRetraso * tarifaDiaria;
-    }
 }
