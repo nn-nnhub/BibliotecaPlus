@@ -53,6 +53,8 @@ La captura `capturas/tablas-antes-desplazamiento.png` evidencia el estado anteri
 
 Se agregó una altura máxima de 280 píxeles a los contenedores de libros, usuarios e historial. Cada tabla tiene ahora su propia barra desplazadora vertical y sus encabezados permanecen visibles durante el desplazamiento.
 
+La prueba completa con 100 libros reales y 100 usuarios ficticios está documentada en [prueba-desplazamiento.md](prueba-desplazamiento.md).
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
