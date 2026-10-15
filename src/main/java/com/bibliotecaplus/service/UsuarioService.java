@@ -33,7 +33,10 @@ public class UsuarioService {
         validarUsuario(datosUsuario);
         Usuario usuario = buscarPorId(id);
         usuario.setNombre(datosUsuario.getNombre());
+        usuario.setApellidos(datosUsuario.getApellidos());
+        usuario.setDni(datosUsuario.getDni());
         usuario.setCorreo(datosUsuario.getCorreo());
+        usuario.setTelefono(datosUsuario.getTelefono());
         return usuarioRepository.save(usuario);
     }
 
@@ -43,8 +46,11 @@ public class UsuarioService {
 
     private void validarUsuario(Usuario usuario) {
         if (usuario == null || usuario.getNombre() == null || usuario.getNombre().isBlank()
-                || usuario.getCorreo() == null || usuario.getCorreo().isBlank()) {
-            throw new IllegalArgumentException("El nombre y el correo son obligatorios");
+                || usuario.getApellidos() == null || usuario.getApellidos().isBlank()
+                || usuario.getDni() == null || usuario.getDni().isBlank()
+                || usuario.getCorreo() == null || usuario.getCorreo().isBlank()
+                || usuario.getTelefono() == null || usuario.getTelefono().isBlank()) {
+            throw new IllegalArgumentException("Nombres, apellidos, DNI, correo y teléfono son obligatorios");
         }
     }
 }
