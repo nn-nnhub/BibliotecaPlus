@@ -40,6 +40,13 @@ Usuario: 3
 
 Ahora se muestra el título del libro y el nombre del usuario. Los identificadores siguen existiendo internamente, pero no se exponen como información principal al usuario.
 
+### Búsqueda
+
+- Se agregó una barra de búsqueda para libros por título, autor o ISBN.
+- Se agregó una barra de búsqueda para usuarios por nombre o correo.
+- El filtrado se realiza en la interfaz sobre los datos ya cargados, evitando llamadas innecesarias al servidor.
+- La búsqueda se mantiene separada de la lógica Java y se implementa en `app.js`.
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
