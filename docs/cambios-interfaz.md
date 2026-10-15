@@ -55,6 +55,8 @@ Se agregó una altura máxima de 280 píxeles a los contenedores de libros, usua
 
 La prueba completa con 100 libros reales y 100 usuarios ficticios está documentada en [prueba-desplazamiento.md](prueba-desplazamiento.md).
 
+El cambio de vencimientos y multas está documentado en [RFC-004-vencimientos-y-multas.md](RFC-004-vencimientos-y-multas.md).
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
