@@ -53,3 +53,7 @@ La captura posterior muestra los nuevos campos de nombres, apellidos, DNI, corre
 ## Ajuste visual posterior
 
 Después de ampliar la tabla de usuarios, la distribución en dos columnas comprimía el correo electrónico y el teléfono. Se corrigió reorganizando Usuarios y Préstamos en filas independientes dentro del dashboard. La captura del problema se conserva en `capturas/rfc-005-interfaz-antes-ajuste.png`.
+
+![Interfaz antes del ajuste](capturas/rfc-005-interfaz-antes-ajuste.png)
+
+![Interfaz después del ajuste](capturas/rfc-005-interfaz-despues-ajuste.png)
