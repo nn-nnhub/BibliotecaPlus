@@ -61,4 +61,8 @@ Si el DNI ya existe, no se guarda el usuario.
 
 ![Tabla con duplicado](capturas/rfc-006-tabla-con-duplicado-antes.png)
 
-La captura final de rechazo y la tabla sin duplicado deben tomarse después de reiniciar la aplicación y repetir la prueba con el DNI `70000001`.
+### Mensaje final después de la corrección
+
+![DNI rechazado correctamente](capturas/rfc-006-rechazo-dni-repetido.png)
+
+La prueba se repitió después de reiniciar la aplicación usando el DNI `70000001`, que ya pertenece a Ana Torres. El sistema rechazó el nuevo registro, mostró el mensaje correcto y no agregó al usuario Carlos a la tabla.
