@@ -18,7 +18,13 @@ function Install-PortableZip {
     )
 
     Write-Host "Descargando $ExpectedFolder..."
-    Invoke-WebRequest -Uri $Url -OutFile $ArchivePath -UseBasicParsing
+    if (-not (Get-Command curl.exe -ErrorAction SilentlyContinue)) {
+        throw 'No se encontró curl.exe, necesario para descargar las herramientas portables.'
+    }
+    & curl.exe --fail --location --tlsv1.2 --retry 3 --output $ArchivePath $Url
+    if ($LASTEXITCODE -ne 0) {
+        throw "No se pudo descargar $ExpectedFolder desde $Url"
+    }
     $extractRoot = Join-Path $downloadRoot ([IO.Path]::GetFileNameWithoutExtension($ArchivePath))
     if (Test-Path -LiteralPath $extractRoot) { Remove-Item -LiteralPath $extractRoot -Recurse -Force }
     Expand-Archive -LiteralPath $ArchivePath -DestinationPath $extractRoot -Force
