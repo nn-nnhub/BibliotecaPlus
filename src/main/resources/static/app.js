@@ -7,8 +7,10 @@ async function consultar(url, opciones) {
 }
 
 function mostrarLibros() {
+    const filtro = document.querySelector('#buscarLibro').value.toLowerCase().trim();
+    const librosVisibles = estado.libros.filter(libro => [libro.titulo, libro.autor, libro.isbn].some(valor => valor.toLowerCase().includes(filtro)));
     const cuerpo = document.querySelector('#tablaLibros');
-    cuerpo.innerHTML = estado.libros.map(libro => `<tr><td>${libro.id}</td><td>${libro.titulo}</td><td>${libro.autor}</td><td>${libro.isbn}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
+    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${libro.id}</td><td>${libro.titulo}</td><td>${libro.autor}</td><td>${libro.isbn}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
     document.querySelector('#totalLibros').textContent = estado.libros.length;
     document.querySelector('#librosDisponibles').textContent = estado.libros.filter(libro => libro.disponible).length;
     const selector = document.querySelector('#libroId');
@@ -16,7 +18,9 @@ function mostrarLibros() {
 }
 
 function mostrarUsuarios() {
-    document.querySelector('#tablaUsuarios').innerHTML = estado.usuarios.map(usuario => `<tr><td>${usuario.id}</td><td>${usuario.nombre}</td><td>${usuario.correo}</td></tr>`).join('');
+    const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
+    const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.correo].some(valor => valor.toLowerCase().includes(filtro)));
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${usuario.id}</td><td>${usuario.nombre}</td><td>${usuario.correo}</td></tr>`).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${usuario.id}">${usuario.nombre}</option>`).join('');
 }
@@ -51,6 +55,8 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
 });
 
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
+document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
+document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);
 
 document.querySelector('#formLibro').addEventListener('submit', async event => {
     event.preventDefault();
