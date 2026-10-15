@@ -47,6 +47,7 @@ nn-nnhub
 La solución se implementó de forma portable:
 
 - `Iniciar-BibliotecaPlus.bat` busca Java y Maven dentro de `.tools`.
+- La detección acepta cualquier carpeta local con el patrón `jdk-*` y `apache-maven-*`, por lo que también funciona con versiones como JDK 27 y Maven 3.10.0.
 - `bootstrap-portable.ps1` descarga Java 17 y Maven 3.9.9 si no existen.
 - Los archivos se descomprimen dentro de la carpeta del proyecto.
 - No se modifica el `PATH` de Windows ni se requiere permisos de administrador.
