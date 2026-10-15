@@ -17,6 +17,11 @@ Inicialmente la acción de exportación se mostraba como un enlace de texto. Se 
 
 ![Interfaz inicial de exportación](capturas/rfc-003-interfaz-exportacion-antes.png)
 
+La prueba del resumen confirmó que los indicadores se muestran correctamente. También se identificó que el enlace de descarga aún conservaba apariencia de texto; por ello se reforzó su estilo con un botón visual uniforme.
+
+![Resumen funcionando](capturas/rfc-003-resumen-funcionando.png)
+![Exportación antes del ajuste final](capturas/rfc-003-exportacion-estilo-antes-ajuste.png)
+
 ## Reportes disponibles
 
 - Total de préstamos.
