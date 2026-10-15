@@ -31,7 +31,7 @@ public class PrestamoService {
         return prestamoRepository.findAll();
     }
 
-    public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo) {
+    public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
         Libro libro = libroRepository.findById(libroId)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
         Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -42,7 +42,11 @@ public class PrestamoService {
         }
 
         validarPrestamo(libro, usuario);
-        Prestamo prestamo = new Prestamo(libro.getId(), usuario.getId(), LocalDate.now());
+        if (fechaVencimiento == null) {
+            throw new IllegalArgumentException("La fecha de vencimiento es obligatoria");
+        }
+
+        Prestamo prestamo = new Prestamo(libro.getId(), usuario.getId(), LocalDate.now(), fechaVencimiento);
         libro.setDisponible(false);
         libroRepository.save(libro);
 
@@ -63,7 +67,8 @@ public class PrestamoService {
         long diasPrestamo = ChronoUnit.DAYS.between(prestamo.getFechaPrestamo(), fechaDevolucion);
         prestamo.setFechaDevolucion(fechaDevolucion);
         prestamo.setDevuelto(true);
-        prestamo.setMulta(calcularMulta(tipoPrestamo, diasPrestamo));
+        long diasRetraso = Math.max(0, ChronoUnit.DAYS.between(prestamo.getFechaVencimiento(), fechaDevolucion));
+        prestamo.setMulta(calcularMulta(tipoPrestamo, diasRetraso));
 
         Libro libro = libroRepository.findById(prestamo.getLibroId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
