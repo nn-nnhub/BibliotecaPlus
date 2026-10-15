@@ -1,20 +1,12 @@
 # RFC-001: Refactorización del sistema BibliotecaPlus
 
-## Línea base
-
-La versión inicial funcional se identifica con el commit `58543d5`:
-
-> Se conectaron los formularios de registro con la API mediante el archivo app.js
-
-Esta versión ya contaba con interfaz, formularios, API REST, persistencia H2 y operaciones de libros, usuarios y préstamos.
-
 ## Objetivo
 
-Refactorizar el código inicial aplicando DRY, Responsabilidad Única, Abierto/Cerrado e Inversión de Control, conservando el comportamiento funcional del sistema.
+Después del diagnóstico del software inicial, se solicita refactorizar la arquitectura interna aplicando DRY, Responsabilidad Única, Abierto/Cerrado e Inversión de Control, conservando el comportamiento funcional del sistema.
 
-## Problemas intencionales identificados
+## Diagnóstico del software inicial
 
-| Código | Principio | Problema inicial | Corrección prevista |
+| Código | Principio | Hallazgo del diagnóstico | Corrección prevista |
 |---|---|---|---|
 | DRY-01 | DRY | Validaciones repetidas en servicios | Centralizar validaciones reutilizables |
 | DRY-02 | DRY | Cálculo de multas mediante reglas repetidas | Extraer el cálculo a un componente |
@@ -25,11 +17,11 @@ Refactorizar el código inicial aplicando DRY, Responsabilidad Única, Abierto/C
 | IOC-01 | Inversión de Control | Dependencias creadas directamente en el diseño inicial | Recibir dependencias por constructor |
 | IOC-02 | Inversión de Control | Notificador acoplado al servicio | Inyectar un componente de notificación |
 
-El detalle de control interno se conserva localmente en `control-interno/errores-intencionales.md` y no se sube a GitHub.
+El detalle técnico de revisión se conserva localmente en `control-interno/errores-intencionales.md` y no se sube a GitHub.
 
 ## Plan de corrección
 
-1. Registrar la línea base y los problemas.
+1. Registrar el diagnóstico y los hallazgos.
 2. Extraer la validación y las reglas reutilizables.
 3. Separar notificaciones y responsabilidades del préstamo.
 4. Aplicar estrategias para las tarifas.
