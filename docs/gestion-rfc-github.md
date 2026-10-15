@@ -41,9 +41,9 @@ Si además se detecta un defecto, puede agregarse `Bug`, sin reemplazar las etiq
 
 ## RFC existentes del proyecto
 
-- RFC-001: Refactorización exhaustiva.
-- RFC-002: Validación de ISBN duplicado.
-- RFC-003: Reportes y exportación compatible con Excel.
-- RFC-004: Vencimientos y multas.
-- RFC-005: Información ampliada de usuarios.
-- RFC-006: Validación de DNI duplicado.
+- RFC-001: [Refactorización exhaustiva](https://github.com/nn-nnhub/BibliotecaPlus/issues/1).
+- RFC-002: [Validación de ISBN duplicado](https://github.com/nn-nnhub/BibliotecaPlus/issues/2).
+- RFC-003: [Reportes y exportación compatible con Excel](https://github.com/nn-nnhub/BibliotecaPlus/issues/3).
+- RFC-004: [Vencimientos y multas](https://github.com/nn-nnhub/BibliotecaPlus/issues/4).
+- RFC-005: [Información ampliada de usuarios](https://github.com/nn-nnhub/BibliotecaPlus/issues/5).
+- RFC-006: [Validación de DNI duplicado](https://github.com/nn-nnhub/BibliotecaPlus/issues/6).
