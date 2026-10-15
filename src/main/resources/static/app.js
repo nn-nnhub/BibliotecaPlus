@@ -28,7 +28,7 @@ function mostrarUsuarios() {
 function mostrarPrestamos() {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
     const nombreUsuario = id => estado.usuarios.find(usuario => usuario.id === id)?.nombre ?? `Usuario ${id}`;
-    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${nombreLibro(prestamo.libroId)}</td><td>${nombreUsuario(prestamo.usuarioId)}</td><td>${prestamo.fechaPrestamo}</td><td>${prestamo.devuelto ? 'Devuelto' : 'Activo'}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
+    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${nombreLibro(prestamo.libroId)}</td><td>${nombreUsuario(prestamo.usuarioId)}</td><td>${prestamo.fechaVencimiento}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
     document.querySelector('#totalPrestamos').textContent = estado.prestamos.length;
 }
 
@@ -51,7 +51,8 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
     const usuarioId = document.querySelector('#usuarioId').value;
     const tipo = document.querySelector('#tipoPrestamo').value;
     const mensaje = document.querySelector('#prestamoMensaje');
-    try { await consultar(`/api/prestamos?libroId=${libroId}&usuarioId=${usuarioId}&tipoPrestamo=${tipo}`, { method: 'POST' }); mensaje.textContent = 'Préstamo registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos(); } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+    const fechaVencimiento = document.querySelector('#fechaVencimiento').value;
+    try { await consultar(`/api/prestamos?libroId=${libroId}&usuarioId=${usuarioId}&tipoPrestamo=${tipo}&fechaVencimiento=${fechaVencimiento}`, { method: 'POST' }); mensaje.textContent = 'Préstamo registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos(); } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
 });
 
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
@@ -86,3 +87,7 @@ document.querySelector('#formUsuario').addEventListener('submit', async event =>
 });
 
 cargarDatos();
+
+const fechaInicial = new Date();
+fechaInicial.setDate(fechaInicial.getDate() + 14);
+document.querySelector('#fechaVencimiento').value = fechaInicial.toISOString().slice(0, 10);
