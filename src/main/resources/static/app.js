@@ -59,6 +59,15 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
 });
 
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
+document.querySelector('#btnResumen').addEventListener('click', async () => {
+    const mensaje = document.querySelector('#reporteResumen');
+    try {
+        const resumen = await consultar('/api/reportes/resumen');
+        const masPrestado = resumen.librosMasPrestados[0];
+        mensaje.textContent = `Préstamos: ${resumen.totalPrestamos} | Activos: ${resumen.prestamosActivos} | Devueltos: ${resumen.prestamosDevueltos} | Multas: S/ ${Number(resumen.totalMultas).toFixed(2)}${masPrestado ? ` | Más prestado: ${masPrestado.libro} (${masPrestado.prestamos})` : ''}`;
+        mensaje.className = 'message success';
+    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+});
 document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
 document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);
 

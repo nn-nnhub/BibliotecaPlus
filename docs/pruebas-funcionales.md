@@ -36,6 +36,8 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-19 | Buscar usuario ampliado | Buscar por apellido o DNI | La tabla muestra el usuario coincidente. |
 | PF-20 | Rechazar DNI duplicado | Intentar registrar un usuario con un DNI existente | La API rechaza el registro y muestra un mensaje. |
 | PF-21 | Rechazar ISBN duplicado | Intentar registrar un libro con un ISBN existente | La API rechaza el registro y muestra un mensaje. |
+| PF-22 | Consultar resumen de reportes | Presionar Ver resumen en Historial | Se muestran totales y el libro más prestado. |
+| PF-23 | Exportar reporte | Presionar Exportar para Excel | Se descarga el archivo reporte-prestamos.csv con el detalle. |
 
 ## Evidencia de ejecución
 

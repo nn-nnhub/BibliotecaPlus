@@ -32,3 +32,10 @@ body { background:var(--paper); color:#533b2a; } .topbar { min-height:94px; disp
 body.dark-mode { --paper:#29241f; --paper-deep:#332c25; background:#29241f; color:#f7eee3; } body.dark-mode .topbar,body.dark-mode .panel,body.dark-mode .summary-card,body.dark-mode .module-card,body.dark-mode .accessibility-panel,body.dark-mode .session-toast { color:#f7eee3; background:#3a3028; border-color:#55463a; } body.dark-mode .main-nav,body.dark-mode .toolbar { background:#47392d; } body.dark-mode .main-nav a,body.dark-mode .brand,body.dark-mode h2,body.dark-mode .summary-card strong { color:#f4d6ae; } body.dark-mode .welcome h1 { color:#e6b37f; } body.dark-mode input,body.dark-mode select { color:#fff; background:#2b2520; border-color:#665445; }
 body.large-text { font-size:18px; } body.dyslexia { letter-spacing:.035em; line-height:1.75; } body.high-contrast { filter:contrast(1.18); } .reading-guide { display:none; position:fixed; left:0; right:0; top:50%; height:54px; pointer-events:none; background:#e9b75b22; border-top:2px solid #d18a2388; border-bottom:2px solid #d18a2388; box-shadow:0 -180px 0 180px #3f2b1a12,0 180px 0 180px #3f2b1a12; z-index:9; } body.reading-mask .reading-guide { display:block; }
 @media (max-width:900px) { .main-nav { gap:10px; padding:12px; } .main-nav a { font-size:.8rem; } .module-grid { grid-template-columns:repeat(2,1fr); } } @media (max-width:650px) { .topbar,.welcome { align-items:flex-start; flex-direction:column; } .main-nav { width:100%; justify-content:space-between; } .toolbar { position:absolute; top:18px; right:18px; } .brand { min-width:auto; } .module-grid { grid-template-columns:1fr 1fr; } .accessibility-panel { right:12px; width:calc(100% - 24px); } }
+.report-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
