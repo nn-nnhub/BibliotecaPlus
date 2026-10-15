@@ -51,6 +51,7 @@ La solución se implementó de forma portable:
 - Los archivos se descomprimen dentro de la carpeta del proyecto.
 - No se modifica el `PATH` de Windows ni se requiere permisos de administrador.
 - `.tools/` está excluida de Git porque contiene herramientas descargadas localmente.
+- El instalador fuerza TLS 1.2 para compatibilidad con PowerShell de Windows al descargar desde HTTPS.
 
 La primera ejecución requiere conexión a Internet. Las siguientes ejecuciones reutilizan las herramientas locales.
 

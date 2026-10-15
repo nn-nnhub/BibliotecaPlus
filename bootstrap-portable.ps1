@@ -1,4 +1,5 @@
 $ErrorActionPreference = 'Stop'
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $toolsRoot = Join-Path $projectRoot '.tools'
@@ -21,10 +22,10 @@ function Install-PortableZip {
     $extractRoot = Join-Path $downloadRoot ([IO.Path]::GetFileNameWithoutExtension($ArchivePath))
     if (Test-Path -LiteralPath $extractRoot) { Remove-Item -LiteralPath $extractRoot -Recurse -Force }
     Expand-Archive -LiteralPath $ArchivePath -DestinationPath $extractRoot -Force
-    $source = Join-Path $extractRoot $ExpectedFolder
-    if (-not (Test-Path -LiteralPath $source)) { throw "No se encontró la carpeta esperada $ExpectedFolder" }
+    $source = Get-ChildItem -LiteralPath $extractRoot -Directory | Where-Object { $_.Name -like $ExpectedFolder } | Select-Object -First 1
+    if ($null -eq $source) { throw "No se encontró la carpeta esperada $ExpectedFolder" }
     if (Test-Path -LiteralPath $Destination) { Remove-Item -LiteralPath $Destination -Recurse -Force }
-    Move-Item -LiteralPath $source -Destination $Destination
+    Move-Item -LiteralPath $source.FullName -Destination $Destination
     Remove-Item -LiteralPath $ArchivePath -Force
     Remove-Item -LiteralPath $extractRoot -Recurse -Force
 }
