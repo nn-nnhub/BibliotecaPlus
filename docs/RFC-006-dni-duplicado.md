@@ -12,7 +12,20 @@ El DNI identifica de manera única a una persona. Permitir duplicados ocasionar�
 
 - `UsuarioRepository.java`: agregó consultas `existsByDni` y `existsByDniAndIdNot`.
 - `UsuarioService.java`: valida el DNI antes de guardar o actualizar.
+- `Usuario.java`: agregó una restricción única y no nula sobre el campo `dni`.
+- `UsuarioController.java`: convierte los errores de validación y de restricción de base de datos en respuestas HTTP 400 controladas.
 - `app.js`: muestra el mensaje enviado por la API cuando el registro es rechazado.
+
+## Corrección detectada durante la prueba
+
+En la primera ejecución, el DNI repetido llegó a generar el mensaje genérico `La operación falló (500)`. Esto evidenció que la excepción del servidor no estaba siendo traducida a un mensaje funcional para la persona usuaria.
+
+Se corrigió separando responsabilidades:
+
+1. La entidad `Usuario` mantiene la regla de unicidad en la base de datos.
+2. `UsuarioService` aplica la validación de negocio antes de guardar.
+3. `UsuarioController` transforma las excepciones en una respuesta `400` con un mensaje comprensible.
+4. `app.js` presenta ese mensaje en el formulario sin mezclar lógica de persistencia con lógica visual.
 
 ## Regla
 
@@ -30,5 +43,22 @@ Si el DNI ya existe, no se guarda el usuario.
 ## Capturas requeridas
 
 - `rfc-006-formulario-dni-repetido.png`: formulario antes de guardar el DNI repetido.
-- `rfc-006-rechazo-dni-repetido.png`: mensaje de rechazo mostrado por la interfaz.
+- `rfc-006-error-500-antes-de-correccion.png`: evidencia del error inicial detectado.
+- `rfc-006-rechazo-dni-repetido.png`: mensaje de rechazo mostrado por la interfaz después de la corrección.
 - `rfc-006-tabla-sin-duplicado.png`: tabla mostrando que no se creó el segundo usuario.
+
+## Evidencias recibidas
+
+### Formulario con DNI repetido
+
+![Formulario con DNI repetido](capturas/rfc-006-formulario-dni-repetido.png)
+
+### Resultado inicial observado
+
+![Error 500 inicial](capturas/rfc-006-error-500-antes-de-correccion.png)
+
+### Registro duplicado observado antes de reforzar la validación
+
+![Tabla con duplicado](capturas/rfc-006-tabla-con-duplicado-antes.png)
+
+La captura final de rechazo y la tabla sin duplicado deben tomarse después de reiniciar la aplicación y repetir la prueba con el DNI `70000001`.
