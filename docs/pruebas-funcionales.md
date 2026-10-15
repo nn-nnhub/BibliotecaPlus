@@ -28,6 +28,8 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-11 | Actualizar datos | Presionar Actualizar datos | Las tablas y contadores se sincronizan con la API. |
 | PF-12 | Buscar libros | Escribir parte del título, autor o ISBN | La tabla muestra solo los libros coincidentes. |
 | PF-13 | Buscar usuarios | Escribir parte del nombre o correo | La tabla muestra solo los usuarios coincidentes. |
+| PF-14 | Desplazar libros | Cargar muchos registros y desplazar la tabla de libros | La tabla se desplaza sin deformar el dashboard. |
+| PF-15 | Desplazar usuarios | Cargar muchos registros y desplazar la tabla de usuarios | La tabla se desplaza dentro de su propio contenedor. |
 
 ## Evidencia de ejecución
 
