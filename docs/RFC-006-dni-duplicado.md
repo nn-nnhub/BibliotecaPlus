@@ -40,12 +40,12 @@ Si el DNI ya existe, no se guarda el usuario.
 3. Verificar el mensaje `El DNI ya está registrado en otro usuario`.
 4. Confirmar que la tabla conserva un solo registro con ese DNI.
 
-## Capturas requeridas
+## Evidencias del proceso
 
-- `rfc-006-formulario-dni-repetido.png`: formulario antes de guardar el DNI repetido.
+- `rfc-006-formulario-dni-repetido.png`: formulario usado para reproducir la situación.
 - `rfc-006-error-500-antes-de-correccion.png`: evidencia del error inicial detectado.
-- `rfc-006-rechazo-dni-repetido.png`: mensaje de rechazo mostrado por la interfaz después de la corrección.
-- `rfc-006-tabla-sin-duplicado.png`: tabla mostrando que no se creó el segundo usuario.
+- `rfc-006-tabla-con-duplicado-antes.png`: evidencia del comportamiento incorrecto inicial.
+- `rfc-006-rechazo-dni-repetido.png`: resultado final después de aplicar la corrección.
 
 ## Evidencias recibidas
 
