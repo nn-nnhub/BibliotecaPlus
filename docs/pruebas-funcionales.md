@@ -32,6 +32,8 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-15 | Desplazar usuarios | Cargar muchos registros y desplazar la tabla de usuarios | La tabla se desplaza dentro de su propio contenedor. |
 | PF-16 | Registrar vencimiento | Seleccionar una fecha de vencimiento y registrar un préstamo | El historial muestra la fecha límite. |
 | PF-17 | Calcular multa | Devolver un préstamo con fecha vencida | Se muestran los días de retraso implícitos y la multa correcta. |
+| PF-18 | Registrar usuario completo | Completar nombres, apellidos, DNI, correo y teléfono | El usuario aparece con todos sus datos. |
+| PF-19 | Buscar usuario ampliado | Buscar por apellido o DNI | La tabla muestra el usuario coincidente. |
 
 ## Evidencia de ejecución
 
