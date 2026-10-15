@@ -2,8 +2,34 @@
 title BibliotecaPlus
 cd /d "%~dp0"
 
-echo Iniciando BibliotecaPlus...
-start "BibliotecaPlus - Servidor" cmd /k "C:\Users\USER\Tools\apache-maven-3.9.9\bin\mvn.cmd spring-boot:run"
+set "PROJECT_DIR=%~dp0"
+set "JAVA_HOME=%PROJECT_DIR%.tools\jdk-17"
+set "MAVEN_HOME=%PROJECT_DIR%.tools\apache-maven-3.9.9"
+set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
+set "MAVEN_CMD=%MAVEN_HOME%\bin\mvn.cmd"
+
+if not exist "%JAVA_EXE%" (
+    echo Java portable no encontrado. Preparando herramientas locales...
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%PROJECT_DIR%bootstrap-portable.ps1"
+    if errorlevel 1 (
+        echo No se pudo preparar Java portable.
+        pause
+        exit /b 1
+    )
+)
+
+if not exist "%MAVEN_CMD%" (
+    echo Maven portable no encontrado. Preparando herramientas locales...
+    powershell -NoProfile -ExecutionPolicy Bypass -File "%PROJECT_DIR%bootstrap-portable.ps1"
+    if errorlevel 1 (
+        echo No se pudo preparar Maven portable.
+        pause
+        exit /b 1
+    )
+)
+
+echo Iniciando BibliotecaPlus con Java y Maven portables...
+start "BibliotecaPlus - Servidor" cmd /k "set JAVA_HOME=%JAVA_HOME%&& set MAVEN_HOME=%MAVEN_HOME%&& \"%MAVEN_CMD%\" spring-boot:run"
 
 echo Esperando a que el servidor este disponible...
 timeout /t 8 /nobreak >nul

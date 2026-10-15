@@ -42,4 +42,20 @@ nn-nnhub
 
 ## Consideración técnica
 
-La instalación automática no se incorporó todavía al `.bat` porque no debe instalar software sin informar al usuario ni asumir que todas las computadoras permiten `winget`. Primero debe definirse si la entrega permitirá conexión a Internet y permisos de administrador.
+## Implementación aprobada
+
+La solución se implementó de forma portable:
+
+- `Iniciar-BibliotecaPlus.bat` busca Java y Maven dentro de `.tools`.
+- `bootstrap-portable.ps1` descarga Java 17 y Maven 3.9.9 si no existen.
+- Los archivos se descomprimen dentro de la carpeta del proyecto.
+- No se modifica el `PATH` de Windows ni se requiere permisos de administrador.
+- `.tools/` está excluida de Git porque contiene herramientas descargadas localmente.
+
+La primera ejecución requiere conexión a Internet. Las siguientes ejecuciones reutilizan las herramientas locales.
+
+## Archivos implementados
+
+- `Iniciar-BibliotecaPlus.bat`
+- `bootstrap-portable.ps1`
+- `.gitignore`
