@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BibliotecaPlus</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="hero">
+        <div><p class="eyebrow">Gestión de biblioteca</p><h1>BibliotecaPlus</h1><p>Administra libros, usuarios y préstamos desde un solo lugar.</p></div>
+        <button id="btnActualizar" class="secondary-button">Actualizar datos</button>
+    </header>
+    <main class="container">
+        <section class="summary-grid">
+            <article class="summary-card"><span>Libros</span><strong id="totalLibros">0</strong></article>
+            <article class="summary-card"><span>Disponibles</span><strong id="librosDisponibles">0</strong></article>
+            <article class="summary-card"><span>Usuarios</span><strong id="totalUsuarios">0</strong></article>
+            <article class="summary-card"><span>Préstamos</span><strong id="totalPrestamos">0</strong></article>
+        </section>
+        <section class="panel"><div class="section-heading"><div><p class="eyebrow">Catálogo</p><h2>Libros registrados</h2></div></div><div id="librosEstado" class="message">Cargando libros...</div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Título</th><th>Autor</th><th>ISBN</th><th>Estado</th></tr></thead><tbody id="tablaLibros"></tbody></table></div></section>
+        <section class="two-columns">
+            <article class="panel"><div class="section-heading"><div><p class="eyebrow">Personas</p><h2>Usuarios registrados</h2></div></div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr></thead><tbody id="tablaUsuarios"></tbody></table></div></article>
+            <article class="panel"><div class="section-heading"><div><p class="eyebrow">Operación</p><h2>Registrar préstamo</h2></div></div><form id="formPrestamo"><label>Libro<select id="libroId" required></select></label><label>Usuario<select id="usuarioId" required></select></label><label>Tipo de préstamo<select id="tipoPrestamo"><option value="DOMICILIO">Domicilio</option><option value="ESPECIAL">Especial</option></select></label><button class="primary-button" type="submit">Registrar préstamo</button></form><p id="prestamoMensaje" class="message"></p></article>
+        </section>
+        <section class="panel"><div class="section-heading"><div><p class="eyebrow">Historial</p><h2>Préstamos</h2></div></div><div class="table-wrapper"><table><thead><tr><th>ID</th><th>Libro</th><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="tablaPrestamos"></tbody></table></div></section>
+    </main>
+    <footer>BibliotecaPlus · Sistema académico de evolución y configuración de software</footer>
+    <script src="/app.js"></script>
+</body>
+</html>
