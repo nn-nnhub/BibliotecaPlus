@@ -19,15 +19,15 @@ function mostrarLibros() {
 
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
-    const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.correo].some(valor => valor.toLowerCase().includes(filtro)));
-    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${usuario.id}</td><td>${usuario.nombre}</td><td>${usuario.correo}</td></tr>`).join('');
+    const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${usuario.id}</td><td>${usuario.nombre}</td><td>${usuario.apellidos ?? '-'}</td><td>${usuario.dni ?? '-'}</td><td>${usuario.correo}</td><td>${usuario.telefono ?? '-'}</td></tr>`).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${usuario.id}">${usuario.nombre}</option>`).join('');
 }
 
 function mostrarPrestamos() {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
-    const nombreUsuario = id => estado.usuarios.find(usuario => usuario.id === id)?.nombre ?? `Usuario ${id}`;
+    const nombreUsuario = id => { const usuario = estado.usuarios.find(item => item.id === id); return usuario ? `${usuario.nombre} ${usuario.apellidos ?? ''}`.trim() : `Usuario ${id}`; };
     document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${nombreLibro(prestamo.libroId)}</td><td>${nombreUsuario(prestamo.usuarioId)}</td><td>${prestamo.fechaVencimiento}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
     document.querySelector('#totalPrestamos').textContent = estado.prestamos.length;
 }
@@ -78,7 +78,10 @@ document.querySelector('#formUsuario').addEventListener('submit', async event =>
     const mensaje = document.querySelector('#usuarioMensaje');
     const usuario = {
         nombre: document.querySelector('#nombreUsuario').value,
-        correo: document.querySelector('#correoUsuario').value
+        apellidos: document.querySelector('#apellidosUsuario').value,
+        dni: document.querySelector('#dniUsuario').value,
+        correo: document.querySelector('#correoUsuario').value,
+        telefono: document.querySelector('#telefonoUsuario').value
     };
     try {
         await consultar('/api/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(usuario) });
