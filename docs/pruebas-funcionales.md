@@ -34,6 +34,7 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-17 | Calcular multa | Devolver un préstamo con fecha vencida | Se muestran los días de retraso implícitos y la multa correcta. |
 | PF-18 | Registrar usuario completo | Completar nombres, apellidos, DNI, correo y teléfono | El usuario aparece con todos sus datos. |
 | PF-19 | Buscar usuario ampliado | Buscar por apellido o DNI | La tabla muestra el usuario coincidente. |
+| PF-20 | Rechazar DNI duplicado | Intentar registrar un usuario con un DNI existente | La API rechaza el registro y muestra un mensaje. |
 
 ## Evidencia de ejecución
 
