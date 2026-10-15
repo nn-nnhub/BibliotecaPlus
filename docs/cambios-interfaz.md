@@ -57,6 +57,8 @@ La prueba completa con 100 libros reales y 100 usuarios ficticios está document
 
 El cambio de vencimientos y multas está documentado en [RFC-004-vencimientos-y-multas.md](RFC-004-vencimientos-y-multas.md).
 
+La ampliación de datos de usuario está documentada en [RFC-005-informacion-usuario.md](RFC-005-informacion-usuario.md).
+
 ## Evidencia visual
 
 La captura siguiente corresponde al estado anterior del historial:
