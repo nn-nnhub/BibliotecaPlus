@@ -45,6 +45,8 @@ La interfaz también expone las tres alternativas con su tarifa diaria: `Domicil
 
 ![Selector de tarifas en la interfaz](capturas/rfc-001-ocp-tarifa-general-interfaz.png)
 
+![Tarifas con costos visibles](capturas/rfc-001-ocp-tarifas-con-costos.png)
+
 ## Resultado
 
 - Las estrategias existentes no necesitan modificarse para agregar otra tarifa.
