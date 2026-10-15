@@ -31,6 +31,7 @@ La revisión del código, los servicios, los controladores y el flujo de présta
 - DRY-02: corregido mediante `CalculadorMulta`, separado de `PrestamoService` y validado con pruebas unitarias.
 - SRP-01/SRP-02: corregidos mediante `ValidadorPrestamo` y `NotificadorPrestamo`.
 - OCP-01/OCP-02: corregidos mediante la interfaz `TarifaMulta` y estrategias de tarifa independientes.
+- IoC-01/IoC-02: corregidos mediante la interfaz `Notificador` y la inyección de dependencias por constructor.
 
 ## Alcance de la refactorización
 
