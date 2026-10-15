@@ -50,6 +50,14 @@ mvn test
 
 El resultado de cada ejecución queda registrado por Maven en `target/surefire-reports/`, sin necesidad de capturas de pantalla.
 
+## Verificación previa a la refactorización
+
+Antes de aplicar las correcciones del RFC-001 se realizó una revisión de compilación, pruebas automatizadas, servicios, repositorios, controladores y flujo de préstamos. La revisión confirmó que los hallazgos estructurales se agrupan en los ocho puntos de la tabla anterior y que no se identificó un noveno defecto funcional independiente.
+
+Las observaciones de notificación, reglas condicionales, validaciones agrupadas y dependencias forman parte de los hallazgos SRP, OCP, DRY e IoC ya definidos. El resto de la solución conserva separación por capas, inyección por constructor, repositorios Spring Data, respuestas HTTP controladas y pruebas automatizadas.
+
+Resultado de la verificación automática: `BUILD SUCCESS`.
+
 ## Evidencia de Git
 
 Cada corrección se registrará en un commit independiente, con una descripción de qué archivo se modificó, qué problema se corrigió y qué principio se aplicó.
