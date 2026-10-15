@@ -16,6 +16,20 @@ El ISBN identifica de forma única una edición de un libro. Permitir duplicados
 - `LibroController.java`: convierte los errores de validación en respuestas HTTP 400.
 - `app.js`: muestra el mensaje enviado por la API en el formulario.
 
+## Evidencias del proceso
+
+### Catálogo con el tercer libro registrado
+
+![Catálogo con tercer libro](capturas/rfc-002-tabla-tercer-libro.png)
+
+La tabla muestra el tercer libro registrado correctamente con el ISBN `9780134757599`.
+
+### Rechazo del ISBN repetido
+
+![Rechazo del ISBN duplicado](capturas/rfc-002-rechazo-isbn-duplicado.png)
+
+Después se intentó registrar nuevamente el mismo libro y el sistema rechazó la operación con el mensaje `El ISBN ya está registrado en otro libro`. El catálogo conservó un solo registro para ese ISBN.
+
 ## Regla de negocio
 
 ```text
