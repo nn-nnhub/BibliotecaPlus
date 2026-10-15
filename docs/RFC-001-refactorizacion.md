@@ -1,12 +1,20 @@
-# RFC-001: Refactorización del sistema BibliotecaPlus
+# RFC-001: Refactorización exhaustiva del sistema BibliotecaPlus
+
+## Justificación del número RFC-001
+
+Este RFC se identifica como RFC-001 porque representa la refactorización exhaustiva de la solución completa. No corresponde necesariamente al primer cambio implementado en el proyecto: se planteó después de completar una versión funcional y de atender los RFC-002 al RFC-006.
+
+Los RFC-002 al RFC-006 se desarrollaron según la importancia y las necesidades detectadas durante la evolución del sistema, no siguiendo un orden estrictamente numérico. Una vez estabilizada la funcionalidad, se realiza este análisis transversal para mejorar la estructura interna sin cambiar el comportamiento esperado.
 
 ## Objetivo
 
 Después del diagnóstico del software inicial, se solicita refactorizar la arquitectura interna aplicando DRY, Responsabilidad Única, Abierto/Cerrado e Inversión de Control, conservando el comportamiento funcional del sistema.
 
-## Diagnóstico del software inicial
+## Análisis profundo del sistema
 
-| Código | Principio | Hallazgo del diagnóstico | Corrección prevista |
+La revisión del código, los servicios, los controladores y el flujo de préstamos permitió identificar ocho hallazgos estructurales:
+
+| Código | Principio | Hallazgo del análisis | Corrección prevista |
 |---|---|---|---|
 | DRY-01 | DRY | Validaciones repetidas en servicios | Centralizar validaciones reutilizables |
 | DRY-02 | DRY | Cálculo de multas mediante reglas repetidas | Extraer el cálculo a un componente |
@@ -17,6 +25,10 @@ Después del diagnóstico del software inicial, se solicita refactorizar la arqu
 | IOC-01 | Inversión de Control | Dependencias creadas directamente en el diseño inicial | Recibir dependencias por constructor |
 | IOC-02 | Inversión de Control | Notificador acoplado al servicio | Inyectar un componente de notificación |
 
+## Alcance de la refactorización
+
+El análisis considera duplicación de reglas, concentración de responsabilidades, dependencia de condicionales para extender comportamientos y acoplamiento entre componentes. Estos hallazgos afectan principalmente el mantenimiento, la posibilidad de agregar nuevas reglas y la facilidad para probar cada parte del sistema.
+
 ## Plan de corrección
 
 1. Registrar el diagnóstico y los hallazgos.
@@ -25,6 +37,18 @@ Después del diagnóstico del software inicial, se solicita refactorizar la arqu
 4. Aplicar estrategias para las tarifas.
 5. Revisar y demostrar la inyección de dependencias.
 6. Ejecutar pruebas y documentar el comportamiento antes/después.
+
+## Validación automatizada
+
+El proyecto utiliza JUnit 5 y Mockito mediante la dependencia `spring-boot-starter-test`. Las pruebas de caja cerrada verifican el comportamiento observable de los servicios sin depender de la implementación interna.
+
+Se ejecutan automáticamente con:
+
+```powershell
+mvn test
+```
+
+El resultado de cada ejecución queda registrado por Maven en `target/surefire-reports/`, sin necesidad de capturas de pantalla.
 
 ## Evidencia de Git
 
