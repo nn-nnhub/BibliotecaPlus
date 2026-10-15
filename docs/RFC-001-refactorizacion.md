@@ -69,3 +69,33 @@ Resultado de la verificación automática: `BUILD SUCCESS`.
 ## Evidencia de Git
 
 Cada corrección se registrará en un commit independiente, con una descripción de qué archivo se modificó, qué problema se corrigió y qué principio se aplicó.
+
+## Gestión en GitHub
+
+La solicitud y aprobación de este cambio se administra mediante la plantilla obligatoria de RFC ubicada en `.github/ISSUE_TEMPLATE/rfc.md`. El flujo de etiquetas y aprobación está documentado en `docs/gestion-rfc-github.md`.
+
+## Diagrama de arquitectura antes y después
+
+### Antes del análisis
+
+```mermaid
+flowchart LR
+    UI[Interfaz] --> API[Controladores]
+    API --> PS[PrestamoService con validación, multas y notificación]
+    PS --> DB[(Repositorios y H2)]
+```
+
+### Después de la refactorización
+
+```mermaid
+flowchart LR
+    UI[Interfaz] --> API[Controladores]
+    API --> PS[PrestamoService coordinador]
+    PS --> VP[ValidadorPrestamo]
+    PS --> CM[CalculadorMulta]
+    CM --> TM[TarifaMulta y estrategias]
+    PS --> NI[Notificador]
+    PS --> DB[(Repositorios y H2)]
+```
+
+La segunda estructura distribuye responsabilidades, permite extender tarifas y mantiene las dependencias bajo control de Spring.
