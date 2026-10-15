@@ -26,6 +26,8 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-09 | Accesibilidad | Abrir el menú y activar Visión baja, Dislexia, Contraste o Máscara de lectura | Se aplica el ajuste visual seleccionado. |
 | PF-10 | Restablecer accesibilidad | Presionar Restablecer | Se eliminan los ajustes visuales y se vuelve al estado normal. |
 | PF-11 | Actualizar datos | Presionar Actualizar datos | Las tablas y contadores se sincronizan con la API. |
+| PF-12 | Buscar libros | Escribir parte del título, autor o ISBN | La tabla muestra solo los libros coincidentes. |
+| PF-13 | Buscar usuarios | Escribir parte del nombre o correo | La tabla muestra solo los usuarios coincidentes. |
 
 ## Evidencia de ejecución
 
