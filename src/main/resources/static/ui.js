@@ -1,5 +1,6 @@
 const panelAccesibilidad = document.querySelector('#panelAccesibilidad');
 const sessionToast = document.querySelector('#sessionToast');
+const readingGuide = document.querySelector('#readingGuide');
 
 document.querySelector('#btnAccesibilidad').addEventListener('click', () => {
     panelAccesibilidad.classList.toggle('open');
@@ -25,6 +26,10 @@ document.querySelector('#btnTema').addEventListener('click', () => {
 
 document.querySelectorAll('[data-a11y]').forEach(button => {
     button.addEventListener('click', () => document.body.classList.toggle(button.dataset.a11y === 'large-text' ? 'large-text' : button.dataset.a11y === 'dyslexia' ? 'dyslexia' : button.dataset.a11y === 'contrast' ? 'high-contrast' : 'reading-mask'));
+});
+
+document.addEventListener('mousemove', event => {
+    if (document.body.classList.contains('reading-mask')) readingGuide.style.top = `${Math.max(0, event.clientY - 27)}px`;
 });
 
 document.querySelector('#btnRestablecer').addEventListener('click', () => {
