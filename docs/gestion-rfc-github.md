@@ -6,7 +6,7 @@ El repositorio utiliza GitHub Issues para registrar, revisar y aprobar solicitud
 
 ## Labels del repositorio
 
-Crear las siguientes etiquetas en GitHub:
+Las siguientes etiquetas ya fueron configuradas en GitHub:
 
 | Label | Uso |
 |---|---|
