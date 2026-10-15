@@ -25,16 +25,29 @@ public class LibroService {
     }
 
     public Libro guardar(Libro libro) {
+        validarIsbnDisponible(libro.getIsbn());
         return libroRepository.save(libro);
     }
 
     public Libro actualizar(Long id, Libro datosLibro) {
         Libro libro = buscarPorId(id);
+        if (libroRepository.existsByIsbnAndIdNot(datosLibro.getIsbn(), id)) {
+            throw new IllegalArgumentException("El ISBN ya está registrado en otro libro");
+        }
         libro.setTitulo(datosLibro.getTitulo());
         libro.setAutor(datosLibro.getAutor());
         libro.setIsbn(datosLibro.getIsbn());
         libro.setDisponible(datosLibro.isDisponible());
         return libroRepository.save(libro);
+    }
+
+    private void validarIsbnDisponible(String isbn) {
+        if (isbn == null || isbn.isBlank()) {
+            throw new IllegalArgumentException("El ISBN es obligatorio");
+        }
+        if (libroRepository.existsByIsbn(isbn)) {
+            throw new IllegalArgumentException("El ISBN ya está registrado en otro libro");
+        }
     }
 
     public void eliminar(Long id) {

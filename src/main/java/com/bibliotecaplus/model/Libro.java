@@ -1,6 +1,7 @@
 package com.bibliotecaplus.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +14,7 @@ public class Libro {
     private Long id;
     private String titulo;
     private String autor;
+    @Column(nullable = false, unique = true)
     private String isbn;
     private boolean disponible = true;
 
