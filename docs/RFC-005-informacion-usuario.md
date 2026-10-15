@@ -49,3 +49,7 @@ La captura anterior muestra que el formulario solo solicitaba nombre y correo.
 ![Formulario de usuario después del RFC-005](capturas/rfc-005-formulario-despues.png)
 
 La captura posterior muestra los nuevos campos de nombres, apellidos, DNI, correo y teléfono.
+
+## Ajuste visual posterior
+
+Después de ampliar la tabla de usuarios, la distribución en dos columnas comprimía el correo electrónico y el teléfono. Se corrigió reorganizando Usuarios y Préstamos en filas independientes dentro del dashboard. La captura del problema se conserva en `capturas/rfc-005-interfaz-antes-ajuste.png`.
