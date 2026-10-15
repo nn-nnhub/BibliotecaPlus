@@ -76,3 +76,20 @@ rfc-004-prestamo-activo.png
 rfc-004-devolucion.png
 rfc-004-multa-calculada.png
 ```
+
+## Evidencias capturadas
+
+1. [Formulario de préstamo](capturas/rfc-004-formulario.png): muestra el formulario y la fecha de vencimiento.
+2. [Préstamo activo](capturas/rfc-004-prestamo-activo.png): confirma el registro y muestra la multa inicial en `S/ 0.00`.
+3. [Pantalla de devolución](capturas/rfc-004-devolucion.png): muestra el historial antes de completar la devolución.
+4. [Multa calculada](capturas/rfc-004-multa-calculada.png): muestra el préstamo devuelto y la multa de `S/ 5.00`.
+
+## Explicación de la multa de Ana Torres
+
+El préstamo de Ana Torres se utilizó como caso de prueba vencido. Se registró con fecha de vencimiento `2026-10-09` y se devolvió el `2026-10-14`. Como el tipo de préstamo fue `DOMICILIO`, la tarifa aplicada fue de `S/ 1.00` por día:
+
+```text
+5 días de retraso × S/ 1.00 = S/ 5.00
+```
+
+La multa no fue ingresada manualmente; fue calculada por `PrestamoService.java` al procesar la devolución.
