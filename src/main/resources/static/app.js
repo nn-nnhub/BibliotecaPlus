@@ -22,7 +22,9 @@ function mostrarUsuarios() {
 }
 
 function mostrarPrestamos() {
-    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${prestamo.libroId}</td><td>${prestamo.usuarioId}</td><td>${prestamo.fechaPrestamo}</td><td>${prestamo.devuelto ? 'Devuelto' : 'Activo'}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
+    const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
+    const nombreUsuario = id => estado.usuarios.find(usuario => usuario.id === id)?.nombre ?? `Usuario ${id}`;
+    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${nombreLibro(prestamo.libroId)}</td><td>${nombreUsuario(prestamo.usuarioId)}</td><td>${prestamo.fechaPrestamo}</td><td>${prestamo.devuelto ? 'Devuelto' : 'Activo'}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
     document.querySelector('#totalPrestamos').textContent = estado.prestamos.length;
 }
 
