@@ -51,7 +51,7 @@ La solución se implementó de forma portable:
 - Los archivos se descomprimen dentro de la carpeta del proyecto.
 - No se modifica el `PATH` de Windows ni se requiere permisos de administrador.
 - `.tools/` está excluida de Git porque contiene herramientas descargadas localmente.
-- El instalador utiliza `curl.exe` con TLS 1.2 para descargar desde HTTPS y evita depender de `Invoke-WebRequest`.
+- El instalador utiliza `curl.exe` con TLS 1.2 y `--ssl-no-revoke` para evitar fallos de Schannel al consultar la revocación local de certificados; la conexión HTTPS continúa validando el certificado del servidor.
 
 La primera ejecución requiere conexión a Internet. Las siguientes ejecuciones reutilizan las herramientas locales.
 

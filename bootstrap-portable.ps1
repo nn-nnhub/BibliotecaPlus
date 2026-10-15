@@ -21,7 +21,7 @@ function Install-PortableZip {
     if (-not (Get-Command curl.exe -ErrorAction SilentlyContinue)) {
         throw 'No se encontró curl.exe, necesario para descargar las herramientas portables.'
     }
-    & curl.exe --fail --location --tlsv1.2 --retry 3 --output $ArchivePath $Url
+    & curl.exe --fail --location --tlsv1.2 --ssl-no-revoke --retry 3 --output $ArchivePath $Url
     if ($LASTEXITCODE -ne 0) {
         throw "No se pudo descargar $ExpectedFolder desde $Url"
     }
