@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/prestamos")
@@ -33,8 +34,9 @@ public class PrestamoController {
     @ResponseStatus(HttpStatus.CREATED)
     public Prestamo registrar(@RequestParam Long libroId,
                               @RequestParam Long usuarioId,
-                              @RequestParam(defaultValue = "DOMICILIO") String tipoPrestamo) {
-        return prestamoService.registrar(libroId, usuarioId, tipoPrestamo);
+                              @RequestParam(defaultValue = "DOMICILIO") String tipoPrestamo,
+                              @RequestParam LocalDate fechaVencimiento) {
+        return prestamoService.registrar(libroId, usuarioId, tipoPrestamo, fechaVencimiento);
     }
 
     @PutMapping("/{id}/devolver")
