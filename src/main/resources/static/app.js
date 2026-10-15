@@ -49,4 +49,32 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
 });
 
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
+
+document.querySelector('#formLibro').addEventListener('submit', async event => {
+    event.preventDefault();
+    const mensaje = document.querySelector('#libroMensaje');
+    const libro = {
+        titulo: document.querySelector('#tituloLibro').value,
+        autor: document.querySelector('#autorLibro').value,
+        isbn: document.querySelector('#isbnLibro').value
+    };
+    try {
+        await consultar('/api/libros', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(libro) });
+        event.target.reset(); mensaje.textContent = 'Libro registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos();
+    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+});
+
+document.querySelector('#formUsuario').addEventListener('submit', async event => {
+    event.preventDefault();
+    const mensaje = document.querySelector('#usuarioMensaje');
+    const usuario = {
+        nombre: document.querySelector('#nombreUsuario').value,
+        correo: document.querySelector('#correoUsuario').value
+    };
+    try {
+        await consultar('/api/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(usuario) });
+        event.target.reset(); mensaje.textContent = 'Usuario registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos();
+    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+});
+
 cargarDatos();
