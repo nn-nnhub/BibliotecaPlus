@@ -85,22 +85,17 @@ public class PrestamoService {
         }
     }
 
-    private double calcularMulta(String tipoPrestamo, long diasPrestamo) {
-        long diasPermitidos;
+    private double calcularMulta(String tipoPrestamo, long diasRetraso) {
         double tarifaDiaria;
 
         if ("ESPECIAL".equalsIgnoreCase(tipoPrestamo)) {
-            diasPermitidos = 7;
             tarifaDiaria = 2.0;
         } else if ("DOMICILIO".equalsIgnoreCase(tipoPrestamo)) {
-            diasPermitidos = 14;
             tarifaDiaria = 1.0;
         } else {
-            diasPermitidos = 30;
             tarifaDiaria = 0.5;
         }
 
-        long diasRetraso = Math.max(0, diasPrestamo - diasPermitidos);
         return diasRetraso * tarifaDiaria;
     }
 }
