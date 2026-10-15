@@ -13,7 +13,16 @@ Consultar los préstamos registrados, conocer los libros más prestados y export
 
 ## Mejora visual posterior
 
-Inicialmente la acción de exportación se mostraba como un enlace de texto. Se ajustó la interfaz para que aparezca como un botón consistente con `Ver resumen`, con el texto `Descargar Excel` y descarga directa del archivo `reporte-prestamos.csv`.
+Inicialmente la acción de exportación se mostraba como un enlace de texto. Durante la verificación se comprobó que el resumen funcionaba correctamente, pero el enlace de descarga no respetaba el diseño visual del sistema. El motivo fue que los estilos generales de los enlaces sobrescribían el estilo de botón.
+
+El cambio se desarrolló en cuatro pasos:
+
+1. Se implementó el resumen con indicadores de préstamos, devoluciones, multas y libro más prestado.
+2. Se agregó la descarga del archivo `reporte-prestamos.csv`, compatible con Excel.
+3. Se detectó visualmente que `Exportar para Excel` todavía aparecía como enlace de texto.
+4. Se reforzó el estilo del enlace con la clase `report-download`, se cambió el texto a `Descargar Excel` y se agregó descarga directa.
+
+El resultado final es un botón consistente con `Ver resumen`, sin modificar la lógica del reporte ni mezclar responsabilidades.
 
 ![Interfaz inicial de exportación](capturas/rfc-003-interfaz-exportacion-antes.png)
 
@@ -21,6 +30,7 @@ La prueba del resumen confirmó que los indicadores se muestran correctamente. T
 
 ![Resumen funcionando](capturas/rfc-003-resumen-funcionando.png)
 ![Exportación antes del ajuste final](capturas/rfc-003-exportacion-estilo-antes-ajuste.png)
+![Exportación con diseño final corregido](capturas/rfc-003-exportacion-estilo-final.png)
 
 ## Reportes disponibles
 
