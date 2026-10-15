@@ -6,7 +6,8 @@ import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.repository.LibroRepository;
 import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.repository.UsuarioRepository;
-import com.bibliotecaplus.validation.ValidadorDatos;
+import com.bibliotecaplus.validation.ValidadorPrestamo;
+import com.bibliotecaplus.notification.NotificadorPrestamo;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,19 +20,22 @@ public class PrestamoService {
     private final PrestamoRepository prestamoRepository;
     private final LibroRepository libroRepository;
     private final UsuarioRepository usuarioRepository;
-    private final ValidadorDatos validadorDatos;
     private final CalculadorMulta calculadorMulta;
+    private final ValidadorPrestamo validadorPrestamo;
+    private final NotificadorPrestamo notificadorPrestamo;
 
     public PrestamoService(PrestamoRepository prestamoRepository,
                            LibroRepository libroRepository,
                            UsuarioRepository usuarioRepository,
-                           ValidadorDatos validadorDatos,
-                           CalculadorMulta calculadorMulta) {
+                           CalculadorMulta calculadorMulta,
+                           ValidadorPrestamo validadorPrestamo,
+                           NotificadorPrestamo notificadorPrestamo) {
         this.prestamoRepository = prestamoRepository;
         this.libroRepository = libroRepository;
         this.usuarioRepository = usuarioRepository;
-        this.validadorDatos = validadorDatos;
         this.calculadorMulta = calculadorMulta;
+        this.validadorPrestamo = validadorPrestamo;
+        this.notificadorPrestamo = notificadorPrestamo;
     }
 
     public List<Prestamo> listarTodos() {
@@ -48,7 +52,7 @@ public class PrestamoService {
             throw new IllegalArgumentException("El libro no está disponible");
         }
 
-        validarPrestamo(libro, usuario);
+        validadorPrestamo.validar(libro, usuario);
         if (fechaVencimiento == null) {
             throw new IllegalArgumentException("La fecha de vencimiento es obligatoria");
         }
@@ -58,7 +62,7 @@ public class PrestamoService {
         libroRepository.save(libro);
 
         Prestamo prestamoGuardado = prestamoRepository.save(prestamo);
-        System.out.println("Notificación: préstamo registrado para " + usuario.getCorreo());
+        notificadorPrestamo.notificarRegistro(usuario);
         return prestamoGuardado;
     }
 
@@ -83,13 +87,6 @@ public class PrestamoService {
         libroRepository.save(libro);
 
         return prestamoRepository.save(prestamo);
-    }
-
-    private void validarPrestamo(Libro libro, Usuario usuario) {
-        if (libro == null || validadorDatos.estaVacio(libro.getTitulo())
-                || usuario == null || validadorDatos.estaVacio(usuario.getNombre())) {
-            throw new IllegalArgumentException("El libro y el usuario son obligatorios");
-        }
     }
 
 }
