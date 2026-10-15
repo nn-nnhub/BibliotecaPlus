@@ -39,3 +39,10 @@ body.large-text { font-size:18px; } body.dyslexia { letter-spacing:.035em; line-
     flex-wrap: wrap;
 }
 
+.report-download {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+

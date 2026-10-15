@@ -11,6 +11,12 @@ Consultar los préstamos registrados, conocer los libros más prestados y export
 - `index.html`: agrega las acciones `Ver resumen` y `Exportar para Excel`.
 - `app.js`: muestra los indicadores principales en la interfaz.
 
+## Mejora visual posterior
+
+Inicialmente la acción de exportación se mostraba como un enlace de texto. Se ajustó la interfaz para que aparezca como un botón consistente con `Ver resumen`, con el texto `Descargar Excel` y descarga directa del archivo `reporte-prestamos.csv`.
+
+![Interfaz inicial de exportación](capturas/rfc-003-interfaz-exportacion-antes.png)
+
 ## Reportes disponibles
 
 - Total de préstamos.
