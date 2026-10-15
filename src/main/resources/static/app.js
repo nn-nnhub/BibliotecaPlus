@@ -2,7 +2,10 @@ const estado = { libros: [], usuarios: [], prestamos: [] };
 
 async function consultar(url, opciones) {
     const respuesta = await fetch(url, opciones);
-    if (!respuesta.ok) throw new Error(`La operación falló (${respuesta.status})`);
+    if (!respuesta.ok) {
+        const detalle = await respuesta.json().catch(() => null);
+        throw new Error(detalle?.message ?? `La operación falló (${respuesta.status})`);
+    }
     return respuesta.status === 204 ? null : respuesta.json();
 }
 
