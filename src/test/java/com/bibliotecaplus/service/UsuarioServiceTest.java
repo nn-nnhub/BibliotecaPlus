@@ -2,9 +2,10 @@ package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.repository.UsuarioRepository;
+import com.bibliotecaplus.validation.ValidadorDatos;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -15,7 +16,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UsuarioServiceTest {
     @Mock private UsuarioRepository usuarioRepository;
-    @InjectMocks private UsuarioService usuarioService;
+    private UsuarioService usuarioService;
+
+    @BeforeEach
+    void setUp() {
+        usuarioService = new UsuarioService(usuarioRepository, new ValidadorDatos());
+    }
 
     @Test
     void rechazaDniDuplicado() {

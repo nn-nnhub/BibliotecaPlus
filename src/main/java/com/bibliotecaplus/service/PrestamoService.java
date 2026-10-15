@@ -6,6 +6,7 @@ import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.repository.LibroRepository;
 import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.repository.UsuarioRepository;
+import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,13 +19,16 @@ public class PrestamoService {
     private final PrestamoRepository prestamoRepository;
     private final LibroRepository libroRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ValidadorDatos validadorDatos;
 
     public PrestamoService(PrestamoRepository prestamoRepository,
                            LibroRepository libroRepository,
-                           UsuarioRepository usuarioRepository) {
+                           UsuarioRepository usuarioRepository,
+                           ValidadorDatos validadorDatos) {
         this.prestamoRepository = prestamoRepository;
         this.libroRepository = libroRepository;
         this.usuarioRepository = usuarioRepository;
+        this.validadorDatos = validadorDatos;
     }
 
     public List<Prestamo> listarTodos() {
@@ -79,8 +83,8 @@ public class PrestamoService {
     }
 
     private void validarPrestamo(Libro libro, Usuario usuario) {
-        if (libro == null || libro.getTitulo() == null || libro.getTitulo().isBlank()
-                || usuario == null || usuario.getNombre() == null || usuario.getNombre().isBlank()) {
+        if (libro == null || validadorDatos.estaVacio(libro.getTitulo())
+                || usuario == null || validadorDatos.estaVacio(usuario.getNombre())) {
             throw new IllegalArgumentException("El libro y el usuario son obligatorios");
         }
     }

@@ -2,6 +2,7 @@ package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.repository.LibroRepository;
+import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,11 @@ import java.util.List;
 public class LibroService {
 
     private final LibroRepository libroRepository;
+    private final ValidadorDatos validadorDatos;
 
-    public LibroService(LibroRepository libroRepository) {
+    public LibroService(LibroRepository libroRepository, ValidadorDatos validadorDatos) {
         this.libroRepository = libroRepository;
+        this.validadorDatos = validadorDatos;
     }
 
     public List<Libro> listarTodos() {
@@ -42,9 +45,7 @@ public class LibroService {
     }
 
     private void validarIsbnDisponible(String isbn) {
-        if (isbn == null || isbn.isBlank()) {
-            throw new IllegalArgumentException("El ISBN es obligatorio");
-        }
+        validadorDatos.exigirTexto(isbn, "El ISBN es obligatorio");
         if (libroRepository.existsByIsbn(isbn)) {
             throw new IllegalArgumentException("El ISBN ya está registrado en otro libro");
         }

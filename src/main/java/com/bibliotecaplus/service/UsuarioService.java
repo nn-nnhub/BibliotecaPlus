@@ -2,6 +2,7 @@ package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.repository.UsuarioRepository;
+import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,11 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final ValidadorDatos validadorDatos;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, ValidadorDatos validadorDatos) {
         this.usuarioRepository = usuarioRepository;
+        this.validadorDatos = validadorDatos;
     }
 
     public List<Usuario> listarTodos() {
@@ -49,11 +52,11 @@ public class UsuarioService {
     }
 
     private void validarUsuario(Usuario usuario) {
-        if (usuario == null || usuario.getNombre() == null || usuario.getNombre().isBlank()
-                || usuario.getApellidos() == null || usuario.getApellidos().isBlank()
-                || usuario.getDni() == null || usuario.getDni().isBlank()
-                || usuario.getCorreo() == null || usuario.getCorreo().isBlank()
-                || usuario.getTelefono() == null || usuario.getTelefono().isBlank()) {
+        if (usuario == null || validadorDatos.estaVacio(usuario.getNombre())
+                || validadorDatos.estaVacio(usuario.getApellidos())
+                || validadorDatos.estaVacio(usuario.getDni())
+                || validadorDatos.estaVacio(usuario.getCorreo())
+                || validadorDatos.estaVacio(usuario.getTelefono())) {
             throw new IllegalArgumentException("Nombres, apellidos, DNI, correo y teléfono son obligatorios");
         }
     }
