@@ -25,11 +25,9 @@ public class DataInitializer {
                     "9786071503145"));
 
             usuarioRepository.save(new Usuario(
-                    "Ana Torres",
-                    "ana.torres@bibliotecaplus.com"));
+                    "Ana", "Torres", "70000001", "ana.torres@bibliotecaplus.com", "999111222"));
             usuarioRepository.save(new Usuario(
-                    "Luis Mendoza",
-                    "luis.mendoza@bibliotecaplus.com"));
+                    "Luis", "Mendoza", "70000002", "luis.mendoza@bibliotecaplus.com", "999333444"));
         };
     }
 }
