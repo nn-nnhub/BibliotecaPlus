@@ -30,6 +30,8 @@ Verificar que los usuarios puedan gestionar libros, usuarios y préstamos desde 
 | PF-13 | Buscar usuarios | Escribir parte del nombre o correo | La tabla muestra solo los usuarios coincidentes. |
 | PF-14 | Desplazar libros | Cargar muchos registros y desplazar la tabla de libros | La tabla se desplaza sin deformar el dashboard. |
 | PF-15 | Desplazar usuarios | Cargar muchos registros y desplazar la tabla de usuarios | La tabla se desplaza dentro de su propio contenedor. |
+| PF-16 | Registrar vencimiento | Seleccionar una fecha de vencimiento y registrar un préstamo | El historial muestra la fecha límite. |
+| PF-17 | Calcular multa | Devolver un préstamo con fecha vencida | Se muestran los días de retraso implícitos y la multa correcta. |
 
 ## Evidencia de ejecución
 
