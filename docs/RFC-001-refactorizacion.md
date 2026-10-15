@@ -17,8 +17,6 @@ Después del diagnóstico del software inicial, se solicita refactorizar la arqu
 | IOC-01 | Inversión de Control | Dependencias creadas directamente en el diseño inicial | Recibir dependencias por constructor |
 | IOC-02 | Inversión de Control | Notificador acoplado al servicio | Inyectar un componente de notificación |
 
-El detalle técnico de revisión se conserva localmente en `control-interno/errores-intencionales.md` y no se sube a GitHub.
-
 ## Plan de corrección
 
 1. Registrar el diagnóstico y los hallazgos.
