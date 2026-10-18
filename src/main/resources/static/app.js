@@ -1,5 +1,10 @@
 const estado = { libros: [], usuarios: [], prestamos: [] };
 
+function escaparHtml(valor) {
+    const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return String(valor ?? '').replace(/[&<>"']/g, caracter => reemplazos[caracter]);
+}
+
 async function consultar(url, opciones) {
     const respuesta = await fetch(url, opciones);
     if (!respuesta.ok) {
@@ -11,27 +16,27 @@ async function consultar(url, opciones) {
 
 function mostrarLibros() {
     const filtro = document.querySelector('#buscarLibro').value.toLowerCase().trim();
-    const librosVisibles = estado.libros.filter(libro => [libro.titulo, libro.autor, libro.isbn].some(valor => valor.toLowerCase().includes(filtro)));
+    const librosVisibles = estado.libros.filter(libro => [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
     const cuerpo = document.querySelector('#tablaLibros');
-    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${libro.id}</td><td>${libro.titulo}</td><td>${libro.autor}</td><td>${libro.isbn}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
+    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
     document.querySelector('#totalLibros').textContent = estado.libros.length;
     document.querySelector('#librosDisponibles').textContent = estado.libros.filter(libro => libro.disponible).length;
     const selector = document.querySelector('#libroId');
-    selector.innerHTML = estado.libros.filter(libro => libro.disponible).map(libro => `<option value="${libro.id}">${libro.titulo}</option>`).join('');
+    selector.innerHTML = estado.libros.filter(libro => libro.disponible).map(libro => `<option value="${escaparHtml(libro.id)}">${escaparHtml(libro.titulo)}</option>`).join('');
 }
 
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
     const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
-    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${usuario.id}</td><td>${usuario.nombre}</td><td>${usuario.apellidos ?? '-'}</td><td>${usuario.dni ?? '-'}</td><td>${usuario.correo}</td><td>${usuario.telefono ?? '-'}</td></tr>`).join('');
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td></tr>`).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
-    document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${usuario.id}">${usuario.nombre}</option>`).join('');
+    document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
 }
 
 function mostrarPrestamos() {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
     const nombreUsuario = id => { const usuario = estado.usuarios.find(item => item.id === id); return usuario ? `${usuario.nombre} ${usuario.apellidos ?? ''}`.trim() : `Usuario ${id}`; };
-    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${prestamo.id}</td><td>${nombreLibro(prestamo.libroId)}</td><td>${nombreUsuario(prestamo.usuarioId)}</td><td>${prestamo.fechaVencimiento}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${prestamo.id})">Devolver</button>`}</td></tr>`).join('');
+    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${escaparHtml(prestamo.id)}</td><td>${escaparHtml(nombreLibro(prestamo.libroId))}</td><td>${escaparHtml(nombreUsuario(prestamo.usuarioId))}</td><td>${escaparHtml(prestamo.fechaVencimiento)}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${Number(prestamo.id)})">Devolver</button>`}</td></tr>`).join('');
     document.querySelector('#totalPrestamos').textContent = estado.prestamos.length;
 }
 
