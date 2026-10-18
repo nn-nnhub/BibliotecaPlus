@@ -92,4 +92,14 @@ class ReporteServiceTest {
         long sentencias = estadisticas.getPrepareStatementCount();
         assertTrue(sentencias <= 3, "se esperaban como máximo 3 consultas y se ejecutaron " + sentencias);
     }
+
+    @Test
+    void generarResumenNoRepiteConsultasPorLibro() {
+        Statistics estadisticas = estadisticas();
+
+        reporteService.generarResumen();
+
+        long sentencias = estadisticas.getPrepareStatementCount();
+        assertTrue(sentencias <= 2, "se esperaban como máximo 2 consultas y se ejecutaron " + sentencias);
+    }
 }

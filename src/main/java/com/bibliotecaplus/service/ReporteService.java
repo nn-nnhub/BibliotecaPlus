@@ -38,11 +38,12 @@ public class ReporteService {
     public Map<String, Object> generarResumen() {
         List<Prestamo> prestamos = prestamoRepository.findAll();
         Map<Long, Long> frecuencia = prestamos.stream().collect(Collectors.groupingBy(Prestamo::getLibroId, Collectors.counting()));
+        Map<Long, String> titulos = titulosDeLibros(frecuencia.keySet().stream());
         List<Map<String, Object>> librosMasPrestados = frecuencia.entrySet().stream()
                 .sorted(Map.Entry.<Long, Long>comparingByValue(Comparator.reverseOrder()))
                 .map(entrada -> {
                     Map<String, Object> fila = new LinkedHashMap<>();
-                    fila.put("libro", libroRepository.findById(entrada.getKey()).map(libro -> libro.getTitulo()).orElse("Libro " + entrada.getKey()));
+                    fila.put("libro", titulos.getOrDefault(entrada.getKey(), "Libro " + entrada.getKey()));
                     fila.put("prestamos", entrada.getValue());
                     return fila;
                 }).toList();
