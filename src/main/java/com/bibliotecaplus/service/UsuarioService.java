@@ -2,6 +2,7 @@ package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Usuario;
+import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.repository.UsuarioRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,12 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PrestamoRepository prestamoRepository;
     private final ValidadorDatos validadorDatos;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, ValidadorDatos validadorDatos) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PrestamoRepository prestamoRepository, ValidadorDatos validadorDatos) {
         this.usuarioRepository = usuarioRepository;
+        this.prestamoRepository = prestamoRepository;
         this.validadorDatos = validadorDatos;
     }
 
@@ -49,7 +52,11 @@ public class UsuarioService {
     }
 
     public void eliminar(Long id) {
-        usuarioRepository.deleteById(id);
+        Usuario usuario = buscarPorId(id);
+        if (prestamoRepository.existsByUsuarioId(id)) {
+            throw new IllegalArgumentException("No se puede eliminar el usuario porque tiene préstamos asociados");
+        }
+        usuarioRepository.delete(usuario);
     }
 
     private void validarUsuario(Usuario usuario) {

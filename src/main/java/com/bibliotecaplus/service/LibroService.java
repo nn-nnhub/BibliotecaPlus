@@ -3,6 +3,7 @@ package com.bibliotecaplus.service;
 import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.repository.LibroRepository;
+import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +13,12 @@ import java.util.List;
 public class LibroService {
 
     private final LibroRepository libroRepository;
+    private final PrestamoRepository prestamoRepository;
     private final ValidadorDatos validadorDatos;
 
-    public LibroService(LibroRepository libroRepository, ValidadorDatos validadorDatos) {
+    public LibroService(LibroRepository libroRepository, PrestamoRepository prestamoRepository, ValidadorDatos validadorDatos) {
         this.libroRepository = libroRepository;
+        this.prestamoRepository = prestamoRepository;
         this.validadorDatos = validadorDatos;
     }
 
@@ -61,6 +64,10 @@ public class LibroService {
     }
 
     public void eliminar(Long id) {
-        libroRepository.deleteById(id);
+        Libro libro = buscarPorId(id);
+        if (prestamoRepository.existsByLibroId(id)) {
+            throw new IllegalArgumentException("No se puede eliminar el libro porque tiene préstamos asociados");
+        }
+        libroRepository.delete(libro);
     }
 }

@@ -1,6 +1,7 @@
 package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Usuario;
+import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.repository.UsuarioRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
 import org.junit.jupiter.api.Test;
@@ -21,11 +22,12 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class UsuarioServiceTest {
     @Mock private UsuarioRepository usuarioRepository;
+    @Mock private PrestamoRepository prestamoRepository;
     private UsuarioService usuarioService;
 
     @BeforeEach
     void setUp() {
-        usuarioService = new UsuarioService(usuarioRepository, new ValidadorDatos());
+        usuarioService = new UsuarioService(usuarioRepository, prestamoRepository, new ValidadorDatos());
     }
 
     @Test
@@ -82,5 +84,29 @@ class UsuarioServiceTest {
         IllegalArgumentException mensaje = assertThrows(IllegalArgumentException.class, () -> usuarioService.actualizar(1L, correoMalo));
         assertEquals("El correo electrónico no es válido", mensaje.getMessage());
         verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void rechazaEliminarUsuarioConPrestamosAsociados() {
+        Usuario existente = new Usuario("Ana", "Torres", "70000009", "ana@pruebas.local", "999111222");
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(existente));
+        when(prestamoRepository.existsByUsuarioId(1L)).thenReturn(true);
+        IllegalArgumentException excepcion = assertThrows(IllegalArgumentException.class, () -> usuarioService.eliminar(1L));
+        assertEquals("No se puede eliminar el usuario porque tiene préstamos asociados", excepcion.getMessage());
+        verify(usuarioRepository, never()).delete(any());
+    }
+
+    @Test
+    void eliminaUsuarioSinPrestamos() {
+        Usuario existente = new Usuario("Ana", "Torres", "70000009", "ana@pruebas.local", "999111222");
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(existente));
+        usuarioService.eliminar(1L);
+        verify(usuarioRepository).delete(existente);
+    }
+
+    @Test
+    void eliminarUsuarioInexistenteLanzaNoEncontrado() {
+        assertThrows(com.bibliotecaplus.exception.RecursoNoEncontradoException.class, () -> usuarioService.eliminar(9999L));
+        verify(usuarioRepository, never()).delete(any());
     }
 }

@@ -2,6 +2,7 @@ package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.repository.LibroRepository;
+import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +23,12 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class LibroServiceTest {
     @Mock private LibroRepository libroRepository;
+    @Mock private PrestamoRepository prestamoRepository;
     private LibroService libroService;
 
     @BeforeEach
     void setUp() {
-        libroService = new LibroService(libroRepository, new ValidadorDatos());
+        libroService = new LibroService(libroRepository, prestamoRepository, new ValidadorDatos());
     }
 
     @Test
@@ -88,5 +90,29 @@ class LibroServiceTest {
         when(libroRepository.save(prestado)).thenReturn(prestado);
         // JSON sin el campo "disponible": el objeto recibido queda con el valor por defecto (true).
         assertFalse(libroService.actualizar(1L, new Libro("Nuevo título", "Autor", "9780000000007")).isDisponible());
+    }
+
+    @Test
+    void rechazaEliminarLibroConPrestamosAsociados() {
+        Libro existente = new Libro("Título", "Autor", "9780000000009");
+        when(libroRepository.findById(1L)).thenReturn(Optional.of(existente));
+        when(prestamoRepository.existsByLibroId(1L)).thenReturn(true);
+        IllegalArgumentException excepcion = assertThrows(IllegalArgumentException.class, () -> libroService.eliminar(1L));
+        assertEquals("No se puede eliminar el libro porque tiene préstamos asociados", excepcion.getMessage());
+        verify(libroRepository, never()).delete(any());
+    }
+
+    @Test
+    void eliminaLibroSinPrestamos() {
+        Libro existente = new Libro("Título", "Autor", "9780000000009");
+        when(libroRepository.findById(1L)).thenReturn(Optional.of(existente));
+        libroService.eliminar(1L);
+        verify(libroRepository).delete(existente);
+    }
+
+    @Test
+    void eliminarLibroInexistenteLanzaNoEncontrado() {
+        assertThrows(com.bibliotecaplus.exception.RecursoNoEncontradoException.class, () -> libroService.eliminar(9999L));
+        verify(libroRepository, never()).delete(any());
     }
 }
