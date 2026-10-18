@@ -58,6 +58,7 @@ public class PrestamoService {
         }
 
         Prestamo prestamo = new Prestamo(libro.getId(), usuario.getId(), LocalDate.now(), fechaVencimiento);
+        prestamo.setTipoPrestamo(normalizarTipo(tipoPrestamo));
         libro.setDisponible(false);
         libroRepository.save(libro);
 
@@ -66,7 +67,13 @@ public class PrestamoService {
         return prestamoGuardado;
     }
 
-    public Prestamo devolver(Long prestamoId, String tipoPrestamo) {
+    private String normalizarTipo(String tipoPrestamo) {
+        return tipoPrestamo == null || tipoPrestamo.isBlank()
+                ? Prestamo.TIPO_POR_DEFECTO
+                : tipoPrestamo.trim().toUpperCase();
+    }
+
+    public Prestamo devolver(Long prestamoId) {
         Prestamo prestamo = prestamoRepository.findById(prestamoId)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el préstamo"));
 
@@ -75,11 +82,10 @@ public class PrestamoService {
         }
 
         LocalDate fechaDevolucion = LocalDate.now();
-        long diasPrestamo = ChronoUnit.DAYS.between(prestamo.getFechaPrestamo(), fechaDevolucion);
         prestamo.setFechaDevolucion(fechaDevolucion);
         prestamo.setDevuelto(true);
         long diasRetraso = Math.max(0, ChronoUnit.DAYS.between(prestamo.getFechaVencimiento(), fechaDevolucion));
-        prestamo.setMulta(calculadorMulta.calcular(tipoPrestamo, diasRetraso));
+        prestamo.setMulta(calculadorMulta.calcular(prestamo.getTipoPrestamo(), diasRetraso));
 
         Libro libro = libroRepository.findById(prestamo.getLibroId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));

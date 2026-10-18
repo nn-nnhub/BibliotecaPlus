@@ -45,7 +45,7 @@ async function cargarDatos() {
 }
 
 async function devolverPrestamo(id) {
-    try { await consultar(`/api/prestamos/${id}/devolver?tipoPrestamo=DOMICILIO`, { method: 'PUT' }); await cargarDatos(); } catch (error) { alert(error.message); }
+    try { await consultar(`/api/prestamos/${id}/devolver`, { method: 'PUT' }); await cargarDatos(); } catch (error) { alert(error.message); }
 }
 
 document.querySelector('#formPrestamo').addEventListener('submit', async event => {
