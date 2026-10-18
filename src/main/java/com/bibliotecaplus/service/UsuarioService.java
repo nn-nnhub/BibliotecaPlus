@@ -60,6 +60,12 @@ public class UsuarioService {
                 || validadorDatos.estaVacio(usuario.getTelefono())) {
             throw new IllegalArgumentException("Nombres, apellidos, DNI, correo y teléfono son obligatorios");
         }
+        if (!validadorDatos.esDniValido(usuario.getDni())) {
+            throw new IllegalArgumentException("El DNI debe tener exactamente 8 dígitos");
+        }
+        if (!validadorDatos.esCorreoValido(usuario.getCorreo())) {
+            throw new IllegalArgumentException("El correo electrónico no es válido");
+        }
     }
 
     private void validarDniDisponible(String dni) {
