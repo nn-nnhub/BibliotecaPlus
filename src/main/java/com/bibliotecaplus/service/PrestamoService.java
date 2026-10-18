@@ -44,6 +44,14 @@ public class PrestamoService {
         return prestamoRepository.findAll();
     }
 
+    public List<Prestamo> buscar(Long usuarioId, Long libroId, Boolean devuelto) {
+        if ((usuarioId != null && usuarioId <= 0) || (libroId != null && libroId <= 0)) {
+            throw new IllegalArgumentException("Los IDs deben ser enteros positivos");
+        }
+        if (usuarioId == null && libroId == null && devuelto == null) return listarTodos();
+        return prestamoRepository.buscarConFiltros(usuarioId, libroId, devuelto);
+    }
+
     @Transactional
     public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
         Libro libro = libroRepository.findById(libroId)

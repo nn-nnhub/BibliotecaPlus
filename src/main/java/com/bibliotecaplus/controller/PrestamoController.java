@@ -26,8 +26,30 @@ public class PrestamoController {
     }
 
     @GetMapping
-    public List<Prestamo> listarTodos() {
-        return prestamoService.listarTodos();
+    public List<Prestamo> listarTodos(@RequestParam(required = false) String usuarioId,
+                                     @RequestParam(required = false) String libroId,
+                                     @RequestParam(required = false) String devuelto) {
+        return prestamoService.buscar(parsearId(usuarioId, "usuarioId"),
+                parsearId(libroId, "libroId"), parsearDevuelto(devuelto));
+    }
+
+    private Long parsearId(String valor, String nombre) {
+        if (valor == null) return null;
+        try {
+            if (!valor.matches("[0-9]+")) throw new NumberFormatException();
+            long id = Long.parseLong(valor);
+            if (id <= 0) throw new NumberFormatException();
+            return id;
+        } catch (NumberFormatException excepcion) {
+            throw new IllegalArgumentException(nombre + " debe ser un ID entero positivo");
+        }
+    }
+
+    private Boolean parsearDevuelto(String valor) {
+        if (valor == null) return null;
+        if ("true".equals(valor)) return true;
+        if ("false".equals(valor)) return false;
+        throw new IllegalArgumentException("devuelto debe ser true o false");
     }
 
     @PostMapping
