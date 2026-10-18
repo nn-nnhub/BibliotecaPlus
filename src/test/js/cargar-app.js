@@ -20,7 +20,7 @@ function cargarApp({ fetch, confirm } = {}) {
     const confirmSimulado = confirm ?? (() => false);
     const contexto = vm.createContext({
         document: documento,
-        fetch: (url, opciones) => { llamadas.push({ url, metodo: opciones?.method ?? 'GET' }); return fetchSimulado(url, opciones); },
+        fetch: (url, opciones) => { llamadas.push({ url, metodo: opciones?.method ?? 'GET', opciones }); return fetchSimulado(url, opciones); },
         confirm: mensaje => { confirmaciones.push(mensaje); return confirmSimulado(mensaje); },
         alert() {},
         console

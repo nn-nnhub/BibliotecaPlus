@@ -150,7 +150,149 @@ edición y eliminación confirmada. Ninguna prueba preexistente falla.
 
 FASE DESPUÉS
 ============
-Pendiente de autorización e implementación.
+Fecha: 2026-10-18
+Rama: rfc-015-edicion-eliminacion
+Punto de partida: commit ANTES 81c8e9e
 
-IMPORTANTE: la evidencia DESPUÉS debe añadirse debajo de esta línea. No se debe
-reemplazar, regenerar ni borrar ninguna sección de la evidencia ANTES precedente.
+La evidencia DESPUÉS se añadió sin reemplazar, regenerar ni borrar ninguna sección
+de la evidencia ANTES precedente.
+
+Cambios comprobados
+-------------------
+- Acciones Editar y Eliminar en las filas de libros y usuarios.
+- Modos visibles de registro y edición en ambos formularios.
+- Cancelación sin peticiones HTTP.
+- Edición mediante PUT y eliminación confirmada mediante DELETE.
+- Recarga de tablas, selectores y contadores tras operaciones correctas.
+- Presentación literal de los mensajes de error enviados por el backend.
+- Conservación del escape HTML y de las pruebas de regresión existentes.
+- El cuerpo PUT de libro no incluye la propiedad `disponible`.
+
+Ejecución de las ocho pruebas RFC-015
+--------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\rfc-015-antes.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  ok 1 - conserva el comportamiento existente: muestra libros y usuarios
+  ok 2 - cada libro muestra botones Editar y Eliminar
+  ok 3 - cada usuario muestra botones Editar y Eliminar
+  ok 4 - los formularios permiten cancelar la edición de libros y usuarios
+  ok 5 - editar un libro usa PUT y actualiza tablas, selectores y contadores
+  ok 6 - editar un usuario usa PUT y actualiza las vistas
+  ok 7 - cancelar la confirmación impide eliminar libros y usuarios
+  ok 8 - confirmar la eliminación usa DELETE y actualiza las vistas
+  1..8
+  # tests 8
+  # pass 8
+  # fail 0
+  # duration_ms 124.9345
+
+Ejecución de las pruebas complementarias RFC-015
+-------------------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\rfc-015-complementarias.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  ok 1 - cancelar una edición restaura ambos formularios sin enviar peticiones
+  ok 2 - muestra los mensajes reales del backend al rechazar eliminaciones
+  ok 3 - editar un libro no envía el campo de disponibilidad
+  1..3
+  # tests 3
+  # pass 3
+  # fail 0
+  # duration_ms 110.7148
+
+Ejecución de las diez pruebas JavaScript preexistentes
+------------------------------------------------------
+Archivos ejecutados de forma explícita:
+
+- src/test/js/escape.test.js
+- src/test/js/prestamos.test.js
+- src/test/js/xss.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  1..10
+  # tests 10
+  # pass 10
+  # fail 0
+  # duration_ms 131.1145
+
+Ejecución de toda la suite JavaScript
+-------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\*.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  1..21
+  # tests 21
+  # pass 21
+  # fail 0
+  # duration_ms 164.7811
+
+Base de datos y captura
+-----------------------
+Las pruebas DESPUÉS usan DOM y fetch simulados. No iniciaron Spring Boot ni
+accedieron a H2. No se accedió a ./data/bibliotecadb.
+
+No se generó ni se afirmó que exista una captura DESPUÉS. Las capturas ANTES se
+conservaron sin modificaciones.
+
+Comprobación manual real
+------------------------
+Resultados comunicados por Carlos después de probar la interfaz:
+
+1. La interfaz muestra botones Editar y Eliminar para libros y usuarios.
+2. Los formularios de edición cargan correctamente los datos de Clean Code y
+   Luis Mendoza.
+3. Cancelar la edición de un libro devuelve el formulario a Registrar libro.
+4. Se cambió el título de Clean Code a Clean Code - RFC 015.
+5. El cambio se mantuvo después de recargar el navegador.
+6. El botón Eliminar mostró una confirmación.
+7. Al pulsar Cancelar, el libro permaneció en la tabla incluso después de recargar.
+
+Alcance exacto: se comprobó la cancelación de la confirmación. No se probó una
+eliminación confirmada y este registro no afirma lo contrario.
+
+Capturas DESPUÉS verificadas por existencia
+--------------------------------------------
+
+- docs/capturas/rfc-015-despues-interfaz.png
+- docs/capturas/rfc-015-despues-edicion.png
+- docs/capturas/rfc-015-despues-confirmacion.png
+
+Los nombres definitivos se registran tal como existen después de la corrección
+realizada por Carlos.
+
+Reejecución final de la suite JavaScript
+-----------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\*.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  1..21
+  # tests 21
+  # suites 0
+  # pass 21
+  # fail 0
+  # cancelled 0
+  # skipped 0
+  # todo 0
+  # duration_ms 174.4498
+
+Esta reejecución utiliza DOM y fetch simulados; no inicia la aplicación ni accede
+a una base de datos.
