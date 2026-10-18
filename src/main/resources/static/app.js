@@ -106,3 +106,4 @@ cargarDatos();
 const fechaInicial = new Date();
 fechaInicial.setDate(fechaInicial.getDate() + 14);
 document.querySelector('#fechaVencimiento').value = fechaInicial.toISOString().slice(0, 10);
+document.querySelector('#fechaVencimiento').min = new Date().toLocaleDateString('en-CA');

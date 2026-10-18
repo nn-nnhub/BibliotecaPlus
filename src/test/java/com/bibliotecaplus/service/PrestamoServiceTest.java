@@ -77,6 +77,15 @@ class PrestamoServiceTest {
     }
 
     @Test
+    void rechazaVencimientoPasadoSinOcuparElLibro() {
+        prepararRegistro();
+        assertThrows(IllegalArgumentException.class,
+                () -> servicio.registrar(1L, 1L, "DOMICILIO", LocalDate.now().minusDays(1)));
+        assertEquals(true, libro.isDisponible());
+        verify(prestamoRepository, never()).save(any());
+    }
+
+    @Test
     void devuelveConLaTarifaDelTipoRegistrado() {
         prestamoVencidoHaceDias("ESPECIAL", 10);
         assertEquals(20.0, servicio.devolver(5L).getMulta());

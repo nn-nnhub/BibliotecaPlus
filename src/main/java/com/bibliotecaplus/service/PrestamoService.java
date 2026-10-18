@@ -53,9 +53,7 @@ public class PrestamoService {
         }
 
         validadorPrestamo.validar(libro, usuario);
-        if (fechaVencimiento == null) {
-            throw new IllegalArgumentException("La fecha de vencimiento es obligatoria");
-        }
+        validadorPrestamo.validarVencimiento(fechaVencimiento);
 
         Prestamo prestamo = new Prestamo(libro.getId(), usuario.getId(), LocalDate.now(), fechaVencimiento);
         prestamo.setTipoPrestamo(normalizarTipo(tipoPrestamo));
