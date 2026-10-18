@@ -91,7 +91,18 @@ public class PrestamoService {
         libro.setDisponible(true);
         libroRepository.save(libro);
 
-        return prestamoRepository.save(prestamo);
+        Prestamo prestamoGuardado = prestamoRepository.save(prestamo);
+        notificarDevolucion(prestamoGuardado);
+        return prestamoGuardado;
+    }
+
+    private void notificarDevolucion(Prestamo prestamo) {
+        usuarioRepository.findById(prestamo.getUsuarioId()).ifPresent(usuario -> {
+            notificador.notificarDevolucion(usuario);
+            if (prestamo.getMulta() > 0) {
+                notificador.notificarMulta(usuario, prestamo.getMulta());
+            }
+        });
     }
 
 }
