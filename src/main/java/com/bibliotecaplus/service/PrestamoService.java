@@ -1,6 +1,9 @@
 package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.exception.RecursoNoEncontradoException;
+import com.bibliotecaplus.exception.ConflictoBloqueoLibroException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.model.Prestamo;
 import com.bibliotecaplus.model.Usuario;
@@ -54,8 +57,7 @@ public class PrestamoService {
 
     @Transactional
     public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
-        Libro libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
+        Libro libro = obtenerLibroConBloqueo(libroId);
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el usuario"));
 
@@ -74,6 +76,15 @@ public class PrestamoService {
         Prestamo prestamoGuardado = prestamoRepository.save(prestamo);
         notificador.notificarRegistro(usuario);
         return prestamoGuardado;
+    }
+
+    private Libro obtenerLibroConBloqueo(Long libroId) {
+        try {
+            return libroRepository.buscarPorIdConBloqueo(libroId)
+                    .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
+        } catch (PessimisticLockingFailureException | QueryTimeoutException excepcion) {
+            throw new ConflictoBloqueoLibroException(excepcion);
+        }
     }
 
     private String normalizarTipo(String tipoPrestamo) {

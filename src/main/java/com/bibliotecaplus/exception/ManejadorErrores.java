@@ -10,6 +10,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class ManejadorErrores {
+    @ExceptionHandler(ConflictoBloqueoLibroException.class)
+    public ResponseEntity<Map<String, String>> manejarBloqueo(ConflictoBloqueoLibroException excepcion) {
+        return respuesta(HttpStatus.CONFLICT, excepcion.getMessage());
+    }
+
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<Map<String, String>> manejarNoEncontrado(RecursoNoEncontradoException excepcion) {
