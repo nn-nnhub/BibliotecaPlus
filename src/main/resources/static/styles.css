@@ -39,6 +39,31 @@ body.large-text { font-size:18px; } body.dyslexia { letter-spacing:.035em; line-
     flex-wrap: wrap;
 }
 
+.row-actions,.form-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.row-actions button {
+    padding: 7px 10px;
+    white-space: nowrap;
+}
+
+.danger-button {
+    color: #a52d2d;
+    background: #fff2f0;
+    border: 1px solid #e2b8b2;
+}
+
+.form-actions .primary-button,.form-actions .secondary-button {
+    flex: 1;
+}
+
+[hidden] {
+    display: none !important;
+}
+
 .report-download {
     text-decoration: none;
     display: inline-flex;
