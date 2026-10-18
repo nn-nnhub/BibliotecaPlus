@@ -1,4 +1,6 @@
 const estado = { libros: [], usuarios: [], prestamos: [] };
+let filtrosHistorial = {};
+let solicitudHistorial = 0;
 
 function escaparHtml(valor) {
     const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -33,17 +35,54 @@ function mostrarUsuarios() {
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
 }
 
-function mostrarPrestamos() {
+function mostrarPrestamos(prestamos = estado.prestamos) {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
     const nombreUsuario = id => { const usuario = estado.usuarios.find(item => item.id === id); return usuario ? `${usuario.nombre} ${usuario.apellidos ?? ''}`.trim() : `Usuario ${id}`; };
-    document.querySelector('#tablaPrestamos').innerHTML = estado.prestamos.map(prestamo => `<tr><td>${escaparHtml(prestamo.id)}</td><td>${escaparHtml(nombreLibro(prestamo.libroId))}</td><td>${escaparHtml(nombreUsuario(prestamo.usuarioId))}</td><td>${escaparHtml(prestamo.fechaVencimiento)}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${Number(prestamo.id)})">Devolver</button>`}</td></tr>`).join('');
+    document.querySelector('#tablaPrestamos').innerHTML = prestamos.map(prestamo => `<tr><td>${escaparHtml(prestamo.id)}</td><td>${escaparHtml(nombreLibro(prestamo.libroId))}</td><td>${escaparHtml(nombreUsuario(prestamo.usuarioId))}</td><td>${escaparHtml(prestamo.fechaVencimiento)}</td><td>${prestamo.devuelto ? 'Sí' : 'No'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td><td>${prestamo.devuelto ? '-' : `<button class="secondary-button" onclick="devolverPrestamo(${Number(prestamo.id)})">Devolver</button>`}</td></tr>`).join('');
     document.querySelector('#totalPrestamos').textContent = estado.prestamos.length;
+    document.querySelector('#historialEstado').textContent = prestamos.length
+        ? `${prestamos.length} préstamos en el historial mostrado.`
+        : 'No hay préstamos que coincidan con los filtros seleccionados.';
+    document.querySelector('#historialEstado').className = 'message';
+}
+
+async function cargarHistorial() {
+    const solicitud = ++solicitudHistorial;
+    const parametros = Object.entries(filtrosHistorial)
+        .map(([nombre, valor]) => `${encodeURIComponent(nombre)}=${encodeURIComponent(valor)}`).join('&');
+    try {
+        const prestamos = parametros ? await consultar(`/api/prestamos?${parametros}`) : estado.prestamos;
+        if (solicitud === solicitudHistorial) mostrarPrestamos(prestamos);
+    } catch (error) {
+        if (solicitud !== solicitudHistorial) return;
+        document.querySelector('#historialEstado').textContent = error.message;
+        document.querySelector('#historialEstado').className = 'message error';
+    }
+}
+
+async function aplicarFiltrosHistorial(event) {
+    event.preventDefault();
+    filtrosHistorial = {};
+    for (const [nombre, selector] of [['usuarioId', '#filtroUsuarioId'], ['libroId', '#filtroLibroId'], ['devuelto', '#filtroDevuelto']]) {
+        const valor = document.querySelector(selector).value.trim();
+        if (valor !== '') filtrosHistorial[nombre] = valor;
+    }
+    await cargarHistorial();
+}
+
+async function limpiarFiltrosHistorial() {
+    filtrosHistorial = {};
+    for (const selector of ['#filtroUsuarioId', '#filtroLibroId', '#filtroDevuelto']) {
+        document.querySelector(selector).value = '';
+    }
+    await cargarHistorial();
 }
 
 async function cargarDatos() {
     try {
         [estado.libros, estado.usuarios, estado.prestamos] = await Promise.all([consultar('/api/libros'), consultar('/api/usuarios'), consultar('/api/prestamos')]);
-        mostrarLibros(); mostrarUsuarios(); mostrarPrestamos();
+        mostrarLibros(); mostrarUsuarios();
+        await cargarHistorial();
         document.querySelector('#librosEstado').textContent = 'Datos actualizados correctamente.';
         document.querySelector('#librosEstado').className = 'message success';
     } catch (error) { document.querySelector('#librosEstado').textContent = error.message; document.querySelector('#librosEstado').className = 'message error'; }
@@ -64,6 +103,8 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
 });
 
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
+document.querySelector('#formFiltrosHistorial').addEventListener('submit', aplicarFiltrosHistorial);
+document.querySelector('#btnLimpiarFiltros').addEventListener('click', limpiarFiltrosHistorial);
 document.querySelector('#btnResumen').addEventListener('click', async () => {
     const mensaje = document.querySelector('#reporteResumen');
     try {
