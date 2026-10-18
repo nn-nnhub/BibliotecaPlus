@@ -40,7 +40,7 @@ class PrestamoServiceTest {
     @BeforeEach
     void setUp() {
         ValidadorDatos validadorDatos = new ValidadorDatos();
-        CalculadorMulta calculador = new CalculadorMulta(List.of(new TarifaEspecial(), new TarifaDomicilio(), new TarifaGeneral()));
+        CalculadorMulta calculador = new CalculadorMulta(List.of(new TarifaGeneral(), new TarifaDomicilio(), new TarifaEspecial()));
         servicio = new PrestamoService(prestamoRepository, libroRepository, usuarioRepository, calculador,
                 new ValidadorPrestamo(validadorDatos), notificador);
         libro = new Libro("Clean Code", "Robert C. Martin", "9780132350884");
