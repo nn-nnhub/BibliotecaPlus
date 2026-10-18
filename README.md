@@ -102,6 +102,14 @@ mvn clean test
 
 Los resultados quedan en `target/surefire-reports/`.
 
+Las pruebas de la interfaz están en `src/test/js/` y **no forman parte de `mvn test`**. Se ejecutan con Node.js:
+
+```powershell
+node --test "src/test/js/*.test.js"
+```
+
+El detalle de cada suite está en [docs/pruebas-automatizadas.md](docs/pruebas-automatizadas.md).
+
 ## RFC y GitHub
 
 La plantilla está en `.github/ISSUE_TEMPLATE/rfc.md` y la guía en [docs/gestion-rfc-github.md](docs/gestion-rfc-github.md).
@@ -114,6 +122,9 @@ La plantilla está en `.github/ISSUE_TEMPLATE/rfc.md` y la guía en [docs/gestio
 - [RFC-006: validación de DNI](docs/RFC-006-validacion-dni.md) — [Issue #6](https://github.com/nn-nnhub/BibliotecaPlus/issues/6)
 - [RFC-007: ejecución portable](docs/RFC-007-ejecucion-portable.md) — [Issue #7](https://github.com/nn-nnhub/BibliotecaPlus/issues/7)
 - [RFC-008: persistencia local](docs/RFC-008-persistencia-base-datos.md) — [Issue #8](https://github.com/nn-nnhub/BibliotecaPlus/issues/8)
+- [RFC-009: corrección de multas y reglas de préstamo](docs/RFC-009.md) — [Issue #9](https://github.com/nn-nnhub/BibliotecaPlus/issues/9)
+- [RFC-010: validación de libros y usuarios](docs/RFC-010.md) — [Issue #10](https://github.com/nn-nnhub/BibliotecaPlus/issues/10)
+- [RFC-011: seguridad y mejora de reportes](docs/RFC-011.md) — [Issue #11](https://github.com/nn-nnhub/BibliotecaPlus/issues/11)
 
 Flujo: crear RFC, definir prioridad y riesgo, implementar por capas, probar, documentar, crear commit descriptivo, subir a `main` y cerrar la Issue.
 
