@@ -29,20 +29,28 @@ public class LibroService {
     }
 
     public Libro guardar(Libro libro) {
+        validarTituloYAutor(libro);
         validarIsbnDisponible(libro.getIsbn());
+        libro.setDisponible(true);
         return libroRepository.save(libro);
     }
 
     public Libro actualizar(Long id, Libro datosLibro) {
         Libro libro = buscarPorId(id);
+        validarTituloYAutor(datosLibro);
+        validadorDatos.exigirTexto(datosLibro.getIsbn(), "El ISBN es obligatorio");
         if (libroRepository.existsByIsbnAndIdNot(datosLibro.getIsbn(), id)) {
             throw new IllegalArgumentException("El ISBN ya está registrado en otro libro");
         }
         libro.setTitulo(datosLibro.getTitulo());
         libro.setAutor(datosLibro.getAutor());
         libro.setIsbn(datosLibro.getIsbn());
-        libro.setDisponible(datosLibro.isDisponible());
         return libroRepository.save(libro);
+    }
+
+    private void validarTituloYAutor(Libro libro) {
+        validadorDatos.exigirTexto(libro.getTitulo(), "El título es obligatorio");
+        validadorDatos.exigirTexto(libro.getAutor(), "El autor es obligatorio");
     }
 
     private void validarIsbnDisponible(String isbn) {

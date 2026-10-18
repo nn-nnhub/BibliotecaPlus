@@ -11,7 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class LibroServiceTest {
@@ -37,5 +43,50 @@ class LibroServiceTest {
         when(libroRepository.existsByIsbn("9780000000002")).thenReturn(false);
         when(libroRepository.save(libro)).thenReturn(libro);
         assertEquals("9780000000002", libroService.guardar(libro).getIsbn());
+    }
+
+    private void assertRechazaGuardar(Libro libro, String mensaje) {
+        IllegalArgumentException excepcion = assertThrows(IllegalArgumentException.class, () -> libroService.guardar(libro));
+        assertEquals(mensaje, excepcion.getMessage());
+        verify(libroRepository, never()).save(any());
+    }
+
+    @Test
+    void rechazaGuardarSinTitulo() {
+        assertRechazaGuardar(new Libro(" ", "Autor", "9780000000003"), "El título es obligatorio");
+    }
+
+    @Test
+    void rechazaGuardarSinAutor() {
+        assertRechazaGuardar(new Libro("Título", null, "9780000000003"), "El autor es obligatorio");
+    }
+
+    @Test
+    void guardarSiempreRegistraElLibroComoDisponible() {
+        Libro libro = new Libro("Título", "Autor", "9780000000004");
+        libro.setDisponible(false);
+        when(libroRepository.save(libro)).thenReturn(libro);
+        assertTrue(libroService.guardar(libro).isDisponible());
+    }
+
+    @Test
+    void rechazaActualizarSinIsbnTituloOAutor() {
+        Libro existente = new Libro("Título", "Autor", "9780000000005");
+        when(libroRepository.findById(1L)).thenReturn(Optional.of(existente));
+        assertThrows(IllegalArgumentException.class, () -> libroService.actualizar(1L, new Libro("Título", "Autor", null)));
+        assertThrows(IllegalArgumentException.class, () -> libroService.actualizar(1L, new Libro("", "Autor", "9780000000006")));
+        assertThrows(IllegalArgumentException.class, () -> libroService.actualizar(1L, new Libro("Título", " ", "9780000000006")));
+        verify(libroRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizarNoCambiaLaDisponibilidadDelLibro() {
+        Libro prestado = new Libro("Título", "Autor", "9780000000007");
+        prestado.setDisponible(false);
+        when(libroRepository.findById(1L)).thenReturn(Optional.of(prestado));
+        when(libroRepository.existsByIsbnAndIdNot("9780000000007", 1L)).thenReturn(false);
+        when(libroRepository.save(prestado)).thenReturn(prestado);
+        // JSON sin el campo "disponible": el objeto recibido queda con el valor por defecto (true).
+        assertFalse(libroService.actualizar(1L, new Libro("Nuevo título", "Autor", "9780000000007")).isDisponible());
     }
 }
