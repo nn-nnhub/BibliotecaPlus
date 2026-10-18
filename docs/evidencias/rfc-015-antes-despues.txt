@@ -1,0 +1,156 @@
+RFC-015 - REGISTRO DE EVIDENCIA ANTES / DESPUÉS
+================================================
+
+FASE ANTES
+Fecha: 2026-10-18
+Rama: rfc-015-edicion-eliminacion
+Issue: https://github.com/nn-nnhub/BibliotecaPlus/issues/23
+Commit HEAD: 7b51b3648652777139b2debf8ff41ea31d7c4e95
+main: 7b51b3648652777139b2debf8ff41ea31d7c4e95
+origin/main después de git fetch origin main: 7b51b3648652777139b2debf8ff41ea31d7c4e95
+Divergencia HEAD...origin/main: 0  0
+
+Entorno JavaScript
+------------------
+El comando inicial con `node` falló antes de cargar pruebas porque Node.js no estaba
+disponible en PATH:
+
+  node : El término 'node' no se reconoce como nombre de un cmdlet,
+  función, archivo de script o programa ejecutable.
+
+Se descargó para la ejecución un binario oficial portable fuera del repositorio:
+
+  Ruta: C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe
+  Versión: v22.23.3
+  SHA-256 observado: 9C9245166B4A8E182E0B797DA9C20136117FF24368EAFF1FEC8343A123C8DB0E
+  SHA-256 publicado por Node.js: 9c9245166b4a8e182e0b797da9c20136117ff24368eaff1fec8343a123c8db0e
+  Resultado de verificación: coinciden.
+
+Ejecución aislada de la especificación RFC-015
+------------------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\rfc-015-antes.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  ok 1 - conserva el comportamiento existente: muestra libros y usuarios
+  not ok 2 - cada libro muestra botones Editar y Eliminar
+  not ok 3 - cada usuario muestra botones Editar y Eliminar
+  not ok 4 - los formularios permiten cancelar la edición de libros y usuarios
+  not ok 5 - editar un libro usa PUT y actualiza tablas, selectores y contadores
+  not ok 6 - editar un usuario usa PUT y actualiza las vistas
+  not ok 7 - cancelar la confirmación impide eliminar libros y usuarios
+  not ok 8 - confirmar la eliminación usa DELETE y actualiza las vistas
+  1..8
+  # tests 8
+  # pass 1
+  # fail 7
+  # duration_ms 142.4791
+
+Fallos observados:
+
+- Las filas generadas no contienen el texto ni las acciones Editar y Eliminar.
+- index.html no contiene `btnCancelarEdicionLibro` ni `btnCancelarEdicionUsuario`.
+- `iniciarEdicionLibro` e `iniciarEdicionUsuario` no están definidos.
+- `eliminarLibro` y `eliminarUsuario` no están definidos.
+
+El código de salida fue 1. Es el resultado esperado en la fase ANTES porque las
+pruebas describen funcionalidad todavía no implementada.
+
+Ejecución de las pruebas JavaScript preexistentes
+--------------------------------------------------
+Archivos ejecutados de forma explícita:
+
+- src/test/js/escape.test.js
+- src/test/js/prestamos.test.js
+- src/test/js/xss.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  1..10
+  # tests 10
+  # pass 10
+  # fail 0
+  # duration_ms 140.0934
+
+El código de salida fue 0. La ampliación del arnés de pruebas no rompe las pruebas
+existentes.
+
+Ejecución de toda la suite JavaScript, incluida RFC-015
+--------------------------------------------------------
+Comando ejecutado:
+
+  C:\tmp\BibliotecaPlus-rfc015-node-v22.23.3\node.exe --test C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus\src\test\js\*.test.js
+
+Salida resumida auténtica:
+
+  TAP version 13
+  1..18
+  # tests 18
+  # pass 11
+  # fail 7
+  # duration_ms 179.59
+
+Los 7 fallos corresponden exclusivamente a los criterios todavía ausentes del
+RFC-015. Las 10 pruebas anteriores y la prueba de regresión añadida pasan.
+
+Base de datos
+-------------
+Estas pruebas usan DOM y fetch simulados. No inician Spring Boot ni acceden a H2.
+No se accedió a ./data/bibliotecadb.
+
+Captura ANTES
+-------------
+Se intentó iniciar temporalmente la aplicación en el puerto 18080 con estos
+parámetros de aislamiento:
+
+  --spring.datasource.url=jdbc:h2:mem:rfc015;DB_CLOSE_DELAY=-1
+  --spring.jpa.hibernate.ddl-auto=create-drop
+  --spring.h2.console.enabled=false
+
+El intento agotó el límite de 90 segundos sin responder ni crear una captura.
+No existe docs/capturas/rfc-015-antes-interfaz.png y no se fabricó una imagen.
+Las instrucciones para capturarla manualmente están en docs/RFC-015.md.
+
+Revisión de la fase ANTES
+-------------------------
+Durante la revisión previa al primer commit se detectó que el evento generado por
+el simulador no incluía `target`. Se corrigió exclusivamente el arnés para que el
+evento predeterminado apunte al formulario simulado, igual que un evento submit
+real. También se acortaron los mensajes de las aserciones para que identifiquen la
+capacidad ausente sin imprimir todo index.html.
+
+La evidencia original anterior se conservó sin reemplazar. Después del ajuste se
+repitieron realmente las tres ejecuciones:
+
+  Especificación RFC-015:
+  # tests 8
+  # pass 1
+  # fail 7
+  # duration_ms 163.8669
+
+  Pruebas JavaScript preexistentes:
+  # tests 10
+  # pass 10
+  # fail 0
+  # duration_ms 156.0751
+
+  Suite JavaScript completa:
+  # tests 18
+  # pass 11
+  # fail 7
+  # duration_ms 169.8239
+
+Los siete fallos revisados siguen correspondiendo a funciones o elementos que no
+existen en app.js/index.html: acciones de fila, controles de cancelación, inicio de
+edición y eliminación confirmada. Ninguna prueba preexistente falla.
+
+FASE DESPUÉS
+============
+Pendiente de autorización e implementación.
+
+IMPORTANTE: la evidencia DESPUÉS debe añadirse debajo de esta línea. No se debe
+reemplazar, regenerar ni borrar ninguna sección de la evidencia ANTES precedente.
