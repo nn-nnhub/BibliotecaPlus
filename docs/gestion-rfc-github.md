@@ -49,3 +49,6 @@ Si además se detecta un defecto, puede agregarse `Bug`, sin reemplazar las etiq
 - RFC-006: [Validación de DNI duplicado](https://github.com/nn-nnhub/BibliotecaPlus/issues/6).
 - RFC-007: [Instalación portable de Java y Maven](https://github.com/nn-nnhub/BibliotecaPlus/issues/7).
 - RFC-008: [Persistencia local de la base de datos](https://github.com/nn-nnhub/BibliotecaPlus/issues/8).
+- RFC-009: [Corrección de multas y reglas de préstamo](https://github.com/nn-nnhub/BibliotecaPlus/issues/9) — documento: [RFC-009](RFC-009.md).
+- RFC-010: [Validación de libros y usuarios](https://github.com/nn-nnhub/BibliotecaPlus/issues/10) — documento: [RFC-010](RFC-010.md).
+- RFC-011: [Seguridad y mejora de reportes](https://github.com/nn-nnhub/BibliotecaPlus/issues/11) — documento: [RFC-011](RFC-011.md).
