@@ -4,6 +4,9 @@ import com.bibliotecaplus.BibliotecaPlusApplication;
 import com.bibliotecaplus.model.Prestamo;
 import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.service.ReporteService;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = BibliotecaPlusApplication.class, properties = {
         "spring.datasource.url=jdbc:h2:mem:reporte-service;DB_CLOSE_DELAY=-1",
-        "spring.jpa.show-sql=false"})
+        "spring.jpa.show-sql=false",
+        "spring.jpa.properties.hibernate.generate_statistics=true"})
 class ReporteServiceTest {
 
     @Autowired private ReporteService reporteService;
     @Autowired private PrestamoRepository prestamoRepository;
+    @Autowired private EntityManagerFactory entityManagerFactory;
 
     /** Datos iniciales: libros 1 (Clean Code) y 2 (Ingeniería de Software); usuarios 1 (Ana Torres) y 2 (Luis Mendoza). */
     @BeforeEach
@@ -40,6 +46,12 @@ class ReporteServiceTest {
         prestamo.setDevuelto(devuelto);
         prestamo.setMulta(multa);
         prestamoRepository.save(prestamo);
+    }
+
+    private Statistics estadisticas() {
+        Statistics estadisticas = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        estadisticas.clear();
+        return estadisticas;
     }
 
     @Test
@@ -69,5 +81,15 @@ class ReporteServiceTest {
         List<Map<String, Object>> masPrestados = (List<Map<String, Object>>) resumen.get("librosMasPrestados");
         assertEquals(List.of("Clean Code=3", "Ingeniería de Software=2", "Libro 999=1"), masPrestados.stream()
                 .map(fila -> fila.get("libro") + "=" + fila.get("prestamos")).toList());
+    }
+
+    @Test
+    void listarPrestamosNoRepiteConsultasPorFila() {
+        Statistics estadisticas = estadisticas();
+
+        reporteService.listarPrestamos();
+
+        long sentencias = estadisticas.getPrepareStatementCount();
+        assertTrue(sentencias <= 3, "se esperaban como máximo 3 consultas y se ejecutaron " + sentencias);
     }
 }
