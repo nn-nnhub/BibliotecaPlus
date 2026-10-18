@@ -10,6 +10,7 @@ import com.bibliotecaplus.repository.UsuarioRepository;
 import com.bibliotecaplus.validation.ValidadorPrestamo;
 import com.bibliotecaplus.notification.Notificador;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -43,6 +44,7 @@ public class PrestamoService {
         return prestamoRepository.findAll();
     }
 
+    @Transactional
     public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
         Libro libro = libroRepository.findById(libroId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
@@ -72,6 +74,7 @@ public class PrestamoService {
                 : tipoPrestamo.trim().toUpperCase();
     }
 
+    @Transactional
     public Prestamo devolver(Long prestamoId) {
         Prestamo prestamo = prestamoRepository.findById(prestamoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el préstamo"));
