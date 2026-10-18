@@ -1,5 +1,6 @@
 package com.bibliotecaplus.service;
 
+import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.model.Prestamo;
 import com.bibliotecaplus.model.Usuario;
@@ -44,9 +45,9 @@ public class PrestamoService {
 
     public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
         Libro libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el usuario"));
 
         if (!libro.isDisponible()) {
             throw new IllegalArgumentException("El libro no está disponible");
@@ -73,7 +74,7 @@ public class PrestamoService {
 
     public Prestamo devolver(Long prestamoId) {
         Prestamo prestamo = prestamoRepository.findById(prestamoId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el préstamo"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el préstamo"));
 
         if (prestamo.isDevuelto()) {
             throw new IllegalArgumentException("El préstamo ya fue devuelto");
@@ -86,7 +87,7 @@ public class PrestamoService {
         prestamo.setMulta(calculadorMulta.calcular(prestamo.getTipoPrestamo(), diasRetraso));
 
         Libro libro = libroRepository.findById(prestamo.getLibroId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
         libro.setDisponible(true);
         libroRepository.save(libro);
 

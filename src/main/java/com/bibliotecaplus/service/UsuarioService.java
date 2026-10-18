@@ -1,5 +1,6 @@
 package com.bibliotecaplus.service;
 
+import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.repository.UsuarioRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
@@ -24,7 +25,7 @@ public class UsuarioService {
 
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el usuario con id: " + id));
     }
 
     public Usuario guardar(Usuario usuario) {

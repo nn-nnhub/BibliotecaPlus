@@ -1,5 +1,6 @@
 package com.bibliotecaplus.service;
 
+import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.repository.LibroRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
@@ -24,7 +25,7 @@ public class LibroService {
 
     public Libro buscarPorId(Long id) {
         return libroRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro con id: " + id));
     }
 
     public Libro guardar(Libro libro) {
