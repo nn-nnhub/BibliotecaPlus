@@ -45,18 +45,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!-- Arnés ANTES conservado: su barrera posterior a la lectura
-                             es incompatible con la exclusión pesimista del RFC-013.
-                             La cobertura activa está en ConcurrenciaPrestamosDespuesTest. -->
-                        <exclude>**/ConcurrenciaPrestamosTest.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>

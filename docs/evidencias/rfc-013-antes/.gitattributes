@@ -1,0 +1,2 @@
+# Conservar los bytes originales, sin normalizar finales de línea al archivar.
+ConcurrenciaPrestamosTest.java -text
