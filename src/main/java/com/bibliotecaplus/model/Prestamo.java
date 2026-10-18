@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 public class Prestamo {
+    public static final String TIPO_POR_DEFECTO = "DOMICILIO";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +18,7 @@ public class Prestamo {
     private LocalDate fechaPrestamo;
     private LocalDate fechaVencimiento;
     private LocalDate fechaDevolucion;
+    private String tipoPrestamo;
     private boolean devuelto;
     private double multa;
 
@@ -74,6 +76,14 @@ public class Prestamo {
 
     public void setFechaDevolucion(LocalDate fechaDevolucion) {
         this.fechaDevolucion = fechaDevolucion;
+    }
+
+    public String getTipoPrestamo() {
+        return tipoPrestamo == null ? TIPO_POR_DEFECTO : tipoPrestamo;
+    }
+
+    public void setTipoPrestamo(String tipoPrestamo) {
+        this.tipoPrestamo = tipoPrestamo;
     }
 
     public boolean isDevuelto() {

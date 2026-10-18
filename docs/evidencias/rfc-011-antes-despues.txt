@@ -1,0 +1,92 @@
+RFC-011 · Evidencia de ejecución real (antes y después)
+Salida literal de Maven y Node.js, filtrada a las líneas de resultado. Las pruebas se ejecutaron en copias aisladas (H2 en memoria, sin tocar ./data).
+
+==================================================================
+ANTES · exportación CSV (código de 9863f4f)
+==================================================================
+Base (código anterior): 9863f4f Se documentó el RFC-010
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="ExportacionCsvTest"
+Fecha:                  2026-10-18 00:01
+-----
+1;=HYPERLINK("x";"y");Ana Torres;2026-10-18;2099-01-01;No;0.0
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 6.657 s <<< FAILURE! -- in com.bibliotecaplus.integration.ExportacionCsvTest
+1;=HYPERLINK("x";"y");Ana Torres;2026-10-18;2099-01-01;No;0.0
+ ==> expected: <true> but was: <false>
+[ERROR]   ExportacionCsvTest.neutralizaFormulasYEscapaSeparadoresEnElCsv:36 ?ID;Libro;Usuario;Fecha pr�stamo;Fecha vencimiento;Devuelto;Multa
+1;=HYPERLINK("x";"y");Ana Torres;2026-10-18;2099-01-01;No;0.0
+ ==> expected: <true> but was: <false>
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+
+==================================================================
+ANTES · consultas de reportes (código de e1990a2)
+==================================================================
+Base (código anterior): e1990a2 Se documentó el RFC-011
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="ReporteServiceTest"
+Fecha:                  2026-10-18 00:01
+-----
+[ERROR] Tests run: 4, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 6.368 s <<< FAILURE! -- in com.bibliotecaplus.integration.ReporteServiceTest
+org.opentest4j.AssertionFailedError: se esperaban como m�ximo 2 consultas y se ejecutaron 4 ==> expected: <true> but was: <false>
+org.opentest4j.AssertionFailedError: se esperaban como m�ximo 3 consultas y se ejecutaron 13 ==> expected: <true> but was: <false>
+[ERROR]   ReporteServiceTest.generarResumenNoRepiteConsultasPorLibro:103 se esperaban como m�ximo 2 consultas y se ejecutaron 4 ==> expected: <true> but was: <false>
+[ERROR]   ReporteServiceTest.listarPrestamosNoRepiteConsultasPorFila:93 se esperaban como m�ximo 3 consultas y se ejecutaron 13 ==> expected: <true> but was: <false>
+[ERROR] Tests run: 4, Failures: 2, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+
+==================================================================
+ANTES · interfaz, pruebas JavaScript (app.js de 9863f4f)
+==================================================================
+Base (app.js anterior): 9863f4f Se documentó el RFC-010
+Pruebas tomadas de:     d08244d
+Comando:                node --test "src/test/js/*.test.js"
+Fecha:                  2026-10-18 00:01
+-----
+✖ escaparHtml convierte los cinco caracteres especiales de HTML (25.1795ms)
+✖ escaparHtml no vuelve a escapar el resultado como texto plano (1.1584ms)
+✖ escaparHtml convierte nulos y números en texto (2.1244ms)
+✖ los libros con HTML en sus datos se muestran como texto (21.2914ms)
+✖ los usuarios con HTML en sus datos se muestran como texto (1.2547ms)
+✖ el historial de préstamos escapa los nombres de libro y usuario (1.5424ms)
+✔ los datos normales conservan el mismo formato visible (1.2274ms)
+✖ un libro con campos nulos no rompe la búsqueda (1.7124ms)
+ℹ tests 8
+ℹ pass 1
+ℹ fail 7
+✖ failing tests:
+
+==================================================================
+DESPUÉS · pruebas Java de reportes y CSV (código final)
+==================================================================
+Base (código anterior): d08244d Se agregaron pruebas HTTP de validación del DNI y del correo de usuarios
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="ExportacionCsvTest,ReporteServiceTest,ReporteControllerTest"
+Fecha:                  2026-10-18 00:01
+-----
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.509 s -- in com.bibliotecaplus.integration.ExportacionCsvTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.883 s -- in com.bibliotecaplus.integration.ReporteControllerTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.747 s -- in com.bibliotecaplus.integration.ReporteServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+==================================================================
+DESPUÉS · pruebas JavaScript (código final)
+==================================================================
+Estado (código final): d08244d Se agregaron pruebas HTTP de validación del DNI y del correo de usuarios
+Comando:               node --test "src/test/js/*.test.js"
+Fecha:                 2026-10-18 00:01
+-----
+✔ escaparHtml convierte los cinco caracteres especiales de HTML (28.6928ms)
+✔ escaparHtml no vuelve a escapar el resultado como texto plano (1.3891ms)
+✔ escaparHtml convierte nulos y números en texto (3.0466ms)
+✔ devolver un préstamo no envía el tipo de préstamo al servidor (25.4753ms)
+✔ el campo de vencimiento no admite fechas anteriores a hoy (2.1085ms)
+✔ los libros con HTML en sus datos se muestran como texto (28.6937ms)
+✔ los usuarios con HTML en sus datos se muestran como texto (1.5392ms)
+✔ el historial de préstamos escapa los nombres de libro y usuario (2.7323ms)
+✔ los datos normales conservan el mismo formato visible (2.4915ms)
+✔ un libro con campos nulos no rompe la búsqueda (1.9038ms)
+ℹ tests 10
+ℹ pass 10
+ℹ fail 0

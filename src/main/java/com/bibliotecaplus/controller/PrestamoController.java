@@ -40,8 +40,7 @@ public class PrestamoController {
     }
 
     @PutMapping("/{id}/devolver")
-    public Prestamo devolver(@PathVariable Long id,
-                             @RequestParam(defaultValue = "DOMICILIO") String tipoPrestamo) {
-        return prestamoService.devolver(id, tipoPrestamo);
+    public Prestamo devolver(@PathVariable Long id) {
+        return prestamoService.devolver(id);
     }
 }

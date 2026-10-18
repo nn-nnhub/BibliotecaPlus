@@ -13,10 +13,14 @@ public class CalculadorMulta {
     }
 
     public double calcular(String tipoPrestamo, long diasRetraso) {
+        return seleccionarTarifa(tipoPrestamo).valorDiario() * diasRetraso;
+    }
+
+    private TarifaMulta seleccionarTarifa(String tipoPrestamo) {
         return tarifas.stream()
-                .filter(tarifa -> tarifa.aplicaA(tipoPrestamo))
+                .filter(tarifa -> !tarifa.esPorDefecto() && tarifa.aplicaA(tipoPrestamo))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No existe una tarifa configurada"))
-                .valorDiario() * diasRetraso;
+                .or(() -> tarifas.stream().filter(TarifaMulta::esPorDefecto).findFirst())
+                .orElseThrow(() -> new IllegalArgumentException("No existe una tarifa configurada"));
     }
 }

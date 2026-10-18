@@ -1,0 +1,61 @@
+RFC-010 · Evidencia de ejecución real (antes y después)
+Salida literal de Maven, filtrada a las líneas de resultado. Las pruebas se ejecutaron en copias aisladas (H2 en memoria, sin tocar ./data).
+
+==================================================================
+ANTES · código previo a RFC-010 (76bf677) con las pruebas HTTP finales
+==================================================================
+Base (código anterior): 76bf677 Se documentó el RFC-009
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="ManejoErroresTest,EliminacionConPrestamosTest,ValidacionLibrosHttpTest,ValidacionUsuariosHttpTest"
+Fecha:                  2026-10-18 00:00
+-----
+[ERROR] Tests run: 3, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 8.019 s <<< FAILURE! -- in com.bibliotecaplus.integration.EliminacionConPrestamosTest
+java.lang.AssertionError: Status expected:<400> but was:<204>
+java.lang.AssertionError: Status expected:<404> but was:<204>
+[ERROR] Tests run: 7, Failures: 2, Errors: 3, Skipped: 0, Time elapsed: 1.533 s <<< FAILURE! -- in com.bibliotecaplus.integration.ManejoErroresTest
+java.lang.AssertionError: Status expected:<404> but was:<400>
+java.lang.AssertionError: Status expected:<404> but was:<400>
+[ERROR] Tests run: 5, Failures: 5, Errors: 0, Skipped: 0, Time elapsed: 1.257 s <<< FAILURE! -- in com.bibliotecaplus.integration.ValidacionLibrosHttpTest
+java.lang.AssertionError: JSON path "$.disponible" expected:<true> but was:<false>
+java.lang.AssertionError: Status expected:<400> but was:<200>
+java.lang.AssertionError: Status expected:<400> but was:<201>
+java.lang.AssertionError: JSON path "$.disponible" expected:<false> but was:<true>
+java.lang.AssertionError: Status expected:<404> but was:<400>
+[ERROR] Tests run: 5, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 0.880 s <<< FAILURE! -- in com.bibliotecaplus.integration.ValidacionUsuariosHttpTest
+java.lang.AssertionError: Status expected:<400> but was:<201>
+java.lang.AssertionError: Status expected:<400> but was:<201>
+java.lang.AssertionError: Status expected:<404> but was:<400>
+java.lang.AssertionError: Status expected:<400> but was:<200>
+[ERROR]   EliminacionConPrestamosTest.eliminarUnRecursoInexistenteResponde404:57 Status expected:<404> but was:<204>
+[ERROR]   EliminacionConPrestamosTest.noEliminaLibroNiUsuarioConPrestamosYConservaElHistorial:38 Status expected:<400> but was:<204>
+[ERROR]   ManejoErroresTest.libroInexistenteResponde404:28 Status expected:<404> but was:<400>
+[ERROR]   ManejoErroresTest.usuarioInexistenteResponde404:35 Status expected:<404> but was:<400>
+[ERROR]   ValidacionLibrosHttpTest.actualizarUnLibroInexistenteResponde404:81 Status expected:<404> but was:<400>
+[ERROR]   ValidacionLibrosHttpTest.actualizarUnLibroPrestadoNoLoMarcaComoDisponible:60 JSON path "$.disponible" expected:<false> but was:<true>
+[ERROR]   ValidacionLibrosHttpTest.rechazaActualizarConDatosInvalidosYConservaElLibro:67 Status expected:<400> but was:<200>
+[ERROR]   ValidacionLibrosHttpTest.rechazaRegistrarUnLibroSinTituloOSinAutor:33 Status expected:<400> but was:<201>
+[ERROR]   ValidacionLibrosHttpTest.unLibroNuevoSiempreQuedaDisponibleAunqueElClienteEnvieOtroValor:46 JSON path "$.disponible" expected:<true> but was:<false>
+[ERROR]   ValidacionUsuariosHttpTest.actualizarAplicaLasMismasValidacionesYConservaElUsuario:62 Status expected:<400> but was:<200>
+[ERROR]   ValidacionUsuariosHttpTest.actualizarUnUsuarioInexistenteResponde404:77 Status expected:<404> but was:<400>
+[ERROR]   ValidacionUsuariosHttpTest.rechazaRegistrarUnUsuarioConCorreoInvalido:45 Status expected:<400> but was:<201>
+[ERROR]   ValidacionUsuariosHttpTest.rechazaRegistrarUnUsuarioConDniDeFormatoInvalido:35 Status expected:<400> but was:<201>
+[ERROR]   ManejoErroresTest.devolverPrestamoInexistenteResponde404:49 � Servlet Request processing failed: java.lang.IllegalArgumentException: No se encontr� el pr�stamo
+[ERROR]   ManejoErroresTest.prestamoConLibroInexistenteResponde404ConMensaje:41 � Servlet Request processing failed: java.lang.IllegalArgumentException: No se encontr� el libro
+[ERROR]   ManejoErroresTest.vencimientoPasadoResponde400ConMensaje:56 � Servlet Request processing failed: java.lang.IllegalArgumentException: La fecha de vencimiento no puede ser anterior a hoy
+[ERROR] Tests run: 20, Failures: 13, Errors: 3, Skipped: 0
+[INFO] BUILD FAILURE
+
+==================================================================
+DESPUÉS · código final de la rama
+==================================================================
+Base (código anterior): d08244d Se agregaron pruebas HTTP de validación del DNI y del correo de usuarios
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="ManejoErroresTest,EliminacionConPrestamosTest,ValidacionLibrosHttpTest,ValidacionUsuariosHttpTest"
+Fecha:                  2026-10-18 00:00
+-----
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.527 s -- in com.bibliotecaplus.integration.EliminacionConPrestamosTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.909 s -- in com.bibliotecaplus.integration.ManejoErroresTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.789 s -- in com.bibliotecaplus.integration.ValidacionLibrosHttpTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.645 s -- in com.bibliotecaplus.integration.ValidacionUsuariosHttpTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS

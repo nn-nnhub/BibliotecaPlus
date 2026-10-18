@@ -1,7 +1,9 @@
 package com.bibliotecaplus.service;
 
+import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.repository.LibroRepository;
+import com.bibliotecaplus.repository.PrestamoRepository;
 import com.bibliotecaplus.validation.ValidadorDatos;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,12 @@ import java.util.List;
 public class LibroService {
 
     private final LibroRepository libroRepository;
+    private final PrestamoRepository prestamoRepository;
     private final ValidadorDatos validadorDatos;
 
-    public LibroService(LibroRepository libroRepository, ValidadorDatos validadorDatos) {
+    public LibroService(LibroRepository libroRepository, PrestamoRepository prestamoRepository, ValidadorDatos validadorDatos) {
         this.libroRepository = libroRepository;
+        this.prestamoRepository = prestamoRepository;
         this.validadorDatos = validadorDatos;
     }
 
@@ -24,24 +28,32 @@ public class LibroService {
 
     public Libro buscarPorId(Long id) {
         return libroRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro con id: " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro con id: " + id));
     }
 
     public Libro guardar(Libro libro) {
+        validarTituloYAutor(libro);
         validarIsbnDisponible(libro.getIsbn());
+        libro.setDisponible(true);
         return libroRepository.save(libro);
     }
 
     public Libro actualizar(Long id, Libro datosLibro) {
         Libro libro = buscarPorId(id);
+        validarTituloYAutor(datosLibro);
+        validadorDatos.exigirTexto(datosLibro.getIsbn(), "El ISBN es obligatorio");
         if (libroRepository.existsByIsbnAndIdNot(datosLibro.getIsbn(), id)) {
             throw new IllegalArgumentException("El ISBN ya está registrado en otro libro");
         }
         libro.setTitulo(datosLibro.getTitulo());
         libro.setAutor(datosLibro.getAutor());
         libro.setIsbn(datosLibro.getIsbn());
-        libro.setDisponible(datosLibro.isDisponible());
         return libroRepository.save(libro);
+    }
+
+    private void validarTituloYAutor(Libro libro) {
+        validadorDatos.exigirTexto(libro.getTitulo(), "El título es obligatorio");
+        validadorDatos.exigirTexto(libro.getAutor(), "El autor es obligatorio");
     }
 
     private void validarIsbnDisponible(String isbn) {
@@ -52,6 +64,10 @@ public class LibroService {
     }
 
     public void eliminar(Long id) {
-        libroRepository.deleteById(id);
+        Libro libro = buscarPorId(id);
+        if (prestamoRepository.existsByLibroId(id)) {
+            throw new IllegalArgumentException("No se puede eliminar el libro porque tiene préstamos asociados");
+        }
+        libroRepository.delete(libro);
     }
 }

@@ -1,0 +1,42 @@
+RFC-009 · Evidencia de ejecución real (antes y después)
+Salida literal de Maven, filtrada a las líneas de resultado. Las pruebas se ejecutaron en copias aisladas (H2 en memoria, sin tocar ./data).
+
+==================================================================
+ANTES · código de main (b5a123b) con las pruebas finales
+==================================================================
+Base (código anterior): b5a123b Se corrigió la ejecución de Maven portable en Windows
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="MultaPorTipoPrestamoTest,CalculadorMultaTest,ManejoErroresTest#vencimientoPasadoResponde400ConMensaje"
+Fecha:                  2026-10-17 23:59
+-----
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 12.27 s <<< FAILURE! -- in com.bibliotecaplus.integration.ManejoErroresTest
+java.lang.AssertionError: Status expected:<400> but was:<201>
+[ERROR] Tests run: 5, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 2.349 s <<< FAILURE! -- in com.bibliotecaplus.integration.MultaPorTipoPrestamoTest
+org.opentest4j.AssertionFailedError: expected: <20.0> but was: <10.0>
+org.opentest4j.AssertionFailedError: expected: <10.0> but was: <5.0>
+org.opentest4j.AssertionFailedError: expected: <2.0> but was: <8.0>
+org.opentest4j.AssertionFailedError: expected: <3.0> but was: <6.0>
+[ERROR] Tests run: 6, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.020 s <<< FAILURE! -- in com.bibliotecaplus.service.CalculadorMultaTest
+org.opentest4j.AssertionFailedError: expected: <1.0> but was: <0.5>
+[ERROR]   ManejoErroresTest.vencimientoPasadoResponde400ConMensaje:58 Status expected:<400> but was:<201>
+[ERROR]   MultaPorTipoPrestamoTest.devolucionUsaElTipoRegistradoAunqueElClienteEnvieOtro:49 expected: <20.0> but was: <10.0>
+[ERROR]   MultaPorTipoPrestamoTest.elPrestamoDeSalaCobraLaTarifaGeneral:77 expected: <2.0> but was: <8.0>
+[ERROR]   MultaPorTipoPrestamoTest.elPrestamoDomicilioCobraUnSolPorDiaDeRetraso:72 expected: <3.0> but was: <6.0>
+[ERROR]   MultaPorTipoPrestamoTest.elTipoSeInterpretaSinDistinguirMayusculas:82 expected: <10.0> but was: <5.0>
+[ERROR]   CalculadorMultaTest.elResultadoNoDependeDelOrdenDeLasTarifas:38 expected: <1.0> but was: <0.5>
+[ERROR] Tests run: 12, Failures: 6, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+
+==================================================================
+DESPUÉS · código final de la rama
+==================================================================
+Base (código anterior): d08244d Se agregaron pruebas HTTP de validación del DNI y del correo de usuarios
+Pruebas tomadas de:     d08244d (rama rfc-011-seguridad-reportes)
+Comando:                mvn -B test -Dtest="MultaPorTipoPrestamoTest,CalculadorMultaTest,ManejoErroresTest#vencimientoPasadoResponde400ConMensaje"
+Fecha:                  2026-10-17 23:59
+-----
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.11 s -- in com.bibliotecaplus.integration.ManejoErroresTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.627 s -- in com.bibliotecaplus.integration.MultaPorTipoPrestamoTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.025 s -- in com.bibliotecaplus.service.CalculadorMultaTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS

@@ -1,5 +1,6 @@
 package com.bibliotecaplus.service;
 
+import com.bibliotecaplus.exception.RecursoNoEncontradoException;
 import com.bibliotecaplus.model.Libro;
 import com.bibliotecaplus.model.Prestamo;
 import com.bibliotecaplus.model.Usuario;
@@ -44,20 +45,19 @@ public class PrestamoService {
 
     public Prestamo registrar(Long libroId, Long usuarioId, String tipoPrestamo, LocalDate fechaVencimiento) {
         Libro libro = libroRepository.findById(libroId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el usuario"));
 
         if (!libro.isDisponible()) {
             throw new IllegalArgumentException("El libro no está disponible");
         }
 
         validadorPrestamo.validar(libro, usuario);
-        if (fechaVencimiento == null) {
-            throw new IllegalArgumentException("La fecha de vencimiento es obligatoria");
-        }
+        validadorPrestamo.validarVencimiento(fechaVencimiento);
 
         Prestamo prestamo = new Prestamo(libro.getId(), usuario.getId(), LocalDate.now(), fechaVencimiento);
+        prestamo.setTipoPrestamo(normalizarTipo(tipoPrestamo));
         libro.setDisponible(false);
         libroRepository.save(libro);
 
@@ -66,23 +66,28 @@ public class PrestamoService {
         return prestamoGuardado;
     }
 
-    public Prestamo devolver(Long prestamoId, String tipoPrestamo) {
+    private String normalizarTipo(String tipoPrestamo) {
+        return tipoPrestamo == null || tipoPrestamo.isBlank()
+                ? Prestamo.TIPO_POR_DEFECTO
+                : tipoPrestamo.trim().toUpperCase();
+    }
+
+    public Prestamo devolver(Long prestamoId) {
         Prestamo prestamo = prestamoRepository.findById(prestamoId)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el préstamo"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el préstamo"));
 
         if (prestamo.isDevuelto()) {
             throw new IllegalArgumentException("El préstamo ya fue devuelto");
         }
 
         LocalDate fechaDevolucion = LocalDate.now();
-        long diasPrestamo = ChronoUnit.DAYS.between(prestamo.getFechaPrestamo(), fechaDevolucion);
         prestamo.setFechaDevolucion(fechaDevolucion);
         prestamo.setDevuelto(true);
         long diasRetraso = Math.max(0, ChronoUnit.DAYS.between(prestamo.getFechaVencimiento(), fechaDevolucion));
-        prestamo.setMulta(calculadorMulta.calcular(tipoPrestamo, diasRetraso));
+        prestamo.setMulta(calculadorMulta.calcular(prestamo.getTipoPrestamo(), diasRetraso));
 
         Libro libro = libroRepository.findById(prestamo.getLibroId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el libro"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro"));
         libro.setDisponible(true);
         libroRepository.save(libro);
 
