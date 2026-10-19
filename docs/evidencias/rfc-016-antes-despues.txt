@@ -1,0 +1,87 @@
+RFC-016 - REGISTRO DE PRUEBAS ANTES/DESPUÉS
+Fecha ANTES: 2026-10-18 (America/Lima)
+Rama: rfc-016-categorias
+Estado: ANTES; funcionalidad de categorías aún no implementada
+
+SEGURIDAD DE DATOS
+------------------
+La clase CategoriasLibrosHttpTest declara expresamente:
+  spring.datasource.url=jdbc:h2:mem:rfc016-antes;DB_CLOSE_DELAY=-1
+  spring.jpa.hibernate.ddl-auto=create-drop
+  spring.h2.console.enabled=false
+
+Antes de limpiar repositorios, cada prueba comprueba que la URL JDBC sea exactamente
+jdbc:h2:mem:rfc016-antes. No se inició Spring con application.properties y no se accedió
+a ./data/bibliotecadb.
+
+ENTORNO
+-------
+Java: Eclipse Temurin 17.0.20.1
+Maven: 3.9.16
+
+PRIMER INTENTO MAVEN DENTRO DEL AISLAMIENTO
+-------------------------------------------
+Comando:
+  mvn -B "-Dtest=CategoriasLibrosHttpTest" test
+
+Resultado: no ejecutó pruebas. Maven no pudo crear su repositorio local en
+C:\.m2\repository dentro del aislamiento. Este intento no cuenta como resultado funcional.
+
+EJECUCIÓN JAVA ANTES
+--------------------
+Comando autorizado para permitir acceso al repositorio local de Maven:
+  mvn -B "-Dtest=CategoriasLibrosHttpTest" test
+
+Finalización: 2026-10-18T21:00:45-05:00
+Resultado Maven: BUILD FAILURE; código de salida 1
+Resumen: Tests run: 7, Failures: 5, Errors: 0, Skipped: 0
+
+Casos aprobados (2):
+  - conservaCompatibilidadCuandoElClienteOmiteLaCategoria
+  - prestamosYDisponibilidadMantienenSuComportamiento
+
+Casos fallidos por funcionalidad ausente (5):
+  - registraUnLibroConCategoria
+    Observado: la respuesta HTTP 201 no contiene $.categoria.
+  - consultaLibrosPorCategoriaSinDistinguirMayusculas
+    Esperado: 1 libro. Observado: 2; el endpoint ignora el parámetro.
+  - muestraSinCategoriaParaUnRegistroAntiguo
+    Observado: la respuesta no contiene $.categoria.
+  - normalizaEspaciosDeLaCategoria
+    Observado: la respuesta no contiene $.categoria.
+  - rechazaUnaCategoriaDemasiadoLarga
+    Esperado: HTTP 400. Observado: HTTP 201.
+
+No hubo errores de contexto, conexión, compilación ni acceso a base de datos. Los cinco
+fallos son aserciones del contrato futuro y constituyen la evidencia ANTES.
+
+PRUEBAS JAVASCRIPT ANTES
+------------------------
+Comandos intentados:
+  node --test "src/test/js/categorias-libros.test.js"
+  node --test "src/test/js/*.test.js"
+
+Resultado: no ejecutadas. PowerShell informó que `node` no se reconoce como comando.
+No se registra ningún caso JavaScript como aprobado o fallido.
+
+CAPTURA REAL ANTES
+------------------
+Archivo: docs/capturas/rfc-016-antes-interfaz.png
+Origen: http://127.0.0.1:18016/
+Navegador: Google Chrome headless
+Base temporal: jdbc:h2:mem:rfc016-captura
+Esquema: create-drop
+Tamaño: 1440 x 1400 píxeles; PNG real inspeccionado visualmente
+
+La captura muestra que el catálogo únicamente ofrece ID, Título, Autor, ISBN y Estado,
+y que el buscador menciona libro, autor o ISBN. No existe categoría ni filtro asociado.
+La instancia temporal se detuvo después de generar la imagen.
+
+CAMBIOS DE PRODUCCIÓN
+---------------------
+Ninguno. No se modificó el modelo, repositorio, servicio, controlador, interfaz ni lógica
+de préstamos. No se hicieron commit, push o merge.
+
+RESULTADOS DESPUÉS
+------------------
+Pendientes de implementación y autorización.
