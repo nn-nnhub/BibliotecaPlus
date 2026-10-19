@@ -26,6 +26,17 @@ public class LibroService {
         return libroRepository.findAll();
     }
 
+    public List<Libro> listarPorCategoria(String categoria) {
+        String categoriaNormalizada = normalizarCategoria(categoria);
+        if (categoriaNormalizada == null) {
+            return listarTodos();
+        }
+        if (Libro.SIN_CATEGORIA.equalsIgnoreCase(categoriaNormalizada)) {
+            return libroRepository.findSinCategoria();
+        }
+        return libroRepository.findByCategoriaIgnoreCase(categoriaNormalizada);
+    }
+
     public Libro buscarPorId(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el libro con id: " + id));
@@ -34,6 +45,7 @@ public class LibroService {
     public Libro guardar(Libro libro) {
         validarTituloYAutor(libro);
         validarIsbnDisponible(libro.getIsbn());
+        libro.setCategoria(normalizarCategoria(libro.getCategoriaAlmacenada()));
         libro.setDisponible(true);
         return libroRepository.save(libro);
     }
@@ -48,7 +60,24 @@ public class LibroService {
         libro.setTitulo(datosLibro.getTitulo());
         libro.setAutor(datosLibro.getAutor());
         libro.setIsbn(datosLibro.getIsbn());
+        if (datosLibro.getCategoriaAlmacenada() != null) {
+            libro.setCategoria(normalizarCategoria(datosLibro.getCategoriaAlmacenada()));
+        }
         return libroRepository.save(libro);
+    }
+
+    private String normalizarCategoria(String categoria) {
+        if (categoria == null) {
+            return null;
+        }
+        String normalizada = categoria.trim();
+        if (normalizada.isEmpty()) {
+            return null;
+        }
+        if (normalizada.length() > 100) {
+            throw new IllegalArgumentException("La categoría no puede superar 100 caracteres");
+        }
+        return normalizada;
     }
 
     private void validarTituloYAutor(Libro libro) {

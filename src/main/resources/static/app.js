@@ -18,13 +18,27 @@ async function consultar(url, opciones) {
 
 function mostrarLibros() {
     const filtro = document.querySelector('#buscarLibro').value.toLowerCase().trim();
-    const librosVisibles = estado.libros.filter(libro => [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
+    const categoriaSeleccionada = document.querySelector('#filtroCategoriaLibro').value.toLowerCase();
+    const categoriaVisible = libro => libro.categoria?.trim() || 'Sin categoría';
+    const librosVisibles = estado.libros.filter(libro =>
+        [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro))
+        && (!categoriaSeleccionada || categoriaVisible(libro).toLowerCase() === categoriaSeleccionada));
     const cuerpo = document.querySelector('#tablaLibros');
-    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
+    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td>${escaparHtml(categoriaVisible(libro))}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
     document.querySelector('#totalLibros').textContent = estado.libros.length;
     document.querySelector('#librosDisponibles').textContent = estado.libros.filter(libro => libro.disponible).length;
     const selector = document.querySelector('#libroId');
     selector.innerHTML = estado.libros.filter(libro => libro.disponible).map(libro => `<option value="${escaparHtml(libro.id)}">${escaparHtml(libro.titulo)}</option>`).join('');
+}
+
+function actualizarFiltroCategorias() {
+    const selector = document.querySelector('#filtroCategoriaLibro');
+    const seleccion = selector.value;
+    const categorias = [...new Set(estado.libros.map(libro => libro.categoria?.trim() || 'Sin categoría'))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    selector.innerHTML = '<option value="">Todas las categorías</option>'
+        + categorias.map(categoria => `<option value="${escaparHtml(categoria)}">${escaparHtml(categoria)}</option>`).join('');
+    selector.value = categorias.includes(seleccion) ? seleccion : '';
 }
 
 function mostrarUsuarios() {
@@ -81,7 +95,7 @@ async function limpiarFiltrosHistorial() {
 async function cargarDatos() {
     try {
         [estado.libros, estado.usuarios, estado.prestamos] = await Promise.all([consultar('/api/libros'), consultar('/api/usuarios'), consultar('/api/prestamos')]);
-        mostrarLibros(); mostrarUsuarios();
+        actualizarFiltroCategorias(); mostrarLibros(); mostrarUsuarios();
         await cargarHistorial();
         document.querySelector('#librosEstado').textContent = 'Datos actualizados correctamente.';
         document.querySelector('#librosEstado').className = 'message success';
@@ -115,6 +129,7 @@ document.querySelector('#btnResumen').addEventListener('click', async () => {
     } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
 });
 document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
+document.querySelector('#filtroCategoriaLibro').addEventListener('change', mostrarLibros);
 document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);
 
 document.querySelector('#formLibro').addEventListener('submit', async event => {
@@ -123,7 +138,8 @@ document.querySelector('#formLibro').addEventListener('submit', async event => {
     const libro = {
         titulo: document.querySelector('#tituloLibro').value,
         autor: document.querySelector('#autorLibro').value,
-        isbn: document.querySelector('#isbnLibro').value
+        isbn: document.querySelector('#isbnLibro').value,
+        categoria: document.querySelector('#categoriaLibro').value
     };
     try {
         await consultar('/api/libros', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(libro) });

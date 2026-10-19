@@ -84,4 +84,66 @@ de préstamos. No se hicieron commit, push o merge.
 
 RESULTADOS DESPUÉS
 ------------------
-Pendientes de implementación y autorización.
+Fecha: 2026-10-18 (America/Lima)
+
+IMPLEMENTACIÓN
+--------------
+- Campo nullable categoria varchar(100) en Libro; constructores existentes intactos.
+- Representación JSON "Sin categoría" para valores nulos o vacíos.
+- Normalización trim y validación de longitud máxima en LibroService.
+- PUT conserva disponibilidad y conserva la categoría si un cliente antiguo omite el campo.
+- GET /api/libros?categoria=... sin distinguir mayúsculas/minúsculas.
+- Consulta especial de valores nulos o vacíos mediante "Sin categoría".
+- Selector de categoría en el alta, columna y filtro en el catálogo web.
+- Sin edición web del RFC-015 y sin cambios en la lógica de préstamos.
+
+EJECUCIÓN RFC-016 DESPUÉS
+----------------------------
+Comando:
+  mvn -B "-Dtest=CategoriasLibrosHttpTest" test
+
+Finalización: 2026-10-18T21:11:10-05:00
+Resultado: BUILD SUCCESS; código de salida 0
+Resumen: Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+
+La clase siguió usando jdbc:h2:mem:rfc016-antes y create-drop. Los diez casos incluyen
+los siete contratos iniciales y tres regresiones adicionales para categoría vacía,
+PUT sin cambiar disponibilidad y PUT de cliente antiguo sin borrar la categoría.
+
+SUITE JAVA COMPLETA DESPUÉS
+---------------------------
+Comando:
+  mvn -B test
+
+Finalización aproximada: 2026-10-18T21:11:32-05:00
+Resultado: BUILD SUCCESS; código de salida 0
+Informes Surefire: 22 clases, 129 pruebas, 0 fallos, 0 errores, 0 omitidas.
+
+Antes de ejecutarla se verificó que todas las clases @SpringBootTest del repositorio
+declaran una URL jdbc:h2:mem:. No se arrancó Spring con la configuración persistente.
+
+PRUEBAS JAVASCRIPT DESPUÉS
+--------------------------
+Node.js continúa sin estar instalado o disponible en PATH. Las pruebas
+categorias-libros.test.js permanecen preparadas, pero no se ejecutaron y no se les
+atribuye un resultado.
+
+CAPTURA REAL DESPUÉS
+--------------------
+Archivo: docs/capturas/rfc-016-despues-interfaz.png
+Origen: http://127.0.0.1:18016/
+Navegador: Google Chrome headless
+Base temporal: jdbc:h2:mem:rfc016-despues
+Esquema: create-drop
+Tamaño: 1440 x 1400 píxeles; PNG de 93667 bytes inspeccionado visualmente
+
+Se conservan visibles los dos libros iniciales como "Sin categoría" y se creó por la
+API real un tercer libro, "El nombre del viento", con categoría "Fantasía". La imagen
+muestra el selector "Todas las categorías" y la columna Categoría. La instancia temporal
+fue detenida y el puerto 18016 quedó cerrado.
+
+SEGURIDAD Y CONTROL DE CAMBIOS DESPUÉS
+--------------------------------------
+No se accedió, modificó, recreó ni eliminó ./data/bibliotecadb. No se modificó otra
+rama y no se realizaron commit, push o merge. Las secciones y la captura ANTES se
+conservaron; esta evidencia DESPUÉS se anexó al mismo registro.

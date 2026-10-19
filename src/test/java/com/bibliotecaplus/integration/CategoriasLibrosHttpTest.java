@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -79,10 +80,20 @@ class CategoriasLibrosHttpTest {
     }
 
     @Test
+    void categoriaVaciaSeMuestraYSePuedeFiltrarComoSinCategoria() throws Exception {
+        registrar("Libro sin clasificar", "RFC016-011", "   ");
+
+        mvc.perform(get("/api/libros").param("categoria", "Sin categoría"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].categoria").value("Sin categoría"));
+    }
+
+    @Test
     void normalizaEspaciosDeLaCategoria() throws Exception {
         mvc.perform(post("/api/libros")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(libroJson("Patrones", "Autor", "RFC016-005", "  Ciencia   ficción  ")))
+                        .content(libroJson("Patrones", "Autor", "RFC016-005", "  Ciencia ficción  ")))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.categoria").value("Ciencia ficción"));
     }
@@ -106,6 +117,34 @@ class CategoriasLibrosHttpTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.titulo").value("Cliente anterior"))
                 .andExpect(jsonPath("$.disponible").value(true));
+    }
+
+    @Test
+    void actualizaCategoriaSinCambiarDisponibilidad() throws Exception {
+        Libro prestado = libros.save(new Libro("Libro prestado", "Autor", "RFC016-009"));
+        prestado.setDisponible(false);
+        libros.saveAndFlush(prestado);
+
+        mvc.perform(put("/api/libros/{id}", prestado.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(libroJson("Libro prestado", "Autor", "RFC016-009", "  Historia  ")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoria").value("Historia"))
+                .andExpect(jsonPath("$.disponible").value(false));
+    }
+
+    @Test
+    void clienteAnteriorPuedeActualizarSinBorrarLaCategoria() throws Exception {
+        Libro libro = new Libro("Libro", "Autor", "RFC016-010");
+        libro.setCategoria("Tecnología");
+        libro = libros.saveAndFlush(libro);
+
+        mvc.perform(put("/api/libros/{id}", libro.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"titulo\":\"Libro actualizado\",\"autor\":\"Autor\",\"isbn\":\"RFC016-010\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.titulo").value("Libro actualizado"))
+                .andExpect(jsonPath("$.categoria").value("Tecnología"));
     }
 
     @Test
