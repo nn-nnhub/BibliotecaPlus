@@ -18,4 +18,6 @@ public interface PrestamoRepository extends JpaRepository<Prestamo, Long> {
     boolean existsByLibroId(Long libroId);
 
     boolean existsByUsuarioId(Long usuarioId);
+
+    List<Prestamo> findByUsuarioIdOrderByFechaPrestamoDesc(Long usuarioId);
 }

@@ -1,0 +1,186 @@
+RFC-017 - REGISTRO DE PRUEBAS ANTES/DESPUÉS
+Fecha ANTES: 2026-10-19 (America/Lima)
+Rama: rfc-017-ficha-lector
+Base: origin/main
+Estado: ANTES; ficha de lector aún no implementada
+
+SEGURIDAD DE DATOS
+------------------
+FichaLectorHttpTest declara expresamente:
+  spring.datasource.url=jdbc:h2:mem:rfc017-antes;DB_CLOSE_DELAY=-1
+  spring.jpa.hibernate.ddl-auto=create-drop
+  spring.jpa.show-sql=false
+  spring.h2.console.enabled=false
+
+Antes de limpiar repositorios, cada prueba comprueba por metadatos que la URL sea
+exactamente jdbc:h2:mem:rfc017-antes. No se arrancó Spring con application.properties y
+no se accedió a ./data/bibliotecadb.
+
+ESTRUCTURA REAL VERIFICADA
+-------------------------
+Usuario: id, nombre, apellidos, dni, correo, telefono.
+Prestamo: id, libroId, usuarioId, fechaPrestamo, fechaVencimiento, fechaDevolucion,
+tipoPrestamo, devuelto, multa.
+
+No existen relaciones JPA entre Prestamo, Usuario y Libro. La multa se calcula y persiste
+en PrestamoService.devolver(); un activo vencido no tiene una multa proyectada almacenada.
+
+EJECUCIÓN JAVA ANTES
+--------------------
+Comando:
+  mvn -B "-Dtest=FichaLectorHttpTest" test
+
+Base observada en el log: jdbc:h2:mem:rfc017-antes
+Finalización: 2026-10-19T01:23:03-05:00
+Resultado: BUILD FAILURE; código de salida 1
+Resumen: Tests run: 8, Failures: 7, Errors: 0, Skipped: 0
+
+Caso aprobado (1):
+  - controlEndpointActualDeUsuarioSigueDisponible
+    GET /api/usuarios/{id} respondió HTTP 200 con el usuario esperado.
+
+Casos fallidos por funcionalidad ausente (7):
+  - usuarioInexistenteResponde404Controlado
+    Observado: HTTP 404 genérico, sin $.message.
+  - lectorSinPrestamosDevuelveFichaYResumenEnCero
+    Observado: HTTP 404; esperado: HTTP 200.
+  - consolidaPrestamosActivosDevueltosVencidosYMultas
+    Observado: HTTP 404; esperado: HTTP 200.
+  - historialIncluyeLibroFechasTipoEstadoYMulta
+    Observado: HTTP 404; esperado: HTTP 200.
+  - prestamoActivoPasadoSeMarcaVencidoSinInventarMulta
+    Observado: HTTP 404; esperado: HTTP 200.
+  - multaAcumuladaUsaLosImportesPersistidosDePrestamosDevueltos
+    Observado: HTTP 404; esperado: HTTP 200.
+  - consultarFichaNoModificaUsuarioLibrosNiPrestamos
+    Observado: datos intactos, pero HTTP 404 en lugar de 200. assertAll ejecutó las
+    comprobaciones de conteos, disponibilidad y multa; el estado HTTP fue el único fallo.
+
+No hubo errores de compilación, contexto Spring o conexión. Los siete fallos son
+aserciones del contrato futuro.
+
+PRUEBAS JAVASCRIPT ANTES
+------------------------
+Comando intentado:
+  node --test "src/test/js/ficha-lector.test.js"
+
+Resultado: no ejecutado. PowerShell informó que `node` no se reconoce como comando.
+Las seis pruebas quedaron creadas, pero no se registra ninguna como aprobada o fallida.
+
+CAPTURA REAL ANTES
+------------------
+Archivo: docs/capturas/rfc-017-antes-interfaz.png
+Origen: http://127.0.0.1:18017/
+Navegador: Google Chrome headless
+Base temporal: jdbc:h2:mem:rfc017-captura
+Esquema: create-drop
+Tamaño: 1440 x 1400 píxeles; PNG real de 87611 bytes, inspeccionado visualmente
+
+La tabla muestra dos usuarios iniciales y las columnas ID, Nombres, Apellidos, DNI,
+Correo y Teléfono. No existe columna Acciones, botón Ver ficha ni panel de ficha.
+La instancia temporal fue detenida y el puerto 18017 quedó cerrado.
+
+DECISIONES DE CONTRATO PARA REVISAR
+----------------------------------
+- Respuesta agrupada en usuario, resumen e historial.
+- Historial ordenado por fechaPrestamo descendente.
+- Vencido significa activo con fechaVencimiento anterior a hoy.
+- Multas acumuladas suma valores persistidos y no proyecta deuda de activos vencidos.
+- La operación debe ser estrictamente de solo lectura.
+
+CAMBIOS DE PRODUCCIÓN
+---------------------
+Ninguno. No se modificaron entidades, repositorios, servicios, controladores, HTML, CSS,
+JavaScript de producción ni lógica de préstamos, devoluciones o multas.
+
+RESULTADOS DESPUÉS
+------------------
+Fecha: 2026-10-19 (America/Lima)
+
+IMPLEMENTACIÓN
+--------------
+- DTO inmutable FichaLector con usuario, resumen e historial.
+- FichaLectorService transaccional de solo lectura.
+- Consulta ordenada de préstamos por usuario y carga de libros por lote con findAllById.
+- Resumen calculado sin modificar ni guardar multas, fechas, disponibilidad o estados.
+- GET /api/usuarios/{id}/ficha en UsuarioController.
+- Columna Acciones, botón Ver ficha y diálogo con resumen e historial.
+- Escape HTML para datos del lector y títulos de libros.
+- Sin cambios en PrestamoService, CalculadorMulta, registro o devolución.
+
+EJECUCIÓN RFC-017 DESPUÉS
+----------------------------
+Comando:
+  mvn -B "-Dtest=FichaLectorHttpTest" test
+
+Base observada: jdbc:h2:mem:rfc017-antes
+Finalización: 2026-10-19T01:32:50-05:00
+Resultado: BUILD SUCCESS; código de salida 0
+Resumen: Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+
+SUITE JAVA COMPLETA DESPUÉS
+---------------------------
+Comando:
+  mvn -B test
+
+Finalización aproximada: 2026-10-19T01:33:28-05:00
+Resultado: BUILD SUCCESS; código de salida 0
+Informes Surefire: 23 clases, 137 pruebas, 0 fallos, 0 errores, 0 omitidas.
+
+Todas las clases Spring declaran una URL jdbc:h2:mem:. No se usó la configuración
+persistente predeterminada.
+
+PRUEBAS JAVASCRIPT DESPUÉS
+--------------------------
+Node.js continúa sin estar instalado o disponible en PATH. Los seis contratos de
+ficha-lector.test.js no se ejecutaron y no se les atribuye un resultado.
+
+VALIDACIÓN REAL DE API DESPUÉS
+------------------------------
+Instancia: http://127.0.0.1:18017
+Base: jdbc:h2:mem:rfc017-despues
+Esquema: create-drop
+
+Se registró y devolvió un préstamo de Clean Code para la usuaria 1, y después se
+registró un préstamo activo de Ingeniería de Software. GET /api/usuarios/1/ficha devolvió:
+  totalPrestamos=2
+  prestamosActivos=1
+  prestamosDevueltos=1
+  prestamosVencidos=0
+  multasAcumuladas=0.0
+
+El historial incluyó ambos títulos, fechas, tipos, estados y multas persistidas.
+
+CAPTURA REAL DESPUÉS
+--------------------
+Archivo: docs/capturas/rfc-017-despues-interfaz.png
+Origen: http://127.0.0.1:18017/
+Navegador: Google Chrome headless
+Base temporal: jdbc:h2:mem:rfc017-despues
+Tamaño: 1440 x 1400 píxeles; PNG real de 89054 bytes, inspeccionado visualmente
+
+La imagen muestra la columna Acciones, los botones Ver ficha, dos préstamos globales y
+un libro actualmente prestado. No muestra el diálogo abierto y no se afirma lo contrario.
+La instancia temporal fue detenida y el puerto 18017 quedó cerrado.
+
+CAPTURA REAL DESPUÉS — FICHA ABIERTA
+------------------------------------
+Archivo: docs/capturas/rfc-017-despues-ficha-abierta.png
+Origen: http://127.0.0.1:18017/
+Navegador: Google Chrome headless, interacción real mediante DevTools
+Base temporal: jdbc:h2:mem:rfc017-ficha-abierta
+Esquema: create-drop
+Tamaño: PNG real de 163758 bytes, inspeccionado visualmente
+
+Se hizo clic en el botón Ver ficha de Ana Torres. Antes de capturar se verificó en el
+DOM real que el diálogo estaba abierto y contenía sus datos, el resumen total=2,
+activos=1, devueltos=1, vencidos=0 y multas=S/ 0.00, además del historial de Clean Code
+e Ingeniería de Software. La imagen muestra el diálogo abierto con esos datos.
+Los procesos temporales se detuvieron al finalizar y los puertos 18017 y 18018 quedaron
+cerrados.
+
+SEGURIDAD Y CONTROL DE CAMBIOS DESPUÉS
+--------------------------------------
+No se accedió, modificó, recreó ni eliminó ./data/bibliotecadb. No se incorporaron
+cambios de RFC-015 o RFC-016. No se hicieron commit, push, merge ni Pull Request. La
+evidencia y captura ANTES se conservaron.
