@@ -30,9 +30,35 @@ function mostrarLibros() {
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
     const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
-    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td></tr>`).join('');
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><button class="secondary-button" onclick="abrirFichaUsuario(${Number(usuario.id)})">Ver ficha</button></td></tr>`).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
+}
+
+function mostrarFichaUsuario(ficha) {
+    const usuario = ficha.usuario;
+    const resumen = ficha.resumen;
+    const filas = ficha.historial.map(prestamo => `<tr><td>${escaparHtml(prestamo.libroTitulo)}</td><td>${escaparHtml(prestamo.fechaPrestamo ?? '-')}</td><td>${escaparHtml(prestamo.fechaVencimiento ?? '-')}</td><td>${escaparHtml(prestamo.fechaDevolucion ?? '-')}</td><td>${escaparHtml(prestamo.tipoPrestamo)}</td><td>${prestamo.devuelto ? 'Devuelto' : prestamo.vencido ? 'Vencido' : 'Activo'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td></tr>`).join('');
+    document.querySelector('#fichaContenido').innerHTML = `
+        <div class="ficha-identidad"><h3>${escaparHtml(usuario.nombre)} ${escaparHtml(usuario.apellidos ?? '')}</h3><p>DNI: ${escaparHtml(usuario.dni)} · ${escaparHtml(usuario.correo)} · ${escaparHtml(usuario.telefono)}</p></div>
+        <div class="ficha-resumen"><article><span>Total</span><strong>${escaparHtml(resumen.totalPrestamos)}</strong></article><article><span>Activos</span><strong>${escaparHtml(resumen.prestamosActivos)}</strong></article><article><span>Devueltos</span><strong>${escaparHtml(resumen.prestamosDevueltos)}</strong></article><article><span>Vencidos</span><strong>${escaparHtml(resumen.prestamosVencidos)}</strong></article><article><span>Multas</span><strong>S/ ${Number(resumen.multasAcumuladas).toFixed(2)}</strong></article></div>
+        ${ficha.historial.length ? `<div class="table-wrapper"><table><thead><tr><th>Libro</th><th>Préstamo</th><th>Vencimiento</th><th>Devolución</th><th>Tipo</th><th>Estado</th><th>Multa</th></tr></thead><tbody>${filas}</tbody></table></div>` : '<p class="message">Este lector no tiene préstamos registrados.</p>'}`;
+}
+
+async function abrirFichaUsuario(id) {
+    const panel = document.querySelector('#fichaLector');
+    const contenido = document.querySelector('#fichaContenido');
+    panel.hidden = false;
+    contenido.textContent = 'Cargando ficha...';
+    try {
+        mostrarFichaUsuario(await consultar(`/api/usuarios/${id}/ficha`));
+    } catch (error) {
+        contenido.textContent = error.message;
+    }
+}
+
+function cerrarFichaUsuario() {
+    document.querySelector('#fichaLector').hidden = true;
 }
 
 function mostrarPrestamos(prestamos = estado.prestamos) {

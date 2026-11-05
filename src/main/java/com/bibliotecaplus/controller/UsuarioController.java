@@ -1,6 +1,8 @@
 package com.bibliotecaplus.controller;
 
+import com.bibliotecaplus.dto.FichaLector;
 import com.bibliotecaplus.model.Usuario;
+import com.bibliotecaplus.service.FichaLectorService;
 import com.bibliotecaplus.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,9 +22,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final FichaLectorService fichaLectorService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, FichaLectorService fichaLectorService) {
         this.usuarioService = usuarioService;
+        this.fichaLectorService = fichaLectorService;
     }
 
     @GetMapping
@@ -33,6 +37,11 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public Usuario buscarPorId(@PathVariable Long id) {
         return usuarioService.buscarPorId(id);
+    }
+
+    @GetMapping("/{id}/ficha")
+    public FichaLector obtenerFicha(@PathVariable Long id) {
+        return fichaLectorService.obtener(id);
     }
 
     @PostMapping
