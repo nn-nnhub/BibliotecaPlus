@@ -1,0 +1,66 @@
+RFC-016 / PR #28 - P2 - FASE 1: evidencia ANTES
+Fecha: 2026-11-07 (America/Lima)
+Carpeta: C:\Users\sebas\OneDrive\Documentos\BibliotecaPlus
+Rama: rfc-016-categorias
+HEAD: 9048e2bfd420c427f17849e9289e80fba4c1651b
+Estado inicial de Git: limpio.
+
+RECUPERACION
+Existia CategoriasLibrosHttpTest.java con 10 pruebas; faltaban las cinco del P2.
+Se recrearon cinco pruebas conforme al contrato solicitado; no son una recuperacion
+byte a byte de las pruebas de la otra computadora.
+Existia docs/evidencias/rfc-016-antes-despues.txt con evidencia historica del RFC
+(7 pruebas ANTES y 10 DESPUES), ademas de las capturas ANTES/DESPUES.
+No se encontro la evidencia local especifica de las 15 pruebas del P2.
+La evidencia historica se conserva sin modificaciones.
+
+AISLAMIENTO DE DATOS VERIFICADO ANTES DE EJECUTAR
+@SpringBootTest fija spring.datasource.url=jdbc:h2:mem:rfc016-antes;DB_CLOSE_DELAY=-1,
+spring.jpa.hibernate.ddl-auto=create-drop y spring.h2.console.enabled=false.
+Antes de borrar repositorios, @BeforeEach verifica mediante metadatos JDBC que la
+URL sea exactamente jdbc:h2:mem:rfc016-antes.
+No hay un DataSource alternativo en el codigo de produccion inspeccionado.
+El inicializador utiliza los repositorios de Spring y la misma base en memoria.
+La configuracion persistente de application.properties queda sobreescrita por
+las propiedades de la clase de pruebas. No se arranco la aplicacion por separado.
+El log real confirma la conexion jdbc:h2:mem:rfc016-antes.
+
+INTENTOS SIN PRUEBAS EJECUTADAS
+1. mvn -B "-Dtest=CategoriasLibrosHttpTest" test
+   Salida 1: no pudo crear C:\.m2\repository dentro del aislamiento.
+   Log: rfc-016-p2-antes-2026-11-07.log
+2. mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" "-Dtest=CategoriasLibrosHttpTest" test
+   Salida 1: acceso a dependencia jackson-annotations al compilar dentro del aislamiento.
+   Log: rfc-016-p2-antes-2026-11-07-ejecucion.log
+
+EJECUCION REAL
+Comando exacto (con acceso ampliado al cache Maven existente; modo offline):
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" "-Dtest=CategoriasLibrosHttpTest" test
+Log completo: rfc-016-p2-antes-2026-11-07-ejecucion-autorizada.log
+Informe: target/surefire-reports/TEST-com.bibliotecaplus.integration.CategoriasLibrosHttpTest.xml
+Fin: 2026-11-07T15:19:22-05:00
+Maven: BUILD FAILURE, codigo de salida 1.
+Tests run: 15, Failures: 4, Errors: 0, Skipped: 0. Aprobadas: 11.
+Estas cifras corresponden a esta ejecucion, no al resultado historico comunicado.
+
+FALLOS REALES
+- registroConSinCategoriaSeAlmacenaComoNull:
+  esperado null; almacenado literalmente "Sin categoría".
+- actualizacionConSinCategoriaSeAlmacenaComoNull:
+  esperado null; almacenado literalmente "Sin categoría".
+- filtroSinCategoriaRecuperaLibroRegistradoConEtiquetaLiteral:
+  esperado 1 libro; recibido 0.
+- filtroSinCategoriaRecuperaLibroActualizadoConEtiquetaLiteral:
+  esperado 1 libro; recibido 0.
+La nueva prueba de compatibilidad con registros antiguos nulos o vacios aprobo.
+Las diez pruebas preexistentes aprobaron. No hubo errores ni pruebas omitidas.
+
+CONTROL DE CAMBIOS Y PUNTO DE PARADA
+Modificado: src/test/java/com/bibliotecaplus/integration/CategoriasLibrosHttpTest.java
+Nuevo: docs/evidencias/rfc-016-p2-antes-2026-11-07.txt (este archivo).
+Generados: tres logs locales de los intentos y target/ con informes Surefire.
+Los archivos *.log y target/ estan ignorados por Git.
+Sin cambios de produccion, documentos RFC, evidencia historica ni GitHub.
+No se ejecuto git add, commit, push, pull, merge, reset ni cambio de rama.
+No se utilizo ./data/bibliotecadb; no existia la carpeta data al verificar.
+Fase 1 finalizada. Correccion de produccion pendiente de autorizacion del usuario.

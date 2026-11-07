@@ -27,12 +27,12 @@ public class LibroService {
     }
 
     public List<Libro> listarPorCategoria(String categoria) {
+        if (categoria != null && Libro.SIN_CATEGORIA.equalsIgnoreCase(categoria.trim())) {
+            return libroRepository.findSinCategoria();
+        }
         String categoriaNormalizada = normalizarCategoria(categoria);
         if (categoriaNormalizada == null) {
             return listarTodos();
-        }
-        if (Libro.SIN_CATEGORIA.equalsIgnoreCase(categoriaNormalizada)) {
-            return libroRepository.findSinCategoria();
         }
         return libroRepository.findByCategoriaIgnoreCase(categoriaNormalizada);
     }
@@ -71,7 +71,7 @@ public class LibroService {
             return null;
         }
         String normalizada = categoria.trim();
-        if (normalizada.isEmpty()) {
+        if (normalizada.isEmpty() || Libro.SIN_CATEGORIA.equalsIgnoreCase(normalizada)) {
             return null;
         }
         if (normalizada.length() > 100) {
