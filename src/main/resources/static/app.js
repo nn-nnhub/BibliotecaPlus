@@ -1,6 +1,7 @@
 const estado = { libros: [], usuarios: [], prestamos: [] };
 let filtrosHistorial = {};
 let solicitudHistorial = 0;
+let solicitudFicha = 0;
 
 function escaparHtml(valor) {
     const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -46,18 +47,23 @@ function mostrarFichaUsuario(ficha) {
 }
 
 async function abrirFichaUsuario(id) {
+    const solicitud = ++solicitudFicha;
     const panel = document.querySelector('#fichaLector');
     const contenido = document.querySelector('#fichaContenido');
     panel.hidden = false;
     contenido.textContent = 'Cargando ficha...';
     try {
-        mostrarFichaUsuario(await consultar(`/api/usuarios/${id}/ficha`));
+        const ficha = await consultar(`/api/usuarios/${id}/ficha`);
+        if (solicitud !== solicitudFicha) return;
+        mostrarFichaUsuario(ficha);
     } catch (error) {
+        if (solicitud !== solicitudFicha) return;
         contenido.textContent = error.message;
     }
 }
 
 function cerrarFichaUsuario() {
+    ++solicitudFicha;
     document.querySelector('#fichaLector').hidden = true;
 }
 
