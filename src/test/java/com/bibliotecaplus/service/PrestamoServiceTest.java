@@ -1,6 +1,9 @@
 package com.bibliotecaplus.service;
 
 import com.bibliotecaplus.model.Libro;
+import com.bibliotecaplus.exception.ConflictoBloqueoLibroException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
 import com.bibliotecaplus.model.Prestamo;
 import com.bibliotecaplus.model.Usuario;
 import com.bibliotecaplus.notification.Notificador;
@@ -21,10 +24,12 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class PrestamoServiceTest {
@@ -48,7 +53,7 @@ class PrestamoServiceTest {
     }
 
     private void prepararRegistro() {
-        when(libroRepository.findById(1L)).thenReturn(Optional.of(libro));
+        when(libroRepository.buscarPorIdConBloqueo(1L)).thenReturn(Optional.of(libro));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
     }
 
@@ -59,6 +64,28 @@ class PrestamoServiceTest {
         when(libroRepository.findById(1L)).thenReturn(Optional.of(libro));
         when(prestamoRepository.save(any(Prestamo.class))).thenAnswer(i -> i.getArgument(0));
         return prestamo;
+    }
+
+    @Test
+    void soloErroresAlAdquirirBloqueoSeConviertenEnConflicto() {
+        for (RuntimeException causa : List.of(new PessimisticLockingFailureException("bloqueo"),
+                new QueryTimeoutException("timeout"))) {
+            doThrow(causa).when(libroRepository).buscarPorIdConBloqueo(1L);
+            var conflicto = assertThrows(ConflictoBloqueoLibroException.class,
+                    () -> servicio.registrar(1L, 1L, "DOMICILIO", LocalDate.now().plusDays(7)));
+            assertSame(causa, conflicto.getCause());
+        }
+        verify(prestamoRepository, never()).save(any());
+    }
+
+    @Test
+    void timeoutDeOtraConsultaConservaLaExcepcionOriginal() {
+        when(libroRepository.buscarPorIdConBloqueo(1L)).thenReturn(Optional.of(libro));
+        var causa = new QueryTimeoutException("consulta de usuario");
+        when(usuarioRepository.findById(1L)).thenThrow(causa);
+        assertSame(causa, assertThrows(QueryTimeoutException.class,
+                () -> servicio.registrar(1L, 1L, "DOMICILIO", LocalDate.now().plusDays(7))));
+        verify(prestamoRepository, never()).save(any());
     }
 
     @Test
