@@ -1,0 +1,61 @@
+RFC-015 / PR #24 / Issue #23 — Resolución P1 e integración local
+Fecha: 07/11/2026 (America/Lima)
+Responsable: Carlos Sebastián Portugal Riega
+Rama inicial guardada: rfc-017-ficha-lector
+HEAD inicial guardado: 3bd0e4fe2b2dd6594c66104b77995971e857d81b
+Rama de trabajo: rfc-015-edicion-eliminacion
+HEAD antes de integrar: cb6924bbf5760277c1de403136d0a306fbc48266
+origin/main integrado: 6c19daa8962ebb42cadd2d02df6ee76070fe438c
+
+PREPARACIÓN E INTEGRACIÓN
+Árbol inicial limpio y sin merge pendiente. Se ejecutó git fetch origin.
+El PR #24 confirma la rama y el HEAD original. Se leyó la revisión P1.
+Comando exacto: git merge --no-ff origin/main
+Se detuvo por conflictos en app.js y src/test/js/cargar-app.js.
+Se combinaron manualmente estado de edición y filtros del historial.
+Se conservaron contador de respuestas tardías, errores, limpieza de filtros,
+edición, eliminación, confirmación, cancelación, búsqueda y escape HTML.
+El cargador conserva fetch con opciones, confirmaciones, listeners, disparo de
+eventos y reset. No se eligió íntegramente una versión de app.js.
+El backend integrado coincide con origin/main, incluido el bloqueo RFC-013.
+
+AISLAMIENTO VERIFICADO ANTES DE JAVA
+Las 11 clases @SpringBootTest fijan spring.datasource.url=jdbc:h2:mem:.
+No se encontraron DataSources alternativos en producción ni configuraciones
+dinámicas de datasource en pruebas. No existe src/test/resources ni data/.
+No se inició la aplicación contra la configuración persistente.
+
+RESULTADOS REALES DEL ÁRBOL INTEGRADO
+Comando exacto:
+node --test src/test/js/rfc-015-antes.test.js src/test/js/rfc-015-complementarias.test.js src/test/js/filtros-historial.test.js
+20 pruebas: 20 aprobadas, 0 fallidas, 0 omitidas; salida 0.
+Desglose: 8 RFC-015 originales, 3 complementarias y 9 RFC-014.
+Duración informada: 142.3482 ms.
+
+Comando exacto: node --test "src/test/js/*.test.js"
+30 pruebas: 30 aprobadas, 0 fallidas, 0 omitidas; salida 0.
+0 canceladas, 0 pendientes (todo). Duración informada: 178.4108 ms.
+
+Comando exacto:
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" test
+127 pruebas: 127 aprobadas, 0 fallos, 0 errores, 0 omitidas.
+Incluye 6 ejecuciones de ConcurrenciaPrestamosDespuesTest y 21 de filtros HTTP.
+BUILD SUCCESS; salida 0. Maven offline con acceso al caché local existente.
+Se utilizó el resumen de esta ejecución, sin sumar XML antiguos de target/.
+
+CONSERVACIÓN Y ALCANCE
+git diff --check: sin errores en la resolución.
+Evidencias y capturas históricas RFC-015 intactas respecto a cb6924b.
+Las evidencias heredadas RFC-013 se conservan idénticas a origin/main;
+sus espacios finales históricos no se corrigen ni se ocultan.
+git diff --cached --check también detecta espacios históricos en la evidencia
+RFC-014 (31486 incidencias) y una línea vacía final en TarifasMultaTest.java.
+Ambos archivos son idénticos a origin/main y se conservan sin cambios.
+Las dos evidencias RFC-013 tienen 3384 y 1340 incidencias respectivamente.
+La comprobación limitada a los cuatro archivos de resolución no tiene errores.
+RFC-016 y RFC-017 solo se compararon mediante git merge-tree de tres argumentos,
+sin escribir árboles ni integrar esas ramas.
+Conflictos futuros RFC-016: app.js, index.html, styles.css y cargar-app.js.
+Conflictos futuros RFC-017: app.js y cargar-app.js.
+Se deberán combinar columnas, acciones, filtros y contadores al autorizarse.
+Sin push ni modificaciones de Issues o Pull Requests. Base persistente intacta.
