@@ -33,7 +33,7 @@ Mensaje del primer commit: `test(rfc-012): documentar inconsistencias antes de l
 
 Validación DESPUÉS de la corrección del commit `11fc483`: prueba dirigida con 3 pruebas y suite completa con 84 pruebas, ambas con 0 fallos, 0 errores y salida 0. Las aserciones originales permanecen intactas. Los tres commits de esta fotografía histórica fueron creados y verificados. La captura DESPUÉS está verificada en `docs/capturas/rfc-012-despues.jpg`. Los commits posteriores se contabilizarán con el historial real, sin alterar el alcance temporal de esta fotografía.
 
-Validación existente: `IntegridadPrestamosTest`, H2 exclusivamente en memoria, 3 pruebas, 2 fallos de consistencia, 0 errores y salida 1. Ambos fallos quedan documentados como evidencia ANTES; el flujo normal pasa. Sin cambios de producción. Referencia: [RFC-012](RFC-012.md), Issue #12.
+Validación existente: `IntegridadPrestamosTest`, H2 exclusivamente en memoria, 3 pruebas, 2 fallos de consistencia, 0 errores y salida 1. Ambos fallos quedan documentados como evidencia ANTES; el flujo normal pasa. Sin cambios de producción. Referencia: [RFC-012](RFC-012-integridad-transaccional-prestamos.md), Issue #12.
 
 ## Organización del trabajo restante
 

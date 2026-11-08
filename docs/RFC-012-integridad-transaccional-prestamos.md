@@ -1,5 +1,27 @@
 # RFC-012 · Integridad transaccional de préstamos y devoluciones
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#12](https://github.com/nn-nnhub/BibliotecaPlus/issues/12) |
+| Pull request | [#20](https://github.com/nn-nnhub/BibliotecaPlus/pull/20) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Evitar cambios parciales en préstamos y disponibilidad.
+
+## Implementación e impacto
+
+Registro y devolución dentro de transacciones.
+
+## Pruebas y evidencias
+
+Regresiones de rollback y capturas antes/después. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#12](https://github.com/nn-nnhub/BibliotecaPlus/issues/12) |
@@ -12,7 +34,7 @@
 
 La aprobación de Ethan fue comunicada por el usuario. El texto del Issue consultado aún indica pendiente de aprobación y no tiene comentarios. No se modificó el Issue.
 
-## Metodología ANTES
+### Metodología ANTES
 
 Se agregó [IntegridadPrestamosTest](../src/test/java/com/bibliotecaplus/integration/IntegridadPrestamosTest.java), sin modificar archivos de producción. Usa el servicio administrado por Spring y repositorios JPA reales, con un espía únicamente en `PrestamoRepository.save` para provocar una excepción controlada antes de persistir el préstamo.
 
@@ -30,7 +52,7 @@ mvn -B "-Dtest=IntegridadPrestamosTest" test
 
 La salida combinada se conservó con `Tee-Object` y se registró `$LASTEXITCODE`. El primer intento fue bloqueado antes de las pruebas por acceso a `C:\.m2\repository`. Se conserva ese diagnóstico al comienzo del registro. Tras autorizar la ejecución fuera del aislamiento, Maven ejecutó las tres pruebas. El bloqueo inicial no se cuenta como defecto del sistema.
 
-## Resultados observados ANTES
+### Resultados observados ANTES
 
 | Escenario | Estado inicial | Estado persistido tras la operación | Resultado |
 |---|---|---|---|
@@ -44,7 +66,7 @@ Resultado real: **3 pruebas, 2 fallos de aserción, 0 errores, 0 omitidas; BUILD
 
 La salida de Maven informa `2026-10-18T00:53:32-05:00`; se conserva literalmente como marca del proceso. [Registro completo de ejecución](evidencias/rfc-012-antes-despues.txt). Los informes de Surefire se generaron en `target/surefire-reports` y pueden sobrescribirse en futuras ejecuciones.
 
-## Captura ANTES
+### Captura ANTES
 
 Se comprobó la captura real guardada como `docs/capturas/rfc-012-antes.jpg`. No existe `docs/capturas/rfc-012-antes.png`; se conserva el formato y nombre originales de la imagen recibida.
 
@@ -52,7 +74,7 @@ Se comprobó la captura real guardada como `docs/capturas/rfc-012-antes.jpg`. No
 
 La captura muestra un extracto del registro de ejecución en la terminal: base `jdbc:h2:mem:rfc012`, registro fallido con libro no disponible y cero préstamos, devolución fallida con libro disponible y préstamo todavía activo, flujo normal correcto y Maven con 3 pruebas, 2 fallos, 0 errores y código de salida 1. Corresponde a la consulta del registro conservado, no a una nueva ejecución de las pruebas.
 
-## Solución implementada y resultados DESPUÉS
+### Solución implementada y resultados DESPUÉS
 
 Se añadió `org.springframework.transaction.annotation.Transactional` a los métodos públicos `registrar()` y `devolver()` de `PrestamoService`. Es el único archivo de producción modificado: una importación y dos anotaciones. No se modificaron las pruebas ni sus aserciones.
 
@@ -77,7 +99,7 @@ Las marcas del proceso son `2026-10-18T01:10:24-05:00` para la prueba dirigida y
 
 Se volvió a revisar la configuración de todas las clases de integración: usan H2 en memoria. La prueba dirigida verifica `jdbc:h2:mem:rfc012` mediante metadatos JDBC y la suite registra únicamente conexiones `jdbc:h2:mem:`. No se abrió la base de producción `./data/bibliotecadb`. La suite Maven no ejecuta las pruebas JavaScript.
 
-## Captura auténtica DESPUÉS
+### Captura auténtica DESPUÉS
 
 Se verificó el archivo real `docs/capturas/rfc-012-despues.jpg` y su contenido visual. El nombre y la extensión coinciden con este enlace relativo:
 
@@ -85,7 +107,7 @@ Se verificó el archivo real `docs/capturas/rfc-012-despues.jpg` y su contenido 
 
 La captura muestra el extracto del registro conservado: H2 en memoria `jdbc:h2:mem:rfc012`, registro fallido con libro disponible y cero préstamos, devolución fallida con libro ocupado y préstamo activo, flujo normal correcto, 3 pruebas específicas y 84 de la suite completa sin fallos ni errores. Ambas ejecuciones terminaron con BUILD SUCCESS y código 0. La captura ANTES enlazada arriba conserva las 3 pruebas con 2 fallos y código 1.
 
-## Alcance y seguimiento
+### Alcance y seguimiento
 
 La atomicidad comprobada abarca las escrituras de la base de datos. La notificación actual se invoca dentro del método de registro; una transacción de base de datos no revierte efectos externos de notificaciones. No se rediseñó ese mecanismo. Tampoco se implementa control de concurrencia (RFC-013) ni filtros (RFC-014), ni se cambian las tarifas de RFC-009 o la persistencia local de RFC-008.
 

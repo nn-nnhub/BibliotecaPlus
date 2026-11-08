@@ -1,4 +1,26 @@
-# RFC-018 · Pruebas automatizadas de las tarifas de multa
+# RFC-018 · Pruebas automatizadas de tarifas de multa
+
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#16](https://github.com/nn-nnhub/BibliotecaPlus/issues/16) |
+| Pull request | [#27](https://github.com/nn-nnhub/BibliotecaPlus/pull/27) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Prevenir regresiones en la selección y cálculo de tarifas.
+
+## Implementación e impacto
+
+Pruebas de tarifas sin cambios en producción.
+
+## Pruebas y evidencias
+
+Ejecuciones Maven y capturas. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
 
 | Campo | Valor |
 |---|---|
@@ -11,11 +33,11 @@
 | Fecha propuesta | 17/10/2026 |
 | Etiquetas | RFC · Media · Mejora |
 
-## Relación con el RFC
+### Relación con el RFC
 
 Este RFC trata un único cambio: agregar pruebas unitarias directas para las tres tarifas de multa. No modifica código de producción, interfaz ni la persistencia H2 (RFC-008). `CalculadorMultaTest` (RFC-009) no se modifica.
 
-## Descripción del cambio
+### Descripción del cambio
 
 Se agrega la clase `TarifasMultaTest` en `src/test/java/com/bibliotecaplus/service/` con 7 pruebas:
 
@@ -29,17 +51,17 @@ Se agrega la clase `TarifasMultaTest` en `src/test/java/com/bibliotecaplus/servi
 | `tarifaGeneralAplicaACualquierTipo` | `aplicaA` devuelve `true` para cualquier tipo, incluido `null`. |
 | `soloLaTarifaGeneralEsPorDefecto` | Solo `TarifaGeneral` devuelve `esPorDefecto() = true`. |
 
-## Justificación
+### Justificación
 
 Las tarifas solo se probaban de forma indirecta a través de `CalculadorMulta` (RFC-009). Si alguien cambia por accidente el valor diario o la regla `aplicaA` de una tarifa, el fallo aparece lejos de su causa. Las pruebas directas protegen el cálculo de multas ante cambios futuros.
 
-## Impacto en el sistema
+### Impacto en el sistema
 
 - Se agrega un solo archivo en `src/test`.
 - No se modifica ningún archivo de `src/main` (ver evidencia).
 - No se toca `application.properties` ni la configuración de H2.
 
-## Criterios de aceptación
+### Criterios de aceptación
 
 1. `TarifaDomicilio` cobra S/ 1.00 por día, `TarifaEspecial` S/ 2.00 y `TarifaGeneral` S/ 0.50.
 2. Solo `TarifaGeneral` devuelve `esPorDefecto() = true`.
@@ -47,23 +69,23 @@ Las tarifas solo se probaban de forma indirecta a través de `CalculadorMulta` (
 4. `mvn clean test` termina en `BUILD SUCCESS`.
 5. `git diff --stat main -- src/main` no muestra cambios.
 
-## Evidencias visuales
+### Evidencias visuales
 
-### Pruebas automatizadas
+#### Pruebas automatizadas
 
 ![Resultado de mvn clean test con TarifasMultaTest: 7 pruebas y BUILD SUCCESS](capturas/rfc-018-pruebas.png)
 
-### Código de producción sin cambios
+#### Código de producción sin cambios
 
 ![git diff sin cambios en src/main](capturas/rfc-018-sin-cambios-produccion.png)
 
-## Resultado
+### Resultado
 
 - 7 pruebas nuevas, todas exitosas.
 - Suite completa: 98 pruebas, 0 fallos, 0 errores.
 - Código de producción sin cambios.
 
-## Validación automatizada
+### Validación automatizada
 
 Comandos ejecutados (PowerShell, desde la raíz del proyecto):
 
@@ -75,7 +97,7 @@ git diff --stat main -- src/main
 
 Resultado: `TarifasMultaTest` con `Tests run: 7, Failures: 0, Errors: 0`; suite completa con `Tests run: 98, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 - Las pruebas fijan los valores actuales de las tarifas. Si un RFC futuro los cambia a propósito, habrá que actualizar los valores esperados.
 - No prueba la selección entre tarifas; eso lo cubre `CalculadorMultaTest` (RFC-009).

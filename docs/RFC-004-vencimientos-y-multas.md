@@ -1,14 +1,36 @@
-# RFC 004 Control de vencimientos y multas
+# RFC-004 · Vencimientos y multas
 
-## Solicitud
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#4](https://github.com/nn-nnhub/BibliotecaPlus/issues/4) |
+| Pull request | Sin PR asociado en el historial consultado |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Calcular multas por atraso al devolver un préstamo.
+
+## Implementación e impacto
+
+Fechas de vencimiento, devolución y cálculo de multa.
+
+## Pruebas y evidencias
+
+Capturas de préstamos y devoluciones con y sin multa. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
+### Solicitud
 
 Incorporar fechas de vencimiento en los préstamos y calcular automáticamente una multa cuando un libro se devuelve después de la fecha límite.
 
-## Motivo
+### Motivo
 
 La versión anterior registraba únicamente la fecha del préstamo. El usuario no podía conocer la fecha límite ni observar una multa desde la interfaz.
 
-## Alcance
+### Alcance
 
 - Agregar fecha de vencimiento al préstamo.
 - Mostrar fecha de vencimiento en el historial.
@@ -16,7 +38,7 @@ La versión anterior registraba únicamente la fecha del préstamo. El usuario n
 - Calcular la multa según el tipo de préstamo.
 - Mostrar la multa en la interfaz.
 
-## Reglas de negocio
+### Reglas de negocio
 
 | Tipo | Tarifa por día de retraso |
 |---|---:|
@@ -30,7 +52,7 @@ La multa se calcula así:
 multa = días de retraso × tarifa diaria
 ```
 
-## Archivos modificados
+### Archivos modificados
 
 - `Prestamo.java`: agregó `fechaVencimiento`.
 - `PrestamoService.java`: calculó los días de retraso y la multa.
@@ -38,7 +60,7 @@ multa = días de retraso × tarifa diaria
 - `index.html`: agregó el campo de fecha y columnas de vencimiento y multa.
 - `app.js`: conectó el formulario y mostró los resultados.
 
-## Desarrollo y control de calidad
+### Desarrollo y control de calidad
 
 1. Se implementó el campo de vencimiento en el modelo.
 2. Se conectó la fecha al servicio y al controlador.
@@ -48,7 +70,7 @@ multa = días de retraso × tarifa diaria
 6. Se corrigió el método de cálculo para recibir directamente los días de retraso.
 7. Se repitió la prueba y se obtuvo una multa correcta de `S/ 5.00`.
 
-## Prueba final ejecutada
+### Prueba final ejecutada
 
 Se creó un préstamo con fecha de vencimiento cinco días antes de la fecha de devolución:
 
@@ -61,7 +83,7 @@ Multa esperada: S/ 5.00
 Multa obtenida: S/ 5.00
 ```
 
-## Capturas que deben tomarse
+### Capturas que deben tomarse
 
 1. **Formulario de préstamo:** antes de presionar Registrar préstamo, mostrando libro, usuario, tipo y fecha de vencimiento.
 2. **Préstamo activo:** inmediatamente después de registrarlo, mostrando la fecha de vencimiento y multa `S/ 0.00`.
@@ -77,14 +99,14 @@ rfc-004-devolucion.png
 rfc-004-multa-calculada.png
 ```
 
-## Evidencias capturadas
+### Evidencias capturadas
 
 1. [Formulario de préstamo](capturas/rfc-004-formulario.png): muestra el formulario y la fecha de vencimiento.
 2. [Préstamo activo](capturas/rfc-004-prestamo-activo.png): confirma el registro y muestra la multa inicial en `S/ 0.00`.
 3. [Pantalla de devolución](capturas/rfc-004-devolucion.png): muestra el historial antes de completar la devolución.
 4. [Multa calculada](capturas/rfc-004-multa-calculada.png): muestra el préstamo devuelto y la multa de `S/ 5.00`.
 
-## Explicación de la multa de Ana Torres
+### Explicación de la multa de Ana Torres
 
 El préstamo de Ana Torres se utilizó como caso de prueba vencido. Se registró con fecha de vencimiento `2026-10-09` y se devolvió el `2026-10-14`. Como el tipo de préstamo fue `DOMICILIO`, la tarifa aplicada fue de `S/ 1.00` por día:
 

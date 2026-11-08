@@ -1,5 +1,27 @@
 # RFC-010 · Validación de libros y usuarios
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#10](https://github.com/nn-nnhub/BibliotecaPlus/issues/10) |
+| Pull request | [#19](https://github.com/nn-nnhub/BibliotecaPlus/pull/19) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Proteger la integridad del catálogo y lectores.
+
+## Implementación e impacto
+
+Validaciones de datos, restricciones de eliminación y errores controlados.
+
+## Pruebas y evidencias
+
+Evidencias de validación y regresión. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#10](https://github.com/nn-nnhub/BibliotecaPlus/issues/10) |
@@ -11,7 +33,7 @@
 | Fecha propuesta | 17/10/2026 |
 | Etiquetas | RFC · Alta · Mejora |
 
-## Relación con el RFC
+### Relación con el RFC
 
 La Issue #10 pide implementar y unificar las validaciones de libros y usuarios al registrar y actualizar: título y autor obligatorios, DNI de ocho dígitos y correo con formato válido, manteniendo intactos los registros existentes.
 
@@ -24,7 +46,7 @@ Dos cambios de este trabajo **no figuran en el texto de la Issue** y se identifi
 | H8 — manejo de errores HTTP (400/404) | **Adicional**, no incluido en la Issue |
 | H3 — bloqueo de la eliminación con préstamos | **Adicional**, no incluido en la Issue |
 
-## Hallazgo
+### Hallazgo
 
 **H4a — libros.** Se guardaba un libro sin título ni autor o con `disponible=false`; `actualizar` aceptaba ISBN, título y autor vacíos. Además, un `PUT` sin el campo `disponible` marcaba como disponible un libro prestado, porque el objeto recibido toma el valor por defecto `true`.
 
@@ -34,7 +56,7 @@ Dos cambios de este trabajo **no figuran en el texto de la Issue** y se identifi
 
 **H3 — eliminación.** `DELETE` de un libro o usuario con préstamos respondía 204 y dejaba el préstamo huérfano (los préstamos guardan solo `libroId` y `usuarioId`, sin clave foránea). `DELETE` de un id inexistente también respondía 204.
 
-## Código anterior
+### Código anterior
 
 `UsuarioService.validarUsuario` (solo comprueba que no estén vacíos):
 
@@ -71,7 +93,7 @@ public ResponseEntity<Map<String, String>> manejarRestriccionUnica(DataIntegrity
 }
 ```
 
-## Solución aplicada
+### Solución aplicada
 
 - **`ManejadorErrores.java`** (`@RestControllerAdvice`, nuevo): `RecursoNoEncontradoException` → 404; `IllegalArgumentException` → 400; `DataIntegrityViolationException` → 400 con mensaje de ISBN, de DNI o genérico según la causa. Se eliminaron los manejadores de `LibroController` y `UsuarioController`.
 - **`RecursoNoEncontradoException.java`** (nueva): extiende `IllegalArgumentException`, por lo que no rompe el código existente.
@@ -95,7 +117,7 @@ public void eliminar(Long id) {
 }
 ```
 
-## Evidencias visuales
+### Evidencias visuales
 
 Las capturas muestran la suite completa en verde tras cada cambio; no existen capturas de pruebas fallando. La evidencia real de los fallos previos se conserva como salida literal en [`evidencias/rfc-010-antes-despues.txt`](evidencias/rfc-010-antes-despues.txt).
 
@@ -105,7 +127,7 @@ Las capturas muestran la suite completa en verde tras cada cambio; no existen ca
 
 ![Suite completa con 55 pruebas aprobadas tras bloquear la eliminación (H3)](capturas/rfc-010-eliminacion-pruebas.png)
 
-## Resultado
+### Resultado
 
 - Se rechazan libros sin título o sin autor al registrar y al actualizar; el ISBN es obligatorio al actualizar.
 - Un libro nuevo queda siempre disponible y actualizar un libro no cambia su disponibilidad.
@@ -113,7 +135,7 @@ Las capturas muestran la suite completa en verde tras cada cambio; no existen ca
 - Los recursos inexistentes responden 404 y los errores de validación 400, con un mensaje JSON `{"message": ...}`.
 - No se puede eliminar un libro o usuario con préstamos asociados; la eliminación de un id inexistente responde 404.
 
-## Validación automatizada
+### Validación automatizada
 
 Pruebas relevantes:
 
@@ -139,7 +161,7 @@ Resultados reales:
 
 El detalle de las ejecuciones archivadas está en `evidencias/rfc-010-antes-despues.txt`.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 - **Alcance:** H8 y H3 exceden el texto de la Issue #10; conviene ampliarla con aprobación formal o tratarlos como trabajo adicional.
 - **HTTP 400 frente a 409:** el rechazo de eliminación con préstamos responde 400 por coherencia con las demás validaciones. Semánticamente sería 409 (Conflict); queda por decidir.
