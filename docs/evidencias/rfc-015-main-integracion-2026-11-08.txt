@@ -1,0 +1,120 @@
+RFC-015: integracion local segura con main
+Fecha: 08/11/2026 (America/Lima)
+Rama: rfc-015-edicion-eliminacion
+HEAD inicial: 0a7b0e62166a66b755a9554c035b6a00582d7d10
+Arbol inicial limpio. git fetch origin: salida 0.
+origin/main actualizado: 1733d4cea90ace5faa28285f81e75730aa4e3d7a.
+Comando: git merge --no-ff --no-commit origin/main
+Unico conflicto: src/test/js/cargar-app.js.
+Resolucion: listeners y reset RFC-015, attributes/setAttribute RFC-021.
+Se conservan fetch, opciones, confirmaciones, VM y disparo de eventos.
+
+REVISION FUNCIONAL:
+app.js: comparados bloques completos con HEAD previo; inicio/cancelacion,
+eliminacion, formularios y sus versiones, filtros e invalidacion intactos.
+Resumen desplegable identico a main, incluido contador y tratamiento de errores.
+index.html: IDs unicos; todos los selectores de app.js presentes. Formularios,
+columnas de acciones, resumen accesible y grupo de botones de filtros conservados.
+styles.css: reglas de acciones, hidden y separacion de filtros conservadas.
+Java RFC-019 identico a origin/main: registro, devolucion y multa positiva.
+Pruebas y funcionalidades conservadas; ninguna prueba eliminada.
+
+PRUEBAS:
+node --test "src/test/js/*.test.js"
+Salida 0: 70 aprobadas, 0 fallidas/canceladas/omitidas/pendientes.
+Incluye 68 anteriores y 2 nuevas de RFC-021.
+
+Primer intento Maven offline: fallo de compilacion al acceder al JAR local
+jackson-annotations-2.17.2.jar bajo las restricciones del entorno.
+Reejecucion con acceso autorizado al cache, sin cambios de codigo:
+mvn -o -B -e "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" test
+Salida 0; BUILD SUCCESS. 132 pruebas, 0 fallos, 0 errores, 0 omitidas.
+Incluye nuevas pruebas de notificaciones RFC-019 y concurrencia RFC-013.
+22.723 s; resumen de esta ejecucion, sin sumar XML historicos.
+Las clases SpringBootTest usan H2 en memoria; no se inicio la aplicacion persistente.
+
+Comprobaciones finales antes de commit: git diff --check y
+ git diff --cached --check; indice sin entradas no resueltas;
+busqueda de marcadores completos de conflicto en fuentes y documentacion.
+Sin validacion visual en navegador; ese es el limite de esta verificacion.
+No se realizo push, fusion de PR, cambio de rama ni integracion RFC-016/RFC-017.
+
+SALIDA JAVASCRIPT:
+✔ escaparHtml convierte los cinco caracteres especiales de HTML (36.2529ms)
+✔ escaparHtml no vuelve a escapar el resultado como texto plano (2.2612ms)
+✔ escaparHtml convierte nulos y números en texto (1.6887ms)
+✔ aplica cada filtro y conserva false como parámetro (39.1407ms)
+✔ combina los tres filtros y mantiene el total global (3.8941ms)
+✔ limpiar vacía los controles y recupera todo el historial (4.5374ms)
+✔ devolver conserva los filtros aplicados al recargar (3.0982ms)
+✔ registrar conserva los filtros del historial al recargar (3.163ms)
+✔ sin coincidencias muestra un mensaje y mantiene el total global (2.4717ms)
+✔ las filas filtradas conservan el escape HTML (2.3349ms)
+✔ una respuesta tardía no restaura filtros después de limpiarlos (2.6604ms)
+✔ los errores de filtrado se muestran como texto (1.8349ms)
+✔ devolver un préstamo no envía el tipo de préstamo al servidor (29.3997ms)
+✔ el campo de vencimiento no admite fechas anteriores a hoy (3.66ms)
+✔ el botón muestra y oculta el resumen sin pedirlo al cerrar (33.1668ms)
+✔ una respuesta tardía no vuelve a mostrar el resumen cerrado (2.0614ms)
+✔ conserva el comportamiento existente: muestra libros y usuarios (40.7078ms)
+✔ cada libro muestra botones Editar y Eliminar (2.7668ms)
+✔ cada usuario muestra botones Editar y Eliminar (1.4692ms)
+✔ los formularios permiten cancelar la edición de libros y usuarios (3.7214ms)
+✔ editar un libro usa PUT y actualiza tablas, selectores y contadores (3.4361ms)
+✔ editar un usuario usa PUT y actualiza las vistas (2.2029ms)
+✔ cancelar la confirmación impide eliminar libros y usuarios (2.9345ms)
+✔ confirmar la eliminación usa DELETE y actualiza las vistas (2.0786ms)
+✔ cancelar una edición restaura ambos formularios sin enviar peticiones (35.2391ms)
+✔ muestra los mensajes reales del backend al rechazar eliminaciones (3.7137ms)
+✔ editar un libro no envía el campo de disponibilidad (3.1626ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras otro registro (30.3341ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras mismo registro (3.9825ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras cancelar (2.0585ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras nuevo envio (2.0773ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras input (1.7829ms)
+✔ Libro: exito tardio conserva formulario y mensaje tras alta a edicion (1.7649ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras otro registro (2.3783ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras mismo registro (1.7344ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras cancelar (2.132ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras nuevo envio (1.6835ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras input (2.3818ms)
+✔ Libro: error HTTP tardio conserva formulario y mensaje tras alta a edicion (1.9718ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras otro registro (1.4559ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras mismo registro (1.3114ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras cancelar (1.3493ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras nuevo envio (1.2479ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras input (1.246ms)
+✔ Libro: error de red tardio conserva formulario y mensaje tras alta a edicion (1.2179ms)
+✔ Libro: un error vigente conserva los datos y muestra el error (1.2846ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras otro registro (1.8638ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras mismo registro (1.0548ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras cancelar (1.1316ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras nuevo envio (1.0576ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras input (0.9863ms)
+✔ Usuario: exito tardio conserva formulario y mensaje tras alta a edicion (0.9134ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras otro registro (0.9385ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras mismo registro (0.9672ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras cancelar (0.9821ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras nuevo envio (1.7308ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras input (1.0017ms)
+✔ Usuario: error HTTP tardio conserva formulario y mensaje tras alta a edicion (0.9288ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras otro registro (0.9196ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras mismo registro (1.0119ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras cancelar (0.9432ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras nuevo envio (0.9538ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras input (0.898ms)
+✔ Usuario: error de red tardio conserva formulario y mensaje tras alta a edicion (1.096ms)
+✔ Usuario: un error vigente conserva los datos y muestra el error (1.2771ms)
+✔ los libros con HTML en sus datos se muestran como texto (29.963ms)
+✔ los usuarios con HTML en sus datos se muestran como texto (2.08ms)
+✔ el historial de préstamos escapa los nombres de libro y usuario (2.5356ms)
+✔ los datos normales conservan el mismo formato visible (2.3677ms)
+✔ un libro con campos nulos no rompe la búsqueda (2.4516ms)
+ℹ tests 70
+ℹ suites 0
+ℹ pass 70
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 242.6107

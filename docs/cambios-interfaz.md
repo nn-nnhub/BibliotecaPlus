@@ -91,3 +91,13 @@ Vista después de agregar las barras de búsqueda:
 | `styles.css` | Identidad visual, responsive y modo oscuro |
 | `app.js` | Comunicación con la API y renderizado de datos |
 | `ui.js` | Accesibilidad, tema y sesión activa |
+
+
+## RFC-015: respuestas tardias en libros y usuarios (08/11/2026)
+
+Los formularios conservan una nueva edicion y sus mensajes cuando termina
+un envio anterior, tanto con exito como con error. La proteccion distingue
+sesiones incluso al volver al mismo registro, cancelar, modificar campos o
+enviar otra solicitud. Las escrituras exitosas siguen actualizando las tablas.
+
+Detalles y evidencia automatizada en [RFC-015](RFC-015-edicion-eliminacion-libros-usuarios.md#respuestas-obsoletas-de-formularios---08112026).

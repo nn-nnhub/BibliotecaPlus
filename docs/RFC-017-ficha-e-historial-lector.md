@@ -1,5 +1,19 @@
 # RFC-017 · Ficha consolidada e historial de cada lector
 
+## Identificación y trazabilidad
+
+- [Issue #30](https://github.com/nn-nnhub/BibliotecaPlus/issues/30) y [PR #31](https://github.com/nn-nnhub/BibliotecaPlus/pull/31).
+- Responsable: Carlos Sebastián Portugal Riega.
+
+## Objetivo e impacto
+
+Consultar los datos e historial del lector en un diálogo accesible de solo lectura.
+
+## Integración de RFC-015, 016 y 017
+
+Se conservan las acciones de edición y eliminación, la categoría en el formulario de libro y el acceso a la ficha del lector. Se mantiene el registro histórico de pruebas y capturas en los apartados siguientes.
+
+
 | Campo | Valor |
 |---|---|
 | Issue | [#30](https://github.com/nn-nnhub/BibliotecaPlus/issues/30) |

@@ -1,5 +1,19 @@
 # RFC-016 · Categorías de libros
 
+## Identificación y trazabilidad
+
+- [Issue #29](https://github.com/nn-nnhub/BibliotecaPlus/issues/29) y [PR #28](https://github.com/nn-nnhub/BibliotecaPlus/pull/28).
+- Responsable: Carlos Sebastián Portugal Riega.
+
+## Objetivo e impacto
+
+Clasificar y filtrar libros, con una categoría opcional y un tratamiento consistente de «Sin categoría».
+
+## Integración de RFC-015, 016 y 017
+
+Se conservan las acciones de edición y eliminación, la categoría en el formulario de libro y el acceso a la ficha del lector. Se mantiene el registro histórico de pruebas y capturas en los apartados siguientes.
+
+
 | Campo | Valor |
 |---|---|
 | Issue | #29 |

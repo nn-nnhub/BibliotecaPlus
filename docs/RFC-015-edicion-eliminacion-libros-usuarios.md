@@ -1,0 +1,205 @@
+# RFC-015 · Edición y eliminación de libros y usuarios desde la interfaz
+
+## Identificación y trazabilidad
+
+- [Issue #23](https://github.com/nn-nnhub/BibliotecaPlus/issues/23) y [PR #24](https://github.com/nn-nnhub/BibliotecaPlus/pull/24).
+- Responsable: Carlos Sebastián Portugal Riega.
+
+## Objetivo e impacto
+
+Editar y eliminar libros y usuarios desde los formularios existentes, sin perder cambios al recibir respuestas tardías.
+
+## Integración de RFC-015, 016 y 017
+
+Se conservan las acciones de edición y eliminación, la categoría en el formulario de libro y el acceso a la ficha del lector. Se mantiene el registro histórico de pruebas y capturas en los apartados siguientes.
+
+
+## Identificación
+
+| Campo | Valor |
+|---|---|
+| Issue | [#23](https://github.com/nn-nnhub/BibliotecaPlus/issues/23) |
+| Rama | `rfc-015-edicion-eliminacion` |
+| Responsable | Carlos Sebastián Portugal Riega |
+| Tipo | Mantenimiento perfectivo |
+| Prioridad | Media |
+| Riesgo | Bajo / medio |
+| Estado actual | Implementado; integración local con main y resolución P1 validadas el 07/11/2026; pendiente de revisión |
+
+## Problema
+
+El backend ya admite actualizar y eliminar libros y usuarios mediante `PUT` y `DELETE`. Sin embargo, la interfaz web solo permite registrar y consultar esos recursos. Las tablas no muestran acciones de edición o eliminación, los formularios no tienen un modo de edición ni una opción para cancelarlo y no existe confirmación previa a una eliminación.
+
+Como consecuencia, una operación soportada por la API requiere una herramienta externa y no puede completarse desde la aplicación web.
+
+## Alcance
+
+El RFC incorporará exclusivamente en la interfaz:
+
+- botones **Editar** y **Eliminar** para cada libro y usuario;
+- carga de los datos actuales en los formularios existentes;
+- cancelación explícita del modo de edición;
+- uso de los endpoints `PUT /api/libros/{id}` y `PUT /api/usuarios/{id}`;
+- confirmación previa a `DELETE /api/libros/{id}` y `DELETE /api/usuarios/{id}`;
+- mensajes claros de éxito y error;
+- actualización de tablas, selectores y contadores después de editar o eliminar;
+- preservación del escape de contenido ingresado por usuarios.
+
+No se modificarán las reglas de préstamos, concurrencia, renovación, multas, notificaciones ni reportes. Las validaciones y restricciones del backend continuarán siendo la fuente de verdad.
+
+## Contrato de interfaz previsto
+
+Las pruebas ANTES fijan nombres estables para las acciones de la interfaz:
+
+- `iniciarEdicionLibro(id)` y `cancelarEdicionLibro()`;
+- `iniciarEdicionUsuario(id)` y `cancelarEdicionUsuario()`;
+- `eliminarLibro(id)` y `eliminarUsuario(id)`;
+- botones `btnCancelarEdicionLibro` y `btnCancelarEdicionUsuario`.
+
+Los formularios `formLibro` y `formUsuario` se reutilizarán para altas y ediciones. Esto evita duplicar campos y validaciones visuales.
+
+## Criterios de aceptación
+
+1. Cada fila de libros y usuarios ofrece acciones Editar y Eliminar.
+2. Editar carga los datos actuales en el formulario correspondiente.
+3. Guardar una edición utiliza el endpoint `PUT` del recurso correcto.
+4. La edición de un libro no altera indebidamente su disponibilidad.
+5. Cancelar restaura el formulario de alta sin enviar cambios.
+6. Eliminar siempre solicita confirmación; cancelar no envía `DELETE`.
+7. Tras una edición o eliminación se actualizan tablas, selectores y contadores.
+8. Los errores y restricciones del backend se presentan al usuario.
+9. Los datos continúan escapándose antes de insertarse como HTML.
+10. El registro y la consulta existentes continúan funcionando.
+11. Las pruebas automatizadas Java y JavaScript del proyecto permanecen aprobadas al finalizar.
+
+## Evidencia ANTES
+
+**Estado de esta evidencia: ANTES**. Este apartado describe el registro histórico previo a la implementación; no representa el estado actual de la rama. Los resultados DESPUÉS originales también se conservan como evidencia histórica.
+
+La especificación ejecutable se encuentra en `src/test/js/rfc-015-antes.test.js`. Incluye una prueba de regresión del comportamiento existente y pruebas de aceptación que deben fallar antes de implementar el RFC.
+
+El registro auténtico de ejecución se conserva en `docs/evidencias/rfc-015-antes-despues.txt`.
+
+El intento inicial de captura automática no respondió dentro del límite establecido. Posteriormente se incorporaron las capturas auténticas ANTES `rfc-015-antes-libros.png` y `rfc-015-antes-usuarios.png`. Esos archivos no fueron modificados durante la implementación.
+
+## Implementación
+
+- Cada fila de libros y usuarios presenta acciones **Editar** y **Eliminar**.
+- Los formularios existentes se reutilizan para creación y edición, mostrando título y botones diferentes para cada modo.
+- Editar carga los valores actuales y guardar utiliza `PUT` sobre el identificador seleccionado.
+- Cancelar limpia el formulario, restaura el modo de registro y no realiza peticiones.
+- Eliminar requiere confirmación y utiliza `DELETE` solo cuando el usuario acepta.
+- Los mensajes `message` enviados por el backend se muestran en el panel correspondiente.
+- Después de una operación correcta se ejecuta `cargarDatos()`, que actualiza tablas, selectores y contadores.
+- Los datos de las filas continúan pasando por `escaparHtml`; los identificadores usados por las acciones se convierten a número.
+- La edición de libros no envía `disponible`, por lo que esa propiedad continúa bajo control del backend.
+
+No se modificaron controladores, servicios, repositorios ni modelos Java.
+
+## Validación DESPUÉS
+
+- Especificación RFC-015: 8 de 8 pruebas aprobadas.
+- Pruebas complementarias de cancelación, errores y disponibilidad: 3 de 3 aprobadas.
+- Pruebas JavaScript preexistentes: 10 de 10 aprobadas.
+- Suite JavaScript completa: 21 de 21 aprobadas.
+
+Los resultados auténticos y comandos utilizados están añadidos en la sección DESPUÉS de `docs/evidencias/rfc-015-antes-despues.txt`.
+
+## Comprobación manual DESPUÉS
+
+Se registraron exclusivamente los resultados manuales comunicados por Carlos:
+
+1. La interfaz mostró botones **Editar** y **Eliminar** para libros y usuarios.
+2. Los formularios de edición cargaron correctamente los datos de *Clean Code* y Luis Mendoza.
+3. Cancelar la edición de un libro devolvió el formulario al modo **Registrar libro**.
+4. El título *Clean Code* se cambió a *Clean Code - RFC 015*.
+5. El cambio permaneció después de recargar el navegador.
+6. El botón **Eliminar** mostró una confirmación.
+7. Al cancelar esa confirmación, el libro permaneció en la tabla incluso después de recargar.
+
+No se confirmó ninguna eliminación durante esta comprobación manual.
+
+### Capturas DESPUÉS
+
+- Interfaz con acciones: `docs/capturas/rfc-015-despues-interfaz.png`
+- Edición: `docs/capturas/rfc-015-despues-edicion.png`
+- Confirmación de eliminación: `docs/capturas/rfc-015-despues-confirmacion.png`
+
+Las tres capturas existen en el repositorio de trabajo con los nombres definitivos indicados.
+
+## Referencias
+
+- Issue principal: https://github.com/nn-nnhub/BibliotecaPlus/issues/23
+- Controladores existentes: `LibroController` y `UsuarioController`.
+- Interfaz afectada: `index.html`, `app.js` y `styles.css`.
+
+## Resolución de observación P1 — 07/11/2026
+
+Seguimiento: Issue #23, PR #24. Responsable: Carlos Sebastián Portugal Riega.
+
+Se integró localmente `origin/main` (`6c19daa`) sobre el HEAD original `cb6924b`. Se resolvieron los dos conflictos señalados por el revisor, sin sustituir archivos completos por una sola versión:
+
+- `app.js`: el estado conserva `edicionLibroId` y `edicionUsuarioId`, junto con `filtrosHistorial` y `solicitudHistorial`. Se mantienen carga y limpieza de filtros, tratamiento de errores y descarte de respuestas obsoletas, además de edición, eliminación, confirmación y cancelación de libros y usuarios.
+- `cargar-app.js`: se conservan listeners, disparo de eventos, `reset()`, inyección de fetch y confirmación, registro de confirmaciones y opciones de las peticiones. El listener de main y el anterior cumplen el mismo contrato; se conserva el registro por tipo y la implementación de reset del RFC-015.
+
+Se preservan búsqueda, disponibilidad, escape HTML y recarga de tablas, selectores y contadores. Los cambios Java de main se incorporan sin modificaciones adicionales, incluidos el bloqueo pesimista del RFC-013, timeout y tratamiento de errores de préstamos.
+
+| Validación nueva sobre el árbol integrado | Aprobadas | Fallidas | Errores / omitidas |
+|---|---|---|---|
+| JavaScript RFC-015: 8 originales y 3 complementarias | 11 | 0 | 0 / 0 |
+| JavaScript RFC-014 | 9 | 0 | 0 / 0 |
+| Suite JavaScript completa | 30 | 0 | 0 / 0 |
+| Suite Java completa, incluidas 6 ejecuciones de concurrencia RFC-013 | 127 | 0 | 0 / 0 |
+
+Las 11 clases Spring declaran H2 en memoria y sobrescriben la URL persistente. No se encontró un DataSource alternativo ni recursos de pruebas que sustituyan esas propiedades; no se accedió a `./data/bibliotecadb`. `git diff --check` pasó sobre la resolución. Las evidencias históricas heredadas de RFC-013 conservan sus espacios originales.
+
+Los comandos exactos y resultados nuevos están en la [evidencia de integración P1](evidencias/rfc-015-p1-integracion-2026-11-07.txt). Las [evidencias históricas ANTES/DESPUÉS](evidencias/rfc-015-antes-despues.txt) y sus capturas permanecen intactas.
+
+RFC-016 y RFC-017 no se integraron. Las comparaciones de solo lectura con sus referencias remotas anticipan conflictos con RFC-016 en `app.js`, `index.html`, `styles.css` y `cargar-app.js`, y con RFC-017 en `app.js` y `cargar-app.js`. Cuando se autorice integrarlos, deben combinarse categoría y filtro con las acciones de edición/eliminación, y añadir Ver ficha sin perder esas acciones ni su contador de solicitudes. También deben conservarse los filtros del historial y todas las capacidades del cargador. Será necesario ejecutar las suites sobre el resultado combinado; la ausencia de conflictos en otras zonas no garantiza compatibilidad funcional.
+
+
+## Respuestas obsoletas de formularios - 08/11/2026
+
+Seguimiento de PR #24 sobre `7f8227f`, exclusivamente en
+`rfc-015-edicion-eliminacion`. No se integra `origin/main` (`1733d4c`).
+
+Cada formulario mantiene su propio contador de version. Iniciar o cancelar
+una edicion, modificar campos (evento input) y enviar el formulario invalida
+los envios anteriores. Solo una respuesta vigente puede limpiar el formulario
+y publicar su mensaje de exito o error. Se conserva la recarga de datos tras
+una escritura exitosa aunque su respuesta ya sea obsoleta: el servidor pudo
+haber guardado el cambio y las tablas, selectores y contadores deben reflejarlo.
+La proteccion tambien cubre altas POST y volver a editar el mismo ID.
+
+Las regresiones usan promesas controladas, sin temporizadores ni red: ambos
+formularios, exito, error HTTP y rechazo de red; cambio a otro registro,
+reinicio del mismo registro, cancelacion, envio posterior, escritura de un
+nuevo borrador y alta seguida de edicion. Comprueban todos los valores,
+ID activo, titulo, botones y mensaje (texto y clase). Ademas verifican que
+un error vigente sigue siendo visible y conserva los datos.
+
+Evidencia y resultados: [respuestas obsoletas](evidencias/rfc-015-obsoletas-2026-11-08.txt).
+
+
+## Integracion con main - 08/11/2026
+
+Se integro `origin/main` (`1733d4c`) mediante merge normal sobre `0a7b0e6`,
+exclusivamente en `rfc-015-edicion-eliminacion`, tras verificar HEAD y arbol
+limpio y ejecutar `git fetch origin`.
+
+El unico conflicto fue `src/test/js/cargar-app.js`: se conservaron listeners,
+reset, fetch con opciones, confirmaciones y disparo de eventos de RFC-015;
+se incorporaron attributes y setAttribute de RFC-021.
+
+Revision funcional de la combinacion automatica: los formularios y sus
+contadores independientes permanecen intactos, al igual que los filtros y la
+invalidacion del historial. Se conservan el resumen desplegable con descarte
+de respuestas obsoletas, sus atributos accesibles, la separacion CSS de filtros
+y las acciones de edicion/eliminacion. Los cambios Java de notificaciones de
+registro, devolucion y multa coinciden con main, sin alteraciones adicionales.
+
+Validacion del arbol integrado: 70/70 pruebas JavaScript (68 previas y 2 nuevas)
+y 132/132 Java, sin fallos, errores ni omisiones. Ver comandos, incidencia de
+acceso al cache Maven y resultados en la [evidencia de integracion](evidencias/rfc-015-main-integracion-2026-11-08.txt).
+No se realizo validacion visual en navegador. Sin push ni fusion de PR;
+RFC-016 y RFC-017 no se integraron.

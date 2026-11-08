@@ -1,6 +1,9 @@
-const estado = { libros: [], usuarios: [], prestamos: [] };
+const estado = { libros: [], usuarios: [], prestamos: [], edicionLibroId: null, edicionUsuarioId: null };
 let filtrosHistorial = {};
 let solicitudHistorial = 0;
+// Cada cambio invalida las respuestas de solicitudes anteriores del formulario.
+let versionFormularioLibro = 0;
+let versionFormularioUsuario = 0;
 let solicitudFicha = 0;
 let botonOrigenFicha = null;
 
@@ -26,7 +29,10 @@ function mostrarLibros() {
         [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro))
         && (!categoriaSeleccionada || categoriaVisible(libro).toLowerCase() === categoriaSeleccionada));
     const cuerpo = document.querySelector('#tablaLibros');
-    cuerpo.innerHTML = librosVisibles.map(libro => `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td>${escaparHtml(categoriaVisible(libro))}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td></tr>`).join('');
+    cuerpo.innerHTML = librosVisibles.map(libro => {
+        const id = Number(libro.id);
+        return `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td>${escaparHtml(categoriaVisible(libro))}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="iniciarEdicionLibro(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarLibro(${id})">Eliminar</button></div></td></tr>`;
+    }).join('');
     document.querySelector('#totalLibros').textContent = estado.libros.length;
     document.querySelector('#librosDisponibles').textContent = estado.libros.filter(libro => libro.disponible).length;
     const selector = document.querySelector('#libroId');
@@ -46,7 +52,10 @@ function actualizarFiltroCategorias() {
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
     const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
-    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><button class="secondary-button" onclick="abrirFichaUsuario(${Number(usuario.id)}, this)">Ver ficha</button></td></tr>`).join('');
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => {
+        const id = Number(usuario.id);
+        return `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="abrirFichaUsuario(${id}, this)">Ver ficha</button><button class="secondary-button" type="button" onclick="iniciarEdicionUsuario(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarUsuario(${id})">Eliminar</button></div></td></tr>`;
+    }).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
 }
@@ -150,6 +159,97 @@ async function devolverPrestamo(id) {
     try { await consultar(`/api/prestamos/${id}/devolver`, { method: 'PUT' }); await cargarDatos(); } catch (error) { alert(error.message); }
 }
 
+function iniciarEdicionLibro(id) {
+    const libro = estado.libros.find(item => item.id === id);
+    if (!libro) return;
+    versionFormularioLibro++;
+    estado.edicionLibroId = id;
+    document.querySelector('#tituloLibro').value = libro.titulo ?? '';
+    document.querySelector('#autorLibro').value = libro.autor ?? '';
+    document.querySelector('#isbnLibro').value = libro.isbn ?? '';
+    const selector = document.querySelector('#categoriaLibro');
+    const categoria = libro.categoria === 'Sin categoría' ? '' : libro.categoria ?? '';
+    if (categoria && !Array.from(selector.options ?? []).some(opcion => opcion.value === categoria)) {
+        selector.innerHTML += `<option value="${escaparHtml(categoria)}">${escaparHtml(categoria)}</option>`;
+    }
+    selector.value = categoria;
+    document.querySelector('#tituloFormLibro').textContent = 'Editar libro';
+    document.querySelector('#btnGuardarLibro').textContent = 'Guardar cambios';
+    document.querySelector('#btnCancelarEdicionLibro').hidden = false;
+}
+
+function cancelarEdicionLibro() {
+    versionFormularioLibro++;
+    estado.edicionLibroId = null;
+    document.querySelector('#formLibro').reset();
+    document.querySelector('#tituloLibro').value = '';
+    document.querySelector('#autorLibro').value = '';
+    document.querySelector('#isbnLibro').value = '';
+    document.querySelector('#categoriaLibro').value = '';
+    document.querySelector('#tituloFormLibro').textContent = 'Registrar libro';
+    document.querySelector('#btnGuardarLibro').textContent = 'Guardar libro';
+    document.querySelector('#btnCancelarEdicionLibro').hidden = true;
+}
+
+function iniciarEdicionUsuario(id) {
+    const usuario = estado.usuarios.find(item => item.id === id);
+    if (!usuario) return;
+    versionFormularioUsuario++;
+    estado.edicionUsuarioId = id;
+    document.querySelector('#nombreUsuario').value = usuario.nombre ?? '';
+    document.querySelector('#apellidosUsuario').value = usuario.apellidos ?? '';
+    document.querySelector('#dniUsuario').value = usuario.dni ?? '';
+    document.querySelector('#correoUsuario').value = usuario.correo ?? '';
+    document.querySelector('#telefonoUsuario').value = usuario.telefono ?? '';
+    document.querySelector('#tituloFormUsuario').textContent = 'Editar usuario';
+    document.querySelector('#btnGuardarUsuario').textContent = 'Guardar cambios';
+    document.querySelector('#btnCancelarEdicionUsuario').hidden = false;
+}
+
+function cancelarEdicionUsuario() {
+    versionFormularioUsuario++;
+    estado.edicionUsuarioId = null;
+    document.querySelector('#formUsuario').reset();
+    document.querySelector('#nombreUsuario').value = '';
+    document.querySelector('#apellidosUsuario').value = '';
+    document.querySelector('#dniUsuario').value = '';
+    document.querySelector('#correoUsuario').value = '';
+    document.querySelector('#telefonoUsuario').value = '';
+    document.querySelector('#tituloFormUsuario').textContent = 'Registrar usuario';
+    document.querySelector('#btnGuardarUsuario').textContent = 'Guardar usuario';
+    document.querySelector('#btnCancelarEdicionUsuario').hidden = true;
+}
+
+async function eliminarLibro(id) {
+    if (!confirm('¿Deseas eliminar este libro?')) return;
+    const mensaje = document.querySelector('#libroMensaje');
+    try {
+        await consultar(`/api/libros/${id}`, { method: 'DELETE' });
+        if (estado.edicionLibroId === id) cancelarEdicionLibro();
+        mensaje.textContent = 'Libro eliminado correctamente.';
+        mensaje.className = 'message success';
+        await cargarDatos();
+    } catch (error) {
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
+}
+
+async function eliminarUsuario(id) {
+    if (!confirm('¿Deseas eliminar este usuario?')) return;
+    const mensaje = document.querySelector('#usuarioMensaje');
+    try {
+        await consultar(`/api/usuarios/${id}`, { method: 'DELETE' });
+        if (estado.edicionUsuarioId === id) cancelarEdicionUsuario();
+        mensaje.textContent = 'Usuario eliminado correctamente.';
+        mensaje.className = 'message success';
+        await cargarDatos();
+    } catch (error) {
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
+}
+
 document.querySelector('#formPrestamo').addEventListener('submit', async event => {
     event.preventDefault();
     const libroId = document.querySelector('#libroId').value;
@@ -194,8 +294,13 @@ botonResumen.addEventListener('click', async () => {
 document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
 document.querySelector('#filtroCategoriaLibro').addEventListener('change', mostrarLibros);
 document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);
+document.querySelector('#btnCancelarEdicionLibro').addEventListener('click', cancelarEdicionLibro);
+document.querySelector('#btnCancelarEdicionUsuario').addEventListener('click', cancelarEdicionUsuario);
+
+document.querySelector('#formLibro').addEventListener('input', () => { versionFormularioLibro++; });
 
 document.querySelector('#formLibro').addEventListener('submit', async event => {
+    const version = ++versionFormularioLibro;
     event.preventDefault();
     const mensaje = document.querySelector('#libroMensaje');
     const libro = {
@@ -205,12 +310,26 @@ document.querySelector('#formLibro').addEventListener('submit', async event => {
         categoria: document.querySelector('#categoriaLibro').value
     };
     try {
-        await consultar('/api/libros', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(libro) });
-        event.target.reset(); mensaje.textContent = 'Libro registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos();
-    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+        const editando = estado.edicionLibroId !== null;
+        const url = editando ? `/api/libros/${estado.edicionLibroId}` : '/api/libros';
+        await consultar(url, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(libro) });
+        if (version === versionFormularioLibro) {
+            cancelarEdicionLibro();
+            mensaje.textContent = editando ? 'Libro actualizado correctamente.' : 'Libro registrado correctamente.';
+            mensaje.className = 'message success';
+        }
+        await cargarDatos();
+    } catch (error) {
+        if (version !== versionFormularioLibro) return;
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
 });
 
+document.querySelector('#formUsuario').addEventListener('input', () => { versionFormularioUsuario++; });
+
 document.querySelector('#formUsuario').addEventListener('submit', async event => {
+    const version = ++versionFormularioUsuario;
     event.preventDefault();
     const mensaje = document.querySelector('#usuarioMensaje');
     const usuario = {
@@ -221,9 +340,20 @@ document.querySelector('#formUsuario').addEventListener('submit', async event =>
         telefono: document.querySelector('#telefonoUsuario').value
     };
     try {
-        await consultar('/api/usuarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(usuario) });
-        event.target.reset(); mensaje.textContent = 'Usuario registrado correctamente.'; mensaje.className = 'message success'; await cargarDatos();
-    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+        const editando = estado.edicionUsuarioId !== null;
+        const url = editando ? `/api/usuarios/${estado.edicionUsuarioId}` : '/api/usuarios';
+        await consultar(url, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(usuario) });
+        if (version === versionFormularioUsuario) {
+            cancelarEdicionUsuario();
+            mensaje.textContent = editando ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.';
+            mensaje.className = 'message success';
+        }
+        await cargarDatos();
+    } catch (error) {
+        if (version !== versionFormularioUsuario) return;
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
 });
 
 cargarDatos();
