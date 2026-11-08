@@ -198,14 +198,33 @@ document.querySelector('#formPrestamo').addEventListener('submit', async event =
 document.querySelector('#btnActualizar').addEventListener('click', cargarDatos);
 document.querySelector('#formFiltrosHistorial').addEventListener('submit', aplicarFiltrosHistorial);
 document.querySelector('#btnLimpiarFiltros').addEventListener('click', limpiarFiltrosHistorial);
-document.querySelector('#btnResumen').addEventListener('click', async () => {
+const botonResumen = document.querySelector('#btnResumen');
+let solicitudResumen = 0;
+let resumenAbierto = false;
+botonResumen.addEventListener('click', async () => {
     const mensaje = document.querySelector('#reporteResumen');
+    const solicitud = ++solicitudResumen;
+    resumenAbierto = !resumenAbierto;
+    botonResumen.setAttribute('aria-expanded', String(resumenAbierto));
+    botonResumen.textContent = resumenAbierto ? 'Ocultar resumen' : 'Ver resumen';
+    mensaje.hidden = !resumenAbierto;
+    if (!resumenAbierto) {
+        mensaje.textContent = '';
+        return;
+    }
+    mensaje.textContent = 'Cargando resumen…';
+    mensaje.className = 'message';
     try {
         const resumen = await consultar('/api/reportes/resumen');
+        if (solicitud !== solicitudResumen) return;
         const masPrestado = resumen.librosMasPrestados[0];
         mensaje.textContent = `Préstamos: ${resumen.totalPrestamos} | Activos: ${resumen.prestamosActivos} | Devueltos: ${resumen.prestamosDevueltos} | Multas: S/ ${Number(resumen.totalMultas).toFixed(2)}${masPrestado ? ` | Más prestado: ${masPrestado.libro} (${masPrestado.prestamos})` : ''}`;
         mensaje.className = 'message success';
-    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+    } catch (error) {
+        if (solicitud !== solicitudResumen) return;
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
 });
 document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
 document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);

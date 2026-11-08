@@ -11,7 +11,8 @@ function cargarApp({ fetch, confirm } = {}) {
     const confirmaciones = [];
     const nodo = () => ({
         value: '', textContent: '', innerHTML: '', className: '', min: '',
-        listeners: {},
+        listeners: {}, attributes: {},
+        setAttribute(nombre, valor) { this.attributes[nombre] = valor; },
         addEventListener(tipo, manejador) { this.listeners[tipo] = manejador; },
         reset() { this.value = ''; }
     });
