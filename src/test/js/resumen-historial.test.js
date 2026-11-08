@@ -10,6 +10,8 @@ test('el botón muestra y oculta el resumen sin pedirlo al cerrar', async () => 
     const boton = app.nodos['#btnResumen'];
     await boton.listeners.click();
     assert.match(app.nodos['#reporteResumen'].textContent, /Préstamos: 1/);
+    assert.equal(app.nodos['#reporteResumen'].hidden, false);
+    assert.equal(app.nodos['#reporteResumen'].className, 'message success');
     assert.equal(boton.attributes['aria-expanded'], 'true');
     await boton.listeners.click();
     assert.equal(app.nodos['#reporteResumen'].hidden, true);
