@@ -1,0 +1,102 @@
+RFC-016 / PR #28 - P2 - FASE 2: evidencia DESPUÉS
+Fecha: 2026-11-07 (America/Lima)
+Rama: rfc-016-categorias
+SHA base: 9048e2bfd420c427f17849e9289e80fba4c1651b
+
+CAUSA Y CORRECCIÓN
+La normalización permitía almacenar literalmente "Sin categoría", mientras que
+el filtro reservado consultaba únicamente categorías almacenadas nulas o vacías.
+LibroService.normalizarCategoria ahora devuelve null para null, texto vacío,
+espacios y Libro.SIN_CATEGORIA después de trim, sin distinguir mayúsculas.
+Las demás categorías conservan trim y el límite de 100 caracteres.
+Para preservar el comportamiento del filtro, listarPorCategoria reconoce primero
+la etiqueta reservada y consulta findSinCategoria; después normaliza los demás
+filtros. Sin este ajuste mínimo, el nuevo null devolvería todos los libros.
+guardar, actualizar, préstamos, disponibilidad y eliminación no se modificaron.
+
+REGRESIONES ORIGINALES DESPUÉS
+Comando exacto:
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" "-Dtest=CategoriasLibrosHttpTest" test
+Resultado: BUILD SUCCESS; salida Maven 0.
+15 pruebas, 0 fallos, 0 errores, 0 omitidas (15 aprobadas).
+Finalización: 2026-11-07T15:32:41-05:00.
+Log: docs/evidencias/rfc-016-p2-despues-15.log
+
+COBERTURA ADICIONAL DESPUÉS
+Se conservaron las 15 pruebas y se añadieron dos invocaciones parametrizadas
+("  Sin categoría  " y "sIN cATEGORÍA") que verifican registro, actualización,
+persistencia null y consulta con exclusión de una categoría ordinaria.
+Se añadió una prueba para la URI exacta del revisor:
+/api/libros?categoria=Sin%20categor%C3%ADa
+Comprueba que incluye el registro nuevo, el actualizado y antiguos nulos/vacíos,
+y excluye un libro clasificado. Se usa URI.create para evitar doble codificación.
+La URI se verificó mediante lectura de la revisión del PR #28, sin modificar GitHub.
+Comando exacto: el mismo comando de regresión indicado arriba.
+Resultado: BUILD SUCCESS; salida Maven 0.
+18 pruebas, 0 fallos, 0 errores, 0 omitidas (18 aprobadas).
+Finalización: 2026-11-07T15:33:48-05:00.
+Log: docs/evidencias/rfc-016-p2-despues-18.log
+
+SUITE JAVA COMPLETA
+Antes de ejecutarla se inspeccionaron las clases Spring y configuraciones JDBC:
+las 11 clases @SpringBootTest declaran spring.datasource.url=jdbc:h2:mem:.
+No se encontraron configuraciones alternativas de conexión en las pruebas.
+Las restantes pruebas usan objetos Java o mocks, sin arrancar una base persistente.
+No existe src/test/resources que introduzca otra configuración.
+La clase de categorías conserva la aserción de URL JDBC antes de limpiar datos.
+El log completo confirma conexiones H2 en memoria para los contextos iniciados.
+Comando exacto:
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" test
+Resultado: BUILD SUCCESS; salida Maven 0.
+137 pruebas, 0 fallos, 0 errores, 0 omitidas (137 aprobadas).
+Finalización: 2026-11-07T15:34:30-05:00.
+Log: docs/evidencias/rfc-016-p2-despues-java-completa.log
+Se usa el resumen de esta ejecución, no la suma indiscriminada de XML existentes
+en target/surefire-reports, que puede incluir informes antiguos.
+Maven se ejecutó offline con acceso ampliado al caché local existente.
+
+JAVASCRIPT
+Verificación posterior: 2026-11-07T15:45:00-05:00 (America/Lima).
+Entorno confirmado: Node.js v26.13.0; npm 11.20.0 (npm.cmd --version).
+Comando exacto ejecutado desde la raíz del repositorio:
+node --test "src/test/js/*.test.js"
+Resultado: código de salida 0.
+21 pruebas ejecutadas: 21 aprobadas, 0 fallidas, 0 omitidas.
+Canceladas: 0; pendientes (todo): 0. Duración informada: 165.7084 ms.
+La ejecución incluyó los cinco archivos de pruebas disponibles:
+- categorias-libros.test.js: 2 aprobadas.
+- escape.test.js: 3 aprobadas.
+- filtros-historial.test.js: 9 aprobadas.
+- prestamos.test.js: 2 aprobadas.
+- xss.test.js: 5 aprobadas.
+cargar-app.js es el auxiliar compartido de las pruebas.
+No hubo fallos que requirieran análisis ni cambios de código.
+Nota del entorno: npm --version fue bloqueado por la política de ejecución
+ de PowerShell para npm.ps1; npm.cmd --version confirmó 11.20.0.
+Las pruebas se ejecutaron directamente con Node y no dependieron de npm.
+Esta ejecución sustituye el resultado previo pendiente por falta de Node.
+
+ARCHIVOS Y RESTRICCIONES
+Modificados en fase 2:
+- src/main/java/com/bibliotecaplus/service/LibroService.java
+- src/test/java/com/bibliotecaplus/integration/CategoriasLibrosHttpTest.java
+Creado en fase 2:
+- docs/evidencias/rfc-016-p2-despues-2026-11-07.txt
+Conservado de fase 1, sin modificar:
+- docs/evidencias/rfc-016-p2-antes-2026-11-07.txt
+La evidencia histórica rfc-016-antes-despues.txt permanece intacta.
+Los tres logs DESPUÉS y los informes target/ son artefactos ignorados por Git.
+No se accedió a ./data/bibliotecadb; la carpeta data no existe al verificar.
+No se modificaron docs/RFC-016.md, Issue #29 ni PR #28.
+No se cambió de rama ni se ejecutó git add, commit, push, pull, merge o reset.
+git diff --check sin errores. Fase 2 detenida antes de operaciones Git de escritura.
+VERIFICACIÓN POSTERIOR A LA SUITE JAVASCRIPT
+Único archivo actualizado en esta verificación: esta evidencia DESPUÉS.
+git status --short conserva el estado previo:
+ M src/main/java/com/bibliotecaplus/service/LibroService.java
+ M src/test/java/com/bibliotecaplus/integration/CategoriasLibrosHttpTest.java
+?? docs/evidencias/rfc-016-p2-antes-2026-11-07.txt
+?? docs/evidencias/rfc-016-p2-despues-2026-11-07.txt
+git diff --check: sin salida, código de salida 0.
+No se modificaron docs/RFC-016.md, Issue #29 ni PR #28.
+No se ejecutaron commit, push, pull, merge ni reset.
