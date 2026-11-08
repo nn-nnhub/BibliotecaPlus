@@ -6,6 +6,7 @@
 |---|---|
 | Issue | [#1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1) |
 | Pull request | Sin PR asociado en el historial consultado |
+| Commits de implementación | [`ee0e585`](https://github.com/nn-nnhub/BibliotecaPlus/commit/ee0e585), [`e131d11`](https://github.com/nn-nnhub/BibliotecaPlus/commit/e131d11), [`8bcf062`](https://github.com/nn-nnhub/BibliotecaPlus/commit/8bcf062), [`3f532f4`](https://github.com/nn-nnhub/BibliotecaPlus/commit/3f532f4), [`23077de`](https://github.com/nn-nnhub/BibliotecaPlus/commit/23077de) |
 | Estado | Integrado en `main`; issue cerrado |
 
 ## Objetivo y justificación
