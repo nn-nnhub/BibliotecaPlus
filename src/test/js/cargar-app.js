@@ -10,7 +10,8 @@ function cargarApp({ fetch } = {}) {
     const llamadas = [];
     const nodo = () => ({
         value: '', textContent: '', innerHTML: '', className: '', min: '',
-        listeners: {},
+        listeners: {}, attributes: {},
+        setAttribute(nombre, valor) { this.attributes[nombre] = valor; },
         addEventListener(tipo, accion) { this.listeners[tipo] = accion; }, reset() {}
     });
     const documento = { querySelector: selector => (nodos[selector] ??= nodo()) };
