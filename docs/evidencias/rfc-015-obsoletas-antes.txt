@@ -1,0 +1,126 @@
+✖ Libro: exito tardio conserva formulario y mensaje tras otro registro (23.739ms)
+✖ Libro: error HTTP tardio conserva formulario y mensaje tras otro registro (3.5149ms)
+✖ Libro: error de red tardio conserva formulario y mensaje tras otro registro (2.0118ms)
+✖ Usuario: exito tardio conserva formulario y mensaje tras otro registro (1.7046ms)
+✖ Usuario: error HTTP tardio conserva formulario y mensaje tras otro registro (1.4985ms)
+✖ Usuario: error de red tardio conserva formulario y mensaje tras otro registro (2.4047ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 137.3265
+
+✖ failing tests:
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Libro: exito tardio conserva formulario y mensaje tras otro registro (23.739ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  null !== 2
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:55:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Libro: error HTTP tardio conserva formulario y mensaje tras otro registro (3.5149ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'Error anterior'
+  - 'Mensaje de la nueva edicion'
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:62:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Error anterior',
+    expected: 'Mensaje de la nueva edicion',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Libro: error de red tardio conserva formulario y mensaje tras otro registro (2.0118ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'Red anterior'
+  - 'Mensaje de la nueva edicion'
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:62:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Red anterior',
+    expected: 'Mensaje de la nueva edicion',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Usuario: exito tardio conserva formulario y mensaje tras otro registro (1.7046ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  null !== 2
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:55:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Usuario: error HTTP tardio conserva formulario y mensaje tras otro registro (1.4985ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'Error anterior'
+  - 'Mensaje de la nueva edicion'
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:62:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Error anterior',
+    expected: 'Mensaje de la nueva edicion',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at src\test\js\rfc-015-obsoletas.test.js:19:13
+✖ Usuario: error de red tardio conserva formulario y mensaje tras otro registro (2.4047ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'Red anterior'
+  - 'Mensaje de la nueva edicion'
+
+      at TestContext.<anonymous> (C:\Users\sebas\AppData\Local\Temp\tmpfrqykskn\src\test\js\rfc-015-obsoletas.test.js:62:24)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Red anterior',
+    expected: 'Mensaje de la nueva edicion',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

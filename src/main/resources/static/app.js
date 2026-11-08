@@ -1,6 +1,9 @@
 const estado = { libros: [], usuarios: [], prestamos: [], edicionLibroId: null, edicionUsuarioId: null };
 let filtrosHistorial = {};
 let solicitudHistorial = 0;
+// Cada cambio invalida las respuestas de solicitudes anteriores del formulario.
+let versionFormularioLibro = 0;
+let versionFormularioUsuario = 0;
 
 function escaparHtml(valor) {
     const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -101,6 +104,7 @@ async function devolverPrestamo(id) {
 function iniciarEdicionLibro(id) {
     const libro = estado.libros.find(item => item.id === id);
     if (!libro) return;
+    versionFormularioLibro++;
     estado.edicionLibroId = id;
     document.querySelector('#tituloLibro').value = libro.titulo ?? '';
     document.querySelector('#autorLibro').value = libro.autor ?? '';
@@ -111,6 +115,7 @@ function iniciarEdicionLibro(id) {
 }
 
 function cancelarEdicionLibro() {
+    versionFormularioLibro++;
     estado.edicionLibroId = null;
     document.querySelector('#formLibro').reset();
     document.querySelector('#tituloLibro').value = '';
@@ -124,6 +129,7 @@ function cancelarEdicionLibro() {
 function iniciarEdicionUsuario(id) {
     const usuario = estado.usuarios.find(item => item.id === id);
     if (!usuario) return;
+    versionFormularioUsuario++;
     estado.edicionUsuarioId = id;
     document.querySelector('#nombreUsuario').value = usuario.nombre ?? '';
     document.querySelector('#apellidosUsuario').value = usuario.apellidos ?? '';
@@ -136,6 +142,7 @@ function iniciarEdicionUsuario(id) {
 }
 
 function cancelarEdicionUsuario() {
+    versionFormularioUsuario++;
     estado.edicionUsuarioId = null;
     document.querySelector('#formUsuario').reset();
     document.querySelector('#nombreUsuario').value = '';
@@ -205,7 +212,10 @@ document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuari
 document.querySelector('#btnCancelarEdicionLibro').addEventListener('click', cancelarEdicionLibro);
 document.querySelector('#btnCancelarEdicionUsuario').addEventListener('click', cancelarEdicionUsuario);
 
+document.querySelector('#formLibro').addEventListener('input', () => { versionFormularioLibro++; });
+
 document.querySelector('#formLibro').addEventListener('submit', async event => {
+    const version = ++versionFormularioLibro;
     event.preventDefault();
     const mensaje = document.querySelector('#libroMensaje');
     const libro = {
@@ -217,14 +227,23 @@ document.querySelector('#formLibro').addEventListener('submit', async event => {
         const editando = estado.edicionLibroId !== null;
         const url = editando ? `/api/libros/${estado.edicionLibroId}` : '/api/libros';
         await consultar(url, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(libro) });
-        cancelarEdicionLibro();
-        mensaje.textContent = editando ? 'Libro actualizado correctamente.' : 'Libro registrado correctamente.';
-        mensaje.className = 'message success';
+        if (version === versionFormularioLibro) {
+            cancelarEdicionLibro();
+            mensaje.textContent = editando ? 'Libro actualizado correctamente.' : 'Libro registrado correctamente.';
+            mensaje.className = 'message success';
+        }
         await cargarDatos();
-    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+    } catch (error) {
+        if (version !== versionFormularioLibro) return;
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
 });
 
+document.querySelector('#formUsuario').addEventListener('input', () => { versionFormularioUsuario++; });
+
 document.querySelector('#formUsuario').addEventListener('submit', async event => {
+    const version = ++versionFormularioUsuario;
     event.preventDefault();
     const mensaje = document.querySelector('#usuarioMensaje');
     const usuario = {
@@ -238,11 +257,17 @@ document.querySelector('#formUsuario').addEventListener('submit', async event =>
         const editando = estado.edicionUsuarioId !== null;
         const url = editando ? `/api/usuarios/${estado.edicionUsuarioId}` : '/api/usuarios';
         await consultar(url, { method: editando ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(usuario) });
-        cancelarEdicionUsuario();
-        mensaje.textContent = editando ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.';
-        mensaje.className = 'message success';
+        if (version === versionFormularioUsuario) {
+            cancelarEdicionUsuario();
+            mensaje.textContent = editando ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.';
+            mensaje.className = 'message success';
+        }
         await cargarDatos();
-    } catch (error) { mensaje.textContent = error.message; mensaje.className = 'message error'; }
+    } catch (error) {
+        if (version !== versionFormularioUsuario) return;
+        mensaje.textContent = error.message;
+        mensaje.className = 'message error';
+    }
 });
 
 cargarDatos();
