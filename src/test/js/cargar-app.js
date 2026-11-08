@@ -10,7 +10,8 @@ function cargarApp({ fetch } = {}) {
     const llamadas = [];
     const nodo = () => ({
         value: '', textContent: '', innerHTML: '', className: '', min: '',
-        addEventListener() {}, reset() {}
+        listeners: {},
+        addEventListener(tipo, accion) { this.listeners[tipo] = accion; }, reset() {}
     });
     const documento = { querySelector: selector => (nodos[selector] ??= nodo()) };
     const fetchSimulado = fetch ?? (() => Promise.reject(new Error('sin red en las pruebas')));
