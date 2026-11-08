@@ -2,6 +2,7 @@ const estado = { libros: [], usuarios: [], prestamos: [] };
 let filtrosHistorial = {};
 let solicitudHistorial = 0;
 let solicitudFicha = 0;
+let botonOrigenFicha = null;
 
 function escaparHtml(valor) {
     const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -31,7 +32,7 @@ function mostrarLibros() {
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
     const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
-    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><button class="secondary-button" onclick="abrirFichaUsuario(${Number(usuario.id)})">Ver ficha</button></td></tr>`).join('');
+    document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><button class="secondary-button" onclick="abrirFichaUsuario(${Number(usuario.id)}, this)">Ver ficha</button></td></tr>`).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
 }
@@ -46,11 +47,14 @@ function mostrarFichaUsuario(ficha) {
         ${ficha.historial.length ? `<div class="table-wrapper"><table><thead><tr><th>Libro</th><th>Préstamo</th><th>Vencimiento</th><th>Devolución</th><th>Tipo</th><th>Estado</th><th>Multa</th></tr></thead><tbody>${filas}</tbody></table></div>` : '<p class="message">Este lector no tiene préstamos registrados.</p>'}`;
 }
 
-async function abrirFichaUsuario(id) {
+async function abrirFichaUsuario(id, origen = document.activeElement) {
     const solicitud = ++solicitudFicha;
     const panel = document.querySelector('#fichaLector');
     const contenido = document.querySelector('#fichaContenido');
-    panel.hidden = false;
+    // Una segunda consulta reutiliza el modal y conserva el origen si procede.
+    if (!panel.open || (origen && !panel.contains(origen))) botonOrigenFicha = origen;
+    if (!panel.open) panel.showModal();
+    document.querySelector('#btnCerrarFicha').focus();
     contenido.textContent = 'Cargando ficha...';
     try {
         const ficha = await consultar(`/api/usuarios/${id}/ficha`);
@@ -64,8 +68,16 @@ async function abrirFichaUsuario(id) {
 
 function cerrarFichaUsuario() {
     ++solicitudFicha;
-    document.querySelector('#fichaLector').hidden = true;
+    document.querySelector('#fichaLector').close();
+    if (botonOrigenFicha?.isConnected) botonOrigenFicha.focus();
+    botonOrigenFicha = null;
 }
+
+// Cancelar el cierre por defecto permite invalidar antes de cerrar con Escape.
+document.querySelector('#fichaLector').addEventListener('cancel', event => {
+    event.preventDefault();
+    cerrarFichaUsuario();
+});
 
 function mostrarPrestamos(prestamos = estado.prestamos) {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
