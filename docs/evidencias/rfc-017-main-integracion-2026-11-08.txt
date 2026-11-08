@@ -1,0 +1,112 @@
+RFC-017 / PR #31 - integracion segura con main
+Fecha: 08/11/2026 (America/Lima)
+Rama exclusiva: rfc-017-ficha-lector
+HEAD inicial: bed96efa892c6399c77b0d4d8f63cb3fc4ed2696.
+Arbol inicial limpio, sin cambios de rama.
+git fetch origin: salida 0.
+origin/main: aaba20193f6e632943c6ee2f67da7650b22cea9c.
+Incluye PR #25 RFC-019, #33 RFC-021 y #34 normalizacion documental.
+git merge --no-ff --no-commit origin/main
+Unico conflicto: src/test/js/cargar-app.js.
+
+RESOLUCION Y REVISION:
+Se unen modal/open/showModal/close, cancel, activeElement, focus, contains e
+isConnected de RFC-017 con attributes/setAttribute de RFC-021. Se conservan
+listeners, reset, fetch, VM y llamadas. No se elige un archivo completo.
+app.js: bloques de ficha, apertura, cierre, cancel y filtros del historial
+comparados con HEAD previo: intactos. Resumen desplegable identico a main.
+index.html: dialogo completo identico al HEAD previo, IDs unicos y todos los
+selectores JS presentes; resumen ARIA y grupo de filtros incorporados de main.
+styles.css: reglas del dialogo y backdrop intactas; espaciado de filtros de main.
+Notificador, NotificadorPrestamo y PrestamoService identicos a origin/main.
+Se conservan notificaciones de registro, devolucion y multa positiva.
+Cambios documentales y capturas de main incorporados sin reescribirlos.
+
+PRUEBAS:
+node --test "src/test/js/*.test.js"
+Salida 0: 39 aprobadas, 0 fallidas/canceladas/omitidas/pendientes.
+Incluye 37 anteriores (con nueve nuevas de accesibilidad) y 2 de main.
+
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" test
+Salida 0; BUILD SUCCESS. 140 pruebas, 0 fallos, errores u omitidas.
+23.405 s. Resumen real de esta ejecucion, sin sumar XML historicos.
+Incluye FichaLectorHttpTest, notificaciones RFC-019 y concurrencia RFC-013.
+Las 12 clases SpringBootTest declaran datasource H2 en memoria.
+No se inicio la aplicacion contra la base persistente.
+
+COMPROBACIONES FINALES ANTES DEL COMMIT:
+git diff --check y git diff --cached --check sin errores.
+Busqueda de marcadores completos de conflicto e indice sin entradas no resueltas.
+Sin rebase, push, fusion de PR ni modificacion de otras ramas.
+No se integran RFC-015 ni RFC-016.
+
+LIMITES:
+Pendiente validacion manual con teclado y lector de pantalla en navegador.
+Tab/fondo inactivo dependen de showModal nativo; el DOM simulado verifica su
+uso y el foco, sin emular el motor de navegacion por teclado del navegador.
+
+SALIDA JAVASCRIPT:
+✔ escaparHtml convierte los cinco caracteres especiales de HTML (24.4661ms)
+✔ escaparHtml no vuelve a escapar el resultado como texto plano (2.096ms)
+✔ escaparHtml convierte nulos y números en texto (2.0083ms)
+✔ cerrar invalida una respuesta de ficha pendiente sin cambiar su contenido (39.6067ms)
+✔ la respuesta tardía de A no reemplaza la ficha de B (3.2653ms)
+✔ un error tardío invalidado al cerrar no modifica la ficha (3.3823ms)
+✔ cada usuario muestra un botón Ver ficha (3.4856ms)
+✔ abre la ficha consultando el endpoint del usuario (2.1296ms)
+✔ cierra la ficha sin alterar los datos cargados (2.336ms)
+✔ muestra resumen e historial de préstamos (2.0371ms)
+✔ muestra un estado vacío para un lector sin préstamos (2.4037ms)
+✔ escapa los datos del lector y del historial para evitar XSS (2.8725ms)
+✔ el HTML utiliza dialog modal nativo, nombre accesible y cierre enfocable (2.1917ms)
+✔ abre modal y enfoca Cerrar antes de recibir la ficha; Cerrar restaura el origen (1.9739ms)
+✔ Escape cierra, restaura foco e invalida exito pendiente (1.5617ms)
+✔ Escape cierra, restaura foco e invalida error de red pendiente (4.6649ms)
+✔ Escape cierra, restaura foco e invalida error HTTP pendiente (2.5021ms)
+✔ no intenta enfocar el boton original si fue retirado de la pagina (2.3235ms)
+✔ otra ficha pendiente conserva modal, foco y nuevo origen ante exito de A (2.2028ms)
+✔ otra ficha pendiente conserva modal, foco y nuevo origen ante error de A (1.9539ms)
+✔ reabrir tras Escape conserva la ficha nueva pese al error anterior (3.7863ms)
+✔ aplica cada filtro y conserva false como parámetro (41.8695ms)
+✔ combina los tres filtros y mantiene el total global (3.3506ms)
+✔ limpiar vacía los controles y recupera todo el historial (2.6193ms)
+✔ devolver conserva los filtros aplicados al recargar (2.1997ms)
+✔ registrar conserva los filtros del historial al recargar (2.455ms)
+✔ sin coincidencias muestra un mensaje y mantiene el total global (3.1279ms)
+✔ las filas filtradas conservan el escape HTML (3.3644ms)
+✔ una respuesta tardía no restaura filtros después de limpiarlos (5.1161ms)
+✔ los errores de filtrado se muestran como texto (4.6355ms)
+✔ devolver un préstamo no envía el tipo de préstamo al servidor (42.2281ms)
+✔ el campo de vencimiento no admite fechas anteriores a hoy (2.6223ms)
+✔ el botón muestra y oculta el resumen sin pedirlo al cerrar (29.8843ms)
+✔ una respuesta tardía no vuelve a mostrar el resumen cerrado (2.5566ms)
+✔ los libros con HTML en sus datos se muestran como texto (31.1537ms)
+✔ los usuarios con HTML en sus datos se muestran como texto (2.3408ms)
+✔ el historial de préstamos escapa los nombres de libro y usuario (3.4692ms)
+✔ los datos normales conservan el mismo formato visible (3.0148ms)
+✔ un libro con campos nulos no rompe la búsqueda (1.9396ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 187.2142
+
+RESUMEN JAVA:
+[INFO] Running com.bibliotecaplus.validation.ValidadorDatosTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.bibliotecaplus.validation.ValidadorDatosTest
+[INFO] Running com.bibliotecaplus.validation.ValidadorPrestamoTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in com.bibliotecaplus.validation.ValidadorPrestamoTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 140, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  23.405 s
+[INFO] Finished at: 2026-11-08T01:16:32-05:00
+[INFO] ------------------------------------------------------------------------
