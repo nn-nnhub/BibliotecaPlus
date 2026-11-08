@@ -100,4 +100,4 @@ un envio anterior, tanto con exito como con error. La proteccion distingue
 sesiones incluso al volver al mismo registro, cancelar, modificar campos o
 enviar otra solicitud. Las escrituras exitosas siguen actualizando las tablas.
 
-Detalles y evidencia automatizada en [RFC-015](RFC-015.md#respuestas-obsoletas-de-formularios---08112026).
+Detalles y evidencia automatizada en [RFC-015](RFC-015-edicion-eliminacion-libros-usuarios.md#respuestas-obsoletas-de-formularios---08112026).

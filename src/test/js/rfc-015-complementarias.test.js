@@ -60,16 +60,17 @@ test('muestra los mensajes reales del backend al rechazar eliminaciones', async 
         'un DELETE rechazado no debe recargar las vistas');
 });
 
-test('editar un libro no envía el campo de disponibilidad', async () => {
+test('editar un libro conserva su categoría y no envía la disponibilidad', async () => {
     const { nodos, llamadas, ejecutar, disparar } = cargarApp({ fetch: respuestaOk });
     llamadas.length = 0;
-    ejecutar(`estado.libros = [{ id: 1, titulo: 'Libro', autor: 'Autor', isbn: 'ISBN', disponible: false }]; iniciarEdicionLibro(1);`);
+    ejecutar(`estado.libros = [{ id: 1, titulo: 'Libro', autor: 'Autor', isbn: 'ISBN', categoria: 'Fantasía', disponible: false }]; iniciarEdicionLibro(1);`);
+    assert.strictEqual(nodos['#categoriaLibro'].value, 'Fantasía');
     nodos['#tituloLibro'].value = 'Libro actualizado';
 
     await disparar('#formLibro', 'submit');
 
     const peticion = llamadas.find(({ metodo }) => metodo === 'PUT');
     const cuerpo = JSON.parse(peticion.opciones.body);
-    assert.deepStrictEqual(cuerpo, { titulo: 'Libro actualizado', autor: 'Autor', isbn: 'ISBN' });
+    assert.deepStrictEqual(cuerpo, { titulo: 'Libro actualizado', autor: 'Autor', isbn: 'ISBN', categoria: 'Fantasía' });
     assert.ok(!Object.hasOwn(cuerpo, 'disponible'));
 });

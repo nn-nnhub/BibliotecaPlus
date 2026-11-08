@@ -1,0 +1,203 @@
+# RFC-017 · Ficha consolidada e historial de cada lector
+
+## Identificación y trazabilidad
+
+- [Issue #30](https://github.com/nn-nnhub/BibliotecaPlus/issues/30) y [PR #31](https://github.com/nn-nnhub/BibliotecaPlus/pull/31).
+- Responsable: Carlos Sebastián Portugal Riega.
+
+## Objetivo e impacto
+
+Consultar los datos e historial del lector en un diálogo accesible de solo lectura.
+
+## Integración de RFC-015, 016 y 017
+
+Se conservan las acciones de edición y eliminación, la categoría en el formulario de libro y el acceso a la ficha del lector. Se mantiene el registro histórico de pruebas y capturas en los apartados siguientes.
+
+
+| Campo | Valor |
+|---|---|
+| Issue | [#30](https://github.com/nn-nnhub/BibliotecaPlus/issues/30) |
+| Responsable | Carlos Sebastián Portugal Riega |
+| Rama | `rfc-017-ficha-lector` |
+| Base | `origin/main` |
+| Estado | Funcionalidad implementada, pruebas Java DESPUÉS aprobadas y evidencia visual completada; pendiente de revisión |
+
+## Objetivo
+
+Ofrecer una ficha de cada lector con sus datos personales, un resumen de actividad y el historial de préstamos, sin modificar el estado de usuarios, libros o préstamos.
+
+## Diagnóstico del código actual
+
+`Usuario` contiene `id`, `nombre`, `apellidos`, `dni`, `correo` y `telefono`. `Prestamo` no tiene una relación JPA con el lector o el libro: almacena `usuarioId` y `libroId`, además de `fechaPrestamo`, `fechaVencimiento`, `fechaDevolucion`, `tipoPrestamo`, `devuelto` y `multa`.
+
+La multa se calcula y persiste al devolver un préstamo. Un préstamo activo que ya venció conserva normalmente multa cero hasta su devolución. El repositorio de préstamos ya permite filtrar por `usuarioId`, pero no existe un servicio de ficha consolidada ni el endpoint `GET /api/usuarios/{id}/ficha`.
+
+La interfaz lista usuarios en una tabla, sin columna de acciones, botón `Ver ficha`, panel o diálogo de detalle.
+
+## Contrato propuesto
+
+La respuesta del futuro endpoint tendrá tres secciones:
+
+```json
+{
+  "usuario": {},
+  "resumen": {
+    "totalPrestamos": 0,
+    "prestamosActivos": 0,
+    "prestamosDevueltos": 0,
+    "prestamosVencidos": 0,
+    "multasAcumuladas": 0.0
+  },
+  "historial": []
+}
+```
+
+Cada elemento de `historial` incluirá `id`, `libroId`, `libroTitulo`, las tres fechas reales, `tipoPrestamo`, `devuelto`, `vencido` y `multa`. El historial se ordenará por `fechaPrestamo` descendente.
+
+Las decisiones de contrato que deben revisarse antes de implementar son:
+
+- `prestamosVencidos` cuenta únicamente préstamos no devueltos cuya `fechaVencimiento` es anterior a la fecha actual.
+- `multasAcumuladas` suma los importes persistidos; no proyecta una multa hipotética para préstamos activos vencidos.
+- Un usuario existente sin préstamos obtiene HTTP 200, contadores en cero e historial vacío.
+- Un usuario inexistente obtiene HTTP 404 con el mensaje ya usado por `UsuarioService`.
+- La consulta es de solo lectura y no actualiza multas, disponibilidad, fechas ni estados.
+
+## Pruebas ANTES
+
+Se creó `FichaLectorHttpTest` con ocho casos. Usa MockMvc y repositorios reales sobre `jdbc:h2:mem:rfc017-antes`, `create-drop`, consola desactivada y verificación de la URL JDBC antes de limpiar fixtures.
+
+Los casos cubren el endpoint actual como control, usuario inexistente, lector sin préstamos, resumen de activos/devueltos/vencidos, contenido del historial, multa acumulada y ausencia de mutaciones.
+
+Se creó también `ficha-lector.test.js` con seis contratos de interfaz: botón `Ver ficha`, apertura, cierre, resumen e historial, estado vacío y escape XSS. Las pruebas usan el mismo DOM simulado de la suite existente.
+
+## Resultados reales ANTES
+
+La prueba Java dirigida produjo **8 pruebas: 1 aprobada, 7 fallidas, 0 errores y 0 omitidas**. El control `GET /api/usuarios/{id}` pasa. Los siete contratos de ficha fallan porque la ruta nueva todavía no existe: los casos de usuarios existentes reciben HTTP 404 en lugar de 200, y el caso inexistente recibe el 404 genérico sin el mensaje JSON esperado.
+
+La prueba de solo lectura ejecutó todas sus aserciones con `assertAll`: usuarios, libros, préstamos, disponibilidad y multa permanecieron iguales. Su único fallo fue el estado HTTP 404 en vez de 200.
+
+Las seis pruebas JavaScript no pudieron ejecutarse porque Node.js no está instalado o disponible en `PATH`. No se les atribuye un resultado.
+
+La salida y las condiciones de ejecución están registradas en [rfc-017-antes-despues.txt](evidencias/rfc-017-antes-despues.txt).
+
+## Captura auténtica ANTES
+
+![Tabla de usuarios sin botón Ver ficha](capturas/rfc-017-antes-interfaz.png)
+
+La captura fue obtenida con Chrome headless contra la aplicación real sin modificar, en `127.0.0.1:18017`, usando exclusivamente `jdbc:h2:mem:rfc017-captura` y `create-drop`. Muestra la tabla de usuarios con ID, nombres, apellidos, DNI, correo y teléfono, sin columna de acciones ni botón `Ver ficha`. La instancia temporal fue detenida después de capturar.
+
+## Implementación DESPUÉS
+
+Se creó `FichaLector` como DTO inmutable y `FichaLectorService` como servicio de solo lectura. La consolidación valida primero el usuario, consulta sus préstamos ordenados y resuelve todos los libros mediante un único `findAllById`. No realiza una consulta por cada fila ni guarda entidades.
+
+El resumen se calcula sobre los valores persistidos. `vencido` se deriva sin modificar el préstamo y `multasAcumuladas` suma `Prestamo.multa`. No se cambiaron `PrestamoService`, `CalculadorMulta`, registro o devolución.
+
+`UsuarioController` expone `GET /api/usuarios/{id}/ficha`. La interfaz incorpora una columna Acciones, botones `Ver ficha` y un diálogo con identidad, resumen e historial. Todo valor de usuario o libro se procesa mediante `escaparHtml`; el estado vacío se presenta expresamente.
+
+## Resultados DESPUÉS
+
+| Ejecución | Resultado real |
+|---|---|
+| `mvn -B "-Dtest=FichaLectorHttpTest" test` | 8 pruebas, 0 fallos, 0 errores, 0 omitidas; BUILD SUCCESS |
+| `mvn -B test` | 137 pruebas en 23 clases, 0 fallos, 0 errores, 0 omitidas; BUILD SUCCESS |
+| `node --test "src/test/js/ficha-lector.test.js"` | No ejecutado: Node.js no está disponible en `PATH` |
+
+Todas las pruebas Spring usan URLs H2 en memoria. La clase RFC-017 conservó `create-drop` y la verificación de URL. No se accedió a `./data/bibliotecadb`.
+
+## Captura auténtica DESPUÉS
+
+![Tabla de usuarios con botones Ver ficha](capturas/rfc-017-despues-interfaz.png)
+
+La captura muestra la nueva columna Acciones y los botones `Ver ficha` sobre una instancia real con dos préstamos de demostración. Se obtuvo en `127.0.0.1:18017` con `jdbc:h2:mem:rfc017-despues` y `create-drop`. La API real de ficha devolvió un préstamo activo, uno devuelto, sus títulos y el resumen 2/1/1. La imagen no se presenta como evidencia del diálogo abierto; ese comportamiento queda cubierto por los contratos JavaScript pendientes de Node.js. La instancia fue detenida.
+
+![Ficha del lector abierta con resumen e historial](capturas/rfc-017-despues-ficha-abierta.png)
+
+La evidencia adicional se obtuvo mediante un clic real en `Ver ficha` dentro de Chrome headless contra una nueva instancia temporal, configurada con `jdbc:h2:mem:rfc017-ficha-abierta` y `create-drop`. Antes de guardar la imagen se verificó que el diálogo estaba abierto y mostraba a Ana Torres, el resumen de dos préstamos —uno activo y uno devuelto— y el historial de `Clean Code` e `Ingeniería de Software`. La captura fue inspeccionada visualmente y los procesos temporales se detuvieron después.
+
+No se realizaron commit, push ni merge.
+
+## Corrección de observación P2 — 07/11/2026
+
+Seguimiento: Issue #30, PR #31. Responsable: Carlos Sebastián Portugal Riega.
+
+`abrirFichaUsuario()` aceptaba respuestas asíncronas sin comprobar si la solicitud seguía vigente. Una respuesta tardía podía modificar el contenido después de cerrar la ficha o reemplazar al lector B con los datos de una apertura anterior del lector A. Los errores tardíos también podían sobrescribir el contenido.
+
+Se añadió un contador de secuencia independiente para la ficha. Cada apertura obtiene un identificador; cerrar incrementa el contador e invalida todas las solicitudes pendientes. Tras la consulta, tanto el resultado como el error se aplican únicamente si su identificador sigue vigente. La apertura normal, el resumen, el historial y el escape HTML conservan su comportamiento.
+
+Se añadieron tres pruebas deterministas con promesas controladas, sin temporizadores: cierre antes de recibir la respuesta, aperturas A/B con respuesta de B antes que A y error tardío tras cerrar. Las seis pruebas existentes comprueban también el funcionamiento normal de la ficha.
+
+| Ejecución del 07/11/2026 | Aprobadas | Fallidas | Omitidas |
+|---|---|---|---|
+| Ficha P2 antes de corregir, con las tres regresiones nuevas | 6 | 3 | 0 |
+| `node --test "src/test/js/ficha-lector.test.js"` después de corregir | 9 | 0 | 0 |
+| `node --test "src/test/js/*.test.js"` después de corregir | 28 | 0 | 0 |
+
+Estos resultados corresponden a ejecuciones nuevas con Node.js v26.13.0. Las cifras y limitaciones históricas ANTES/DESPUÉS anteriores se conservan como registro de aquellas ejecuciones, sin atribuirles los resultados actuales. Detalles en la [evidencia P2 del 07/11/2026](evidencias/rfc-017-p2-2026-11-07.txt). No se ejecutó Java ni se accedió a la base persistente para esta corrección de interfaz.
+
+
+## Accesibilidad del dialogo - 08/11/2026
+
+Seguimiento: PR #31. Responsable: Carlos Sebastian Portugal Riega.
+Rama exclusiva `rfc-017-ficha-lector`, partiendo de `3bd0e4f` con arbol limpio.
+
+Se reemplazo la superposicion con ARIA por un elemento nativo `<dialog>`
+abierto mediante `showModal()`. El navegador proporciona la modalidad e
+inactiva el fondo, evitando que Tab navegue por los controles de la pagina.
+Se conserva el nombre accesible mediante `aria-labelledby`; el fondo visual
+se dibuja con `::backdrop`. El boton Cerrar recibe foco de inmediato, incluso
+mientras la consulta sigue pendiente.
+
+El evento nativo `cancel` (Escape) cancela el cierre automatico y utiliza
+`cerrarFichaUsuario()`, igual que el boton Cerrar. Esta funcion incrementa
+`solicitudFicha` antes de cerrar y restaura el foco al boton Ver ficha original
+si sigue conectado. El boton se pasa expresamente desde el onclick, por lo
+que tambien se identifica en navegadores que no enfocan botones al hacer clic.
+Si se abre otra ficha con una consulta pendiente, se reutiliza el modal sin
+volver a llamar showModal y la solicitud anterior queda invalidada. Si existe
+un nuevo boton de origen se actualiza; una apertura desde dentro del dialogo
+conserva el origen externo.
+
+El entorno JavaScript simula open/showModal/close, cancel, activeElement,
+focus, contains e isConnected. Las nueve pruebas anteriores de ficha se
+adaptaron al estado open conservando sus aserciones funcionales; se sumaron
+nueve pruebas de estructura nativa, foco antes de responder, cierre/restauracion,
+Escape con exito/error HTTP/error de red pendiente, origen eliminado,
+otra ficha pendiente (exito/error anterior) y reapertura tras Escape.
+
+Resultados nuevos: **37/37 JavaScript** y **135/135 Java**, sin fallos,
+errores ni omisiones; Maven BUILD SUCCESS. Las nueve regresiones nuevas se
+probaron tambien en una copia temporal de la implementacion inicial:
+**1 aprobada y 8 fallidas**, sin sustituir archivos del arbol de trabajo.
+Los resultados historicos de las secciones previas se conservan intactos.
+
+Evidencia: [accesibilidad 08/11/2026](evidencias/rfc-017-accesibilidad-2026-11-08.txt).
+La simulacion no implementa el motor de navegacion Tab del navegador: ese
+comportamiento se delega a showModal nativo. Queda pendiente la comprobacion
+manual con teclado y lector de pantalla en los navegadores objetivo.
+No se integro origin/main ni RFC-015/RFC-016; sin push ni fusion de PR.
+
+
+## Integracion segura con main - 08/11/2026
+
+Tras verificar rama `rfc-017-ficha-lector`, HEAD `bed96ef` y arbol limpio,
+se ejecuto `git fetch origin`. El main actualizado es `aaba201`, que incluye
+RFC-019, RFC-021 y la normalizacion documental del PR #34. Se integro mediante
+`git merge --no-ff --no-commit origin/main`, sin rebase ni incorporar las ramas
+RFC-015/RFC-016.
+
+El unico conflicto fue `src/test/js/cargar-app.js`. Se conservaron todas las
+capacidades de dialogo y foco de RFC-017 y se agregaron `attributes` y
+`setAttribute()` de main para comprobar la accesibilidad del resumen RFC-021.
+
+Se revisaron app.js, index.html y styles.css aunque combinaron automaticamente.
+Se conservaron integralmente la ficha nativa, showModal, foco inicial, Escape,
+restauracion al origen e invalidacion de consultas, asi como los filtros e
+invalidacion del historial. Se mantienen el resumen desplegable, sus atributos
+ARIA y la separacion de botones de filtros. Las notificaciones Java RFC-019
+coinciden con main sin alteraciones adicionales.
+
+Resultado del arbol integrado: **39/39 JavaScript** (37 previas y 2 de main),
+**140/140 Java**, sin fallos, errores u omisiones; BUILD SUCCESS.
+Comandos y salida en [evidencia de integracion](evidencias/rfc-017-main-integracion-2026-11-08.txt).
+No se realizo validacion manual con teclado o lector de pantalla en navegador.
+Sin push ni fusion de PR. RFC-015 y RFC-016 siguen fuera de esta integracion.

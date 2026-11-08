@@ -112,21 +112,5 @@ El detalle de cada suite está en [docs/pruebas-automatizadas.md](docs/pruebas-a
 
 ## RFC y GitHub
 
-La plantilla está en `.github/ISSUE_TEMPLATE/rfc.md` y la guía en [docs/gestion-rfc-github.md](docs/gestion-rfc-github.md).
-
-- [RFC-001: refactorización exhaustiva](docs/RFC-001-refactorizacion.md) — [Issue #1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1)
-- [RFC-002: validación de ISBN](docs/RFC-002-validacion-isbn.md) — [Issue #2](https://github.com/nn-nnhub/BibliotecaPlus/issues/2)
-- [RFC-003: reportes y exportación](docs/RFC-003-reportes-exportacion.md) — [Issue #3](https://github.com/nn-nnhub/BibliotecaPlus/issues/3)
-- [RFC-004: vencimientos y multas](docs/RFC-004-vencimientos-multas.md) — [Issue #4](https://github.com/nn-nnhub/BibliotecaPlus/issues/4)
-- [RFC-005: mejora del registro de usuarios](docs/RFC-005-mejora-usuarios.md) — [Issue #5](https://github.com/nn-nnhub/BibliotecaPlus/issues/5)
-- [RFC-006: validación de DNI](docs/RFC-006-validacion-dni.md) — [Issue #6](https://github.com/nn-nnhub/BibliotecaPlus/issues/6)
-- [RFC-007: ejecución portable](docs/RFC-007-ejecucion-portable.md) — [Issue #7](https://github.com/nn-nnhub/BibliotecaPlus/issues/7)
-- [RFC-008: persistencia local](docs/RFC-008-persistencia-base-datos.md) — [Issue #8](https://github.com/nn-nnhub/BibliotecaPlus/issues/8)
-- [RFC-009: corrección de multas y reglas de préstamo](docs/RFC-009.md) — [Issue #9](https://github.com/nn-nnhub/BibliotecaPlus/issues/9)
-- [RFC-010: validación de libros y usuarios](docs/RFC-010.md) — [Issue #10](https://github.com/nn-nnhub/BibliotecaPlus/issues/10)
-- [RFC-011: seguridad y mejora de reportes](docs/RFC-011.md) — [Issue #11](https://github.com/nn-nnhub/BibliotecaPlus/issues/11)
-
-Flujo: crear RFC, definir prioridad y riesgo, implementar por capas, probar, documentar, crear commit descriptivo, subir a `main` y cerrar la Issue.
-
-Repositorio: [github.com/nn-nnhub/BibliotecaPlus](https://github.com/nn-nnhub/BibliotecaPlus)
+Consulta el [índice de los 21 RFC](docs/indice-rfc.md) para ver sus documentos, issues, PR y estado. El [formato de documentación](docs/formato-documento-rfc.md) y la [guía de gestión](docs/gestion-rfc-github.md) explican cómo registrar y verificar un cambio.
 

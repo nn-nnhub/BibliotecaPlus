@@ -1,5 +1,27 @@
 # RFC-011 · Seguridad y mejora de reportes
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#11](https://github.com/nn-nnhub/BibliotecaPlus/issues/11) |
+| Pull request | [#19](https://github.com/nn-nnhub/BibliotecaPlus/pull/19) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Proteger el contenido mostrado y exportado.
+
+## Implementación e impacto
+
+Escape HTML, neutralización de fórmulas CSV y consultas agrupadas.
+
+## Pruebas y evidencias
+
+Pruebas de XSS, exportación y equivalencia. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#11](https://github.com/nn-nnhub/BibliotecaPlus/issues/11) |
@@ -11,7 +33,7 @@
 | Fecha propuesta | 17/10/2026 |
 | Etiquetas | RFC · Media · Mejora |
 
-## Relación con el RFC
+### Relación con el RFC
 
 La Issue #11 pide corregir la inserción insegura de contenido dinámico en la interfaz, proteger el CSV frente a contenido peligroso, reducir las consultas repetidas de los reportes y revisar la configuración de H2 y del registro de SQL sin comprometer la persistencia de RFC-008.
 
@@ -22,7 +44,7 @@ La Issue #11 pide corregir la inserción insegura de contenido dinámico en la i
 | H10 — consultas repetidas en los reportes | Corregido |
 | H11 — `h2-console` y `show-sql` | Revisado y documentado; **sin cambios de configuración** |
 
-## Hallazgo
+### Hallazgo
 
 **H2.** Título, autor, ISBN, nombres y demás datos se insertaban con `innerHTML` sin escapar. En la prueba, `<img src=x onerror=alert(1)>`, `<script>…` y `"><svg onload=…>` llegaban intactos al HTML. Un libro con título nulo rompía además el filtro de búsqueda.
 
@@ -32,7 +54,7 @@ La Issue #11 pide corregir la inserción insegura de contenido dinámico en la i
 
 **H11.** La consola H2 está habilitada, `show-sql` está activo y el servidor no restringe su dirección de enlace. Se observó el comportamiento real (ver *Riesgos y limitaciones*).
 
-## Código anterior
+### Código anterior
 
 `app.js` (datos sin escapar en `innerHTML`):
 
@@ -56,7 +78,7 @@ fila.put("libro", libroRepository.findById(prestamo.getLibroId()).map(libro -> l
 fila.put("usuario", usuarioRepository.findById(prestamo.getUsuarioId()).map(usuario -> (usuario.getNombre() + " " + usuario.getApellidos()).trim()).orElse("Usuario " + prestamo.getUsuarioId()));
 ```
 
-## Solución aplicada
+### Solución aplicada
 
 - **`app.js` (H2)**: la función `escaparHtml` convierte `& < > " '` y se aplica a todos los valores dinámicos de las cinco asignaciones a `innerHTML` (tabla y selector de libros, tabla y selector de usuarios, historial de préstamos). El identificador del botón "Devolver" pasa por `Number()` y el filtro de libros tolera valores nulos. Los mensajes de estado ya usaban `textContent`.
 - **`ExportadorCsv.java` y `ReporteController.java` (H9)**: se antepone `'` a los textos que empiezan por `=`, `+`, `-`, `@`, tabulación o retorno de carro; se entrecomillan los valores con `;`, comillas o saltos de línea duplicando las comillas. Solo se neutralizan las cadenas, no los números. Se conservan el encabezado y el BOM UTF-8.
@@ -73,7 +95,7 @@ private Map<Long, String> titulosDeLibros(Stream<Long> libroIds) {
 
 Los resultados se conservan: los libros o usuarios ausentes (datos históricos) siguen mostrándose como `Libro N` y `Usuario N`.
 
-## Evidencias visuales
+### Evidencias visuales
 
 Las capturas muestran resultados en verde; no existen capturas de pruebas fallando. La evidencia real de los fallos previos (incluida la fila `=HYPERLINK(...)` del CSV, los conteos 13 y 4 de consultas y las pruebas JavaScript en rojo) se conserva como salida literal en [`evidencias/rfc-011-antes-despues.txt`](evidencias/rfc-011-antes-despues.txt).
 
@@ -83,14 +105,14 @@ Las capturas muestran resultados en verde; no existen capturas de pruebas fallan
 
 ![Commit de la corrección de H2](capturas/rfc-011-commit.png)
 
-## Resultado
+### Resultado
 
 - Los datos controlados por el usuario se muestran como texto y no se interpretan como HTML ni JavaScript.
 - El CSV escapa separadores, comillas y saltos de línea y neutraliza los valores que empiezan por caracteres de fórmula.
 - Listar los préstamos del reporte necesita como máximo 3 consultas y el resumen 2, con independencia del número de filas.
 - Los resultados de los reportes son equivalentes a los anteriores (pruebas de caracterización).
 
-## Validación automatizada
+### Validación automatizada
 
 Pruebas relevantes:
 
@@ -120,7 +142,7 @@ Resultados reales:
 
 El detalle de las ejecuciones archivadas está en `evidencias/rfc-011-antes-despues.txt`. **Las pruebas JavaScript no forman parte de `mvn test`**: se ejecutan por separado con Node.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 **H11 — revisión sin cambios.** Observaciones reales (aplicación en ejecución y una prueba con servidor aleatorio y base en memoria):
 

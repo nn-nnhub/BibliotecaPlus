@@ -11,12 +11,22 @@ function cargarApp({ fetch, confirm } = {}) {
     const confirmaciones = [];
     const nodo = () => ({
         value: '', textContent: '', innerHTML: '', className: '', min: '',
-        listeners: {}, attributes: {},
+        listeners: {}, open: false, isConnected: true,
+        focus() { documento.activeElement = this; },
+        contains(elemento) { return this === elemento || (this === nodos['#fichaLector'] && elemento === nodos['#btnCerrarFicha']); },
+        showModal() { if (this.open) throw new Error('Dialogo ya abierto'); this.open = true; this.modal = true; },
+        close() { this.open = false; this.modal = false; },
+        dispatchEvent(evento) {
+            this.listeners[evento.type]?.(evento);
+            if (evento.type === 'cancel' && !evento.defaultPrevented) this.close();
+            return !evento.defaultPrevented;
+        },
+        attributes: {},
         setAttribute(nombre, valor) { this.attributes[nombre] = valor; },
         addEventListener(tipo, manejador) { this.listeners[tipo] = manejador; },
         reset() { this.value = ''; }
     });
-    const documento = { querySelector: selector => (nodos[selector] ??= nodo()) };
+    const documento = { activeElement: null, querySelector: selector => (nodos[selector] ??= nodo()) };
     const fetchSimulado = fetch ?? (() => Promise.reject(new Error('sin red en las pruebas')));
     const confirmSimulado = confirm ?? (() => false);
     const contexto = vm.createContext({
@@ -31,6 +41,7 @@ function cargarApp({ fetch, confirm } = {}) {
         nodos,
         llamadas,
         confirmaciones,
+        documento,
         ejecutar: codigo => vm.runInContext(codigo, contexto),
         disparar(selector, tipo, evento) {
             const eventoSimulado = evento ?? { target: nodos[selector], preventDefault() {} };

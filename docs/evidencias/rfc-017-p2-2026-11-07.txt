@@ -1,0 +1,41 @@
+RFC-017 / PR #31 / Issue #30 — Corrección P2
+Fecha: 07/11/2026 (America/Lima)
+Responsable: Carlos Sebastián Portugal Riega
+Rama: rfc-017-ficha-lector
+HEAD base: 7eff53fa61c00388702e6bd2570073aa8e518f70
+Entorno: Node.js v26.13.0
+
+DEFECTO Y SOLUCIÓN
+Las respuestas y errores de aperturas anteriores podían modificar la ficha
+después de cerrarla o después de mostrar otro lector.
+Cada apertura incrementa solicitudFicha y conserva su secuencia local.
+Cerrar incrementa el contador. Resultado y error solo modifican la interfaz
+si su secuencia sigue vigente. Las consultas HTTP no se cancelan; se descartan
+sus efectos obsoletos.
+
+PRUEBAS DETERMINISTAS
+Tres regresiones nuevas con promesas controladas, sin red ni temporizadores:
+- Abrir y cerrar antes de resolver: no reaparece ni cambia el contenido.
+- Abrir A y después B, resolver B antes que A: permanece la ficha de B.
+- Rechazar una solicitud después de cerrar: no cambia el contenido.
+Se conservan las seis pruebas existentes, incluida la apertura normal.
+
+ANTES DE CORREGIR, CON LAS REGRESIONES NUEVAS
+Comando exacto: node --test "src/test/js/ficha-lector.test.js"
+9 pruebas: 6 aprobadas, 3 fallidas, 0 omitidas; salida 1.
+Fallaron las tres regresiones nuevas: contenido tardío después del cierre,
+datos de A reemplazando B y mensaje de error tardío después del cierre.
+
+DESPUÉS DE CORREGIR
+Comando exacto: node --test "src/test/js/ficha-lector.test.js"
+9 pruebas: 9 aprobadas, 0 fallidas, 0 omitidas; salida 0.
+Duración informada: 110.886 ms.
+Comando exacto: node --test "src/test/js/*.test.js"
+28 pruebas: 28 aprobadas, 0 fallidas, 0 omitidas; salida 0.
+Duración informada: 161.7089 ms.
+Ambas ejecuciones DESPUÉS: 0 canceladas, 0 pendientes (todo).
+
+ALCANCE
+Sin cambios de backend, base persistente, evidencias históricas o capturas.
+No se ejecutó Java. No se integraron main, RFC-015 ni RFC-016.
+Sin commit, push ni modificaciones de Issues o Pull Requests.

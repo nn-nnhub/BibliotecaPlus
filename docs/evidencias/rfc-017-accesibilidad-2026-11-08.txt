@@ -1,0 +1,106 @@
+RFC-017 / PR #31 - accesibilidad de la ficha
+Fecha: 08/11/2026 (America/Lima)
+Responsable: Carlos Sebastian Portugal Riega.
+Rama inicial y de trabajo: rfc-017-ficha-lector
+HEAD inicial: 3bd0e4fe2b2dd6594c66104b77995971e857d81b.
+Arbol inicial limpio. origin/main local: 1733d4c, sin integrar ni fetch.
+
+IMPLEMENTACION:
+Dialogo nativo showModal, foco inmediato en Cerrar, fondo inactivo nativo.
+Escape usa cancel/preventDefault y la misma funcion que Cerrar.
+Invalidacion de solicitudFicha antes del cierre y restauracion de foco solo
+si el origen sigue conectado. Se pasa this desde Ver ficha para capturar
+el boton aunque el clic no cambie activeElement. Otra ficha reutiliza el modal
+y conserva la invalidacion de exito y error anterior.
+CSS ::backdrop y panel centrado, dimensiones adaptables y scroll conservados.
+
+ANTES (copia temporal aislada de app.js e index.html de 3bd0e4f):
+node --test --test-name-pattern="el HTML utiliza|abre modal y enfoca|Escape cierra|no intenta enfocar|otra ficha pendiente|reabrir tras Escape" src/test/js/ficha-lector.test.js
+9 pruebas: 1 aprobada y 8 fallidas; salida 1.
+La prueba de origen desconectado ya pasa en la implementacion anterior.
+Salida guardada en rfc-017-accesibilidad-antes-2026-11-08.txt.
+
+DESPUES:
+node --test "src/test/js/*.test.js"
+37 pruebas: 37 aprobadas, 0 fallidas/canceladas/omitidas/pendientes; salida 0.
+Incluye 28 anteriores y 9 nuevas. Promesas controladas, sin temporizadores.
+Las pruebas anteriores se adaptaron de hidden a open sin eliminar contratos.
+
+mvn -o -B "-Dmaven.repo.local=C:/Users/sebas/.m2/repository" test
+135 pruebas: 0 fallos, 0 errores, 0 omitidas; BUILD SUCCESS; salida 0.
+23.397 s. Resumen de esta ejecucion, sin sumar informes XML anteriores.
+Las clases SpringBootTest declaran H2 en memoria, incluida FichaLectorHttpTest.
+No se inicio la aplicacion contra la base persistente. No hay cambios Java.
+
+VERIFICACIONES Y LIMITES:
+git diff --check y git diff --cached --check antes del commit.
+Sin marcadores de conflicto. Sin modificaciones de otras ramas ni de documentos
+RFC-015/RFC-016. No se integro main, no se hizo push ni fusion de PR.
+El bloqueo del fondo/Tab lo proporciona el navegador con showModal; el DOM
+simulado verifica el uso modal y el foco, no emula la navegacion nativa.
+Pendiente comprobacion manual de teclado y lector de pantalla en navegadores
+objetivo; se requiere soporte de HTMLDialogElement.showModal.
+
+SALIDA JAVASCRIPT:
+✔ escaparHtml convierte los cinco caracteres especiales de HTML (24.5328ms)
+✔ escaparHtml no vuelve a escapar el resultado como texto plano (4.4819ms)
+✔ escaparHtml convierte nulos y números en texto (1.4113ms)
+✔ cerrar invalida una respuesta de ficha pendiente sin cambiar su contenido (28.1651ms)
+✔ la respuesta tardía de A no reemplaza la ficha de B (2.0518ms)
+✔ un error tardío invalidado al cerrar no modifica la ficha (1.0688ms)
+✔ cada usuario muestra un botón Ver ficha (1.6657ms)
+✔ abre la ficha consultando el endpoint del usuario (1.4406ms)
+✔ cierra la ficha sin alterar los datos cargados (1.0236ms)
+✔ muestra resumen e historial de préstamos (0.899ms)
+✔ muestra un estado vacío para un lector sin préstamos (0.8131ms)
+✔ escapa los datos del lector y del historial para evitar XSS (1.0891ms)
+✔ el HTML utiliza dialog modal nativo, nombre accesible y cierre enfocable (0.7631ms)
+✔ abre modal y enfoca Cerrar antes de recibir la ficha; Cerrar restaura el origen (1.1639ms)
+✔ Escape cierra, restaura foco e invalida exito pendiente (0.99ms)
+✔ Escape cierra, restaura foco e invalida error de red pendiente (0.9577ms)
+✔ Escape cierra, restaura foco e invalida error HTTP pendiente (1.0107ms)
+✔ no intenta enfocar el boton original si fue retirado de la pagina (0.9959ms)
+✔ otra ficha pendiente conserva modal, foco y nuevo origen ante exito de A (1.069ms)
+✔ otra ficha pendiente conserva modal, foco y nuevo origen ante error de A (1.0019ms)
+✔ reabrir tras Escape conserva la ficha nueva pese al error anterior (1.3265ms)
+✔ aplica cada filtro y conserva false como parámetro (34.5804ms)
+✔ combina los tres filtros y mantiene el total global (1.5884ms)
+✔ limpiar vacía los controles y recupera todo el historial (1.6912ms)
+✔ devolver conserva los filtros aplicados al recargar (1.6331ms)
+✔ registrar conserva los filtros del historial al recargar (1.6639ms)
+✔ sin coincidencias muestra un mensaje y mantiene el total global (1.2832ms)
+✔ las filas filtradas conservan el escape HTML (1.1764ms)
+✔ una respuesta tardía no restaura filtros después de limpiarlos (1.3316ms)
+✔ los errores de filtrado se muestran como texto (1.7129ms)
+✔ devolver un préstamo no envía el tipo de préstamo al servidor (38.4877ms)
+✔ el campo de vencimiento no admite fechas anteriores a hoy (2.0533ms)
+✔ los libros con HTML en sus datos se muestran como texto (27.3233ms)
+✔ los usuarios con HTML en sus datos se muestran como texto (18.8352ms)
+✔ el historial de préstamos escapa los nombres de libro y usuario (2.3859ms)
+✔ los datos normales conservan el mismo formato visible (0.9384ms)
+✔ un libro con campos nulos no rompe la búsqueda (0.8306ms)
+ℹ tests 37
+ℹ suites 0
+ℹ pass 37
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 190.2487
+
+RESUMEN JAVA:
+[INFO] Running com.bibliotecaplus.validation.ValidadorDatosTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.bibliotecaplus.validation.ValidadorDatosTest
+[INFO] Running com.bibliotecaplus.validation.ValidadorPrestamoTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.bibliotecaplus.validation.ValidadorPrestamoTest
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 135, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  23.397 s
+[INFO] Finished at: 2026-11-08T01:13:26-05:00
+[INFO] ------------------------------------------------------------------------

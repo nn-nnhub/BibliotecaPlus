@@ -1,4 +1,26 @@
-# RFC-019 · Notificación de devolución y de multa
+# RFC-019 · Registro de devolución y multa
+
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#17](https://github.com/nn-nnhub/BibliotecaPlus/issues/17) |
+| Pull request | [#25](https://github.com/nn-nnhub/BibliotecaPlus/pull/25) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Registrar en el log la devolución y la multa si corresponde.
+
+## Implementación e impacto
+
+Extensión de Notificador; no envía correo al lector.
+
+## Pruebas y evidencias
+
+Pruebas de devolución y multa; capturas de terminal. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
 
 | Campo | Valor |
 |---|---|
@@ -11,13 +33,13 @@
 | Fecha propuesta | 18/10/2026 |
 | Etiquetas | RFC · Media · Mejora |
 
-## Relación con el RFC
+### Relación con el RFC
 
 Este RFC amplía el registro de eventos del préstamo. Si se encuentra al usuario, el sistema escribe en el log la devolución y, cuando corresponde, el importe de la multa.
 
 No modifica reglas de multas (RFC-009), transaccionalidad (RFC-012), concurrencia (RFC-013) ni la configuración de H2 (RFC-008).
 
-## Descripción del cambio
+### Descripción del cambio
 
 - `Notificador` incorpora dos métodos: `notificarDevolucion(Usuario)` y `notificarMulta(Usuario, double)`.
 - `NotificadorPrestamo` los implementa con `LOGGER.info`:
@@ -28,11 +50,11 @@ No modifica reglas de multas (RFC-009), transaccionalidad (RFC-012), concurrenci
   - notifica la multa solo si `multa > 0`;
   - si el usuario ya no existe, la devolución se completa sin error y no se notifica.
 
-## Justificación
+### Justificación
 
 El log permite comprobar qué ocurrió al devolver un préstamo. La interfaz existente (`Notificador`) permite incorporar en el futuro un canal de entrega al usuario.
 
-## Impacto en el sistema
+### Impacto en el sistema
 
 | Archivo | Cambio |
 |---|---|
@@ -44,7 +66,7 @@ El log permite comprobar qué ocurrió al devolver un préstamo. La interfaz exi
 - La API no cambia: `PUT /api/prestamos/{id}/devolver` responde igual.
 - Ninguna otra clase implementa `Notificador`, por lo que agregar métodos a la interfaz no rompe otras implementaciones.
 
-## Criterios de aceptación
+### Criterios de aceptación
 
 1. Al devolver un préstamo a tiempo se registra `Devolución registrada para {correo}` y **no** se registra ninguna multa.
 2. Al devolver con retraso se registran `Devolución registrada para {correo}` y `Multa de S/ X.XX pendiente para {correo}`.
@@ -52,31 +74,31 @@ El log permite comprobar qué ocurrió al devolver un préstamo. La interfaz exi
 4. El monto de la multa siempre se muestra con dos decimales y punto.
 5. Las pruebas existentes siguen pasando.
 
-## Evidencias visuales
+### Evidencias visuales
 
-### Captura histórica de las pruebas Java del PR
+#### Captura histórica de las pruebas Java del PR
 
 ![Maven muestra 89 pruebas, 0 fallos, 0 errores, 0 omitidas y BUILD SUCCESS](capturas/rfc-019-pruebas.png)
 
-### Devolución a tiempo (sin multa)
+#### Devolución a tiempo (sin multa)
 
 En la terminal se ven el registro del préstamo y su devolución, sin entrada de multa.
 
 ![Log del registro del préstamo y de su devolución](capturas/rfc-019-devolucion-sin-multa.png)
 
-### Devolución con retraso (con multa)
+#### Devolución con retraso (con multa)
 
 La terminal muestra la devolución seguida de una multa pendiente de S/ 6.00.
 
 ![Log de devolución y multa pendiente de S/ 6.00](capturas/rfc-019-devolucion-con-multa.png)
 
-## Resultado
+### Resultado
 
 - Si se encuentra al usuario, la devolución queda registrada en el log.
 - El log incluye una segunda entrada si la multa es mayor que cero.
 - Una devolución con usuario inexistente no falla.
 
-## Validación automatizada
+### Validación automatizada
 
 - `NotificadorPrestamoTest` (3): verifica con un `ListAppender` de Logback los mensajes de registro, devolución y multa, incluido el formato del monto.
 - `PrestamoDevolucionNotificacionTest` (3, Mockito):
@@ -97,7 +119,7 @@ mvn test "-Dtest=NotificadorPrestamoTest,PrestamoDevolucionNotificacionTest"
 | Revisión del PR | 89 | 10 | Java según la captura de Maven. JavaScript según la revisión del [PR #25](https://github.com/nn-nnhub/BibliotecaPlus/pull/25) |
 | Validación con main integrado | 132 | 19 | El revisor verificó el commit [d0b5768](https://github.com/nn-nnhub/BibliotecaPlus/commit/d0b5768) con Java 17 y confirmó que todas las pruebas pasaron. |
 
-## Pasos para reproducir la prueba manual
+### Pasos para reproducir la prueba manual
 
 1. Arrancar la aplicación sin el SQL de Hibernate en pantalla (no modifica `application.properties`):
 ```powershell
@@ -114,7 +136,7 @@ mvn test "-Dtest=NotificadorPrestamoTest,PrestamoDevolucionNotificacionTest"
 
 El `UPDATE` es necesario porque el RFC-009 impide registrar vencimientos pasados. Solo afecta la base local de prueba; el archivo `data/` no se versiona ni se incluye en el Pull Request.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 - **Canal de notificación:** por ahora es solo un log; no se envía correo real. La interfaz `Notificador` deja preparada esa ampliación.
 - **Datos personales en el log:** se registra el correo del usuario, igual que ya hacía `notificarRegistro`.

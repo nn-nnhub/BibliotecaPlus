@@ -4,6 +4,8 @@ let solicitudHistorial = 0;
 // Cada cambio invalida las respuestas de solicitudes anteriores del formulario.
 let versionFormularioLibro = 0;
 let versionFormularioUsuario = 0;
+let solicitudFicha = 0;
+let botonOrigenFicha = null;
 
 function escaparHtml(valor) {
     const reemplazos = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -21,11 +23,15 @@ async function consultar(url, opciones) {
 
 function mostrarLibros() {
     const filtro = document.querySelector('#buscarLibro').value.toLowerCase().trim();
-    const librosVisibles = estado.libros.filter(libro => [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
+    const categoriaSeleccionada = document.querySelector('#filtroCategoriaLibro').value.toLowerCase();
+    const categoriaVisible = libro => libro.categoria?.trim() || 'Sin categoría';
+    const librosVisibles = estado.libros.filter(libro =>
+        [libro.titulo, libro.autor, libro.isbn].some(valor => (valor ?? '').toLowerCase().includes(filtro))
+        && (!categoriaSeleccionada || categoriaVisible(libro).toLowerCase() === categoriaSeleccionada));
     const cuerpo = document.querySelector('#tablaLibros');
     cuerpo.innerHTML = librosVisibles.map(libro => {
         const id = Number(libro.id);
-        return `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="iniciarEdicionLibro(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarLibro(${id})">Eliminar</button></div></td></tr>`;
+        return `<tr><td>${escaparHtml(libro.id)}</td><td>${escaparHtml(libro.titulo)}</td><td>${escaparHtml(libro.autor)}</td><td>${escaparHtml(libro.isbn)}</td><td>${escaparHtml(categoriaVisible(libro))}</td><td><span class="status ${libro.disponible ? '' : 'unavailable'}">${libro.disponible ? 'Disponible' : 'Prestado'}</span></td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="iniciarEdicionLibro(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarLibro(${id})">Eliminar</button></div></td></tr>`;
     }).join('');
     document.querySelector('#totalLibros').textContent = estado.libros.length;
     document.querySelector('#librosDisponibles').textContent = estado.libros.filter(libro => libro.disponible).length;
@@ -33,16 +39,68 @@ function mostrarLibros() {
     selector.innerHTML = estado.libros.filter(libro => libro.disponible).map(libro => `<option value="${escaparHtml(libro.id)}">${escaparHtml(libro.titulo)}</option>`).join('');
 }
 
+function actualizarFiltroCategorias() {
+    const selector = document.querySelector('#filtroCategoriaLibro');
+    const seleccion = selector.value;
+    const categorias = [...new Set(estado.libros.map(libro => libro.categoria?.trim() || 'Sin categoría'))]
+        .sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    selector.innerHTML = '<option value="">Todas las categorías</option>'
+        + categorias.map(categoria => `<option value="${escaparHtml(categoria)}">${escaparHtml(categoria)}</option>`).join('');
+    selector.value = categorias.includes(seleccion) ? seleccion : '';
+}
+
 function mostrarUsuarios() {
     const filtro = document.querySelector('#buscarUsuario').value.toLowerCase().trim();
     const usuariosVisibles = estado.usuarios.filter(usuario => [usuario.nombre, usuario.apellidos, usuario.dni, usuario.correo, usuario.telefono].some(valor => (valor ?? '').toLowerCase().includes(filtro)));
     document.querySelector('#tablaUsuarios').innerHTML = usuariosVisibles.map(usuario => {
         const id = Number(usuario.id);
-        return `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="iniciarEdicionUsuario(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarUsuario(${id})">Eliminar</button></div></td></tr>`;
+        return `<tr><td>${escaparHtml(usuario.id)}</td><td>${escaparHtml(usuario.nombre)}</td><td>${escaparHtml(usuario.apellidos ?? '-')}</td><td>${escaparHtml(usuario.dni ?? '-')}</td><td>${escaparHtml(usuario.correo)}</td><td>${escaparHtml(usuario.telefono ?? '-')}</td><td><div class="row-actions"><button class="secondary-button" type="button" onclick="abrirFichaUsuario(${id}, this)">Ver ficha</button><button class="secondary-button" type="button" onclick="iniciarEdicionUsuario(${id})">Editar</button><button class="danger-button" type="button" onclick="eliminarUsuario(${id})">Eliminar</button></div></td></tr>`;
     }).join('');
     document.querySelector('#totalUsuarios').textContent = estado.usuarios.length;
     document.querySelector('#usuarioId').innerHTML = estado.usuarios.map(usuario => `<option value="${escaparHtml(usuario.id)}">${escaparHtml(usuario.nombre)}</option>`).join('');
 }
+
+function mostrarFichaUsuario(ficha) {
+    const usuario = ficha.usuario;
+    const resumen = ficha.resumen;
+    const filas = ficha.historial.map(prestamo => `<tr><td>${escaparHtml(prestamo.libroTitulo)}</td><td>${escaparHtml(prestamo.fechaPrestamo ?? '-')}</td><td>${escaparHtml(prestamo.fechaVencimiento ?? '-')}</td><td>${escaparHtml(prestamo.fechaDevolucion ?? '-')}</td><td>${escaparHtml(prestamo.tipoPrestamo)}</td><td>${prestamo.devuelto ? 'Devuelto' : prestamo.vencido ? 'Vencido' : 'Activo'}</td><td>S/ ${Number(prestamo.multa).toFixed(2)}</td></tr>`).join('');
+    document.querySelector('#fichaContenido').innerHTML = `
+        <div class="ficha-identidad"><h3>${escaparHtml(usuario.nombre)} ${escaparHtml(usuario.apellidos ?? '')}</h3><p>DNI: ${escaparHtml(usuario.dni)} · ${escaparHtml(usuario.correo)} · ${escaparHtml(usuario.telefono)}</p></div>
+        <div class="ficha-resumen"><article><span>Total</span><strong>${escaparHtml(resumen.totalPrestamos)}</strong></article><article><span>Activos</span><strong>${escaparHtml(resumen.prestamosActivos)}</strong></article><article><span>Devueltos</span><strong>${escaparHtml(resumen.prestamosDevueltos)}</strong></article><article><span>Vencidos</span><strong>${escaparHtml(resumen.prestamosVencidos)}</strong></article><article><span>Multas</span><strong>S/ ${Number(resumen.multasAcumuladas).toFixed(2)}</strong></article></div>
+        ${ficha.historial.length ? `<div class="table-wrapper"><table><thead><tr><th>Libro</th><th>Préstamo</th><th>Vencimiento</th><th>Devolución</th><th>Tipo</th><th>Estado</th><th>Multa</th></tr></thead><tbody>${filas}</tbody></table></div>` : '<p class="message">Este lector no tiene préstamos registrados.</p>'}`;
+}
+
+async function abrirFichaUsuario(id, origen = document.activeElement) {
+    const solicitud = ++solicitudFicha;
+    const panel = document.querySelector('#fichaLector');
+    const contenido = document.querySelector('#fichaContenido');
+    // Una segunda consulta reutiliza el modal y conserva el origen si procede.
+    if (!panel.open || (origen && !panel.contains(origen))) botonOrigenFicha = origen;
+    if (!panel.open) panel.showModal();
+    document.querySelector('#btnCerrarFicha').focus();
+    contenido.textContent = 'Cargando ficha...';
+    try {
+        const ficha = await consultar(`/api/usuarios/${id}/ficha`);
+        if (solicitud !== solicitudFicha) return;
+        mostrarFichaUsuario(ficha);
+    } catch (error) {
+        if (solicitud !== solicitudFicha) return;
+        contenido.textContent = error.message;
+    }
+}
+
+function cerrarFichaUsuario() {
+    ++solicitudFicha;
+    document.querySelector('#fichaLector').close();
+    if (botonOrigenFicha?.isConnected) botonOrigenFicha.focus();
+    botonOrigenFicha = null;
+}
+
+// Cancelar el cierre por defecto permite invalidar antes de cerrar con Escape.
+document.querySelector('#fichaLector').addEventListener('cancel', event => {
+    event.preventDefault();
+    cerrarFichaUsuario();
+});
 
 function mostrarPrestamos(prestamos = estado.prestamos) {
     const nombreLibro = id => estado.libros.find(libro => libro.id === id)?.titulo ?? `Libro ${id}`;
@@ -90,7 +148,7 @@ async function limpiarFiltrosHistorial() {
 async function cargarDatos() {
     try {
         [estado.libros, estado.usuarios, estado.prestamos] = await Promise.all([consultar('/api/libros'), consultar('/api/usuarios'), consultar('/api/prestamos')]);
-        mostrarLibros(); mostrarUsuarios();
+        actualizarFiltroCategorias(); mostrarLibros(); mostrarUsuarios();
         await cargarHistorial();
         document.querySelector('#librosEstado').textContent = 'Datos actualizados correctamente.';
         document.querySelector('#librosEstado').className = 'message success';
@@ -109,6 +167,12 @@ function iniciarEdicionLibro(id) {
     document.querySelector('#tituloLibro').value = libro.titulo ?? '';
     document.querySelector('#autorLibro').value = libro.autor ?? '';
     document.querySelector('#isbnLibro').value = libro.isbn ?? '';
+    const selector = document.querySelector('#categoriaLibro');
+    const categoria = libro.categoria === 'Sin categoría' ? '' : libro.categoria ?? '';
+    if (categoria && !Array.from(selector.options ?? []).some(opcion => opcion.value === categoria)) {
+        selector.innerHTML += `<option value="${escaparHtml(categoria)}">${escaparHtml(categoria)}</option>`;
+    }
+    selector.value = categoria;
     document.querySelector('#tituloFormLibro').textContent = 'Editar libro';
     document.querySelector('#btnGuardarLibro').textContent = 'Guardar cambios';
     document.querySelector('#btnCancelarEdicionLibro').hidden = false;
@@ -121,6 +185,7 @@ function cancelarEdicionLibro() {
     document.querySelector('#tituloLibro').value = '';
     document.querySelector('#autorLibro').value = '';
     document.querySelector('#isbnLibro').value = '';
+    document.querySelector('#categoriaLibro').value = '';
     document.querySelector('#tituloFormLibro').textContent = 'Registrar libro';
     document.querySelector('#btnGuardarLibro').textContent = 'Guardar libro';
     document.querySelector('#btnCancelarEdicionLibro').hidden = true;
@@ -227,6 +292,7 @@ botonResumen.addEventListener('click', async () => {
     }
 });
 document.querySelector('#buscarLibro').addEventListener('input', mostrarLibros);
+document.querySelector('#filtroCategoriaLibro').addEventListener('change', mostrarLibros);
 document.querySelector('#buscarUsuario').addEventListener('input', mostrarUsuarios);
 document.querySelector('#btnCancelarEdicionLibro').addEventListener('click', cancelarEdicionLibro);
 document.querySelector('#btnCancelarEdicionUsuario').addEventListener('click', cancelarEdicionUsuario);
@@ -240,7 +306,8 @@ document.querySelector('#formLibro').addEventListener('submit', async event => {
     const libro = {
         titulo: document.querySelector('#tituloLibro').value,
         autor: document.querySelector('#autorLibro').value,
-        isbn: document.querySelector('#isbnLibro').value
+        isbn: document.querySelector('#isbnLibro').value,
+        categoria: document.querySelector('#categoriaLibro').value
     };
     try {
         const editando = estado.edicionLibroId !== null;

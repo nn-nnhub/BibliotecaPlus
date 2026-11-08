@@ -1,5 +1,19 @@
 # RFC-015 · Edición y eliminación de libros y usuarios desde la interfaz
 
+## Identificación y trazabilidad
+
+- [Issue #23](https://github.com/nn-nnhub/BibliotecaPlus/issues/23) y [PR #24](https://github.com/nn-nnhub/BibliotecaPlus/pull/24).
+- Responsable: Carlos Sebastián Portugal Riega.
+
+## Objetivo e impacto
+
+Editar y eliminar libros y usuarios desde los formularios existentes, sin perder cambios al recibir respuestas tardías.
+
+## Integración de RFC-015, 016 y 017
+
+Se conservan las acciones de edición y eliminación, la categoría en el formulario de libro y el acceso a la ficha del lector. Se mantiene el registro histórico de pruebas y capturas en los apartados siguientes.
+
+
 ## Identificación
 
 | Campo | Valor |

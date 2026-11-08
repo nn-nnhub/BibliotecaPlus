@@ -1,5 +1,11 @@
 # RFC-001 · SRP: Separación de responsabilidades del préstamo
 
+## Identificación y trazabilidad
+
+Anexo técnico del [RFC-001](RFC-001-refactorizacion.md) · [Issue #1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1) · Integrado en main.
+
+El registro conserva el diagnóstico, la solución aplicada y la validación del principio de diseño indicado en el título.
+
 ## Relación con RFC-001
 
 Este documento registra la corrección de los hallazgos SRP-01 y SRP-02 dentro de la refactorización exhaustiva RFC-001.

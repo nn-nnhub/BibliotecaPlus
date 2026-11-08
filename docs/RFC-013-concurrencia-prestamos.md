@@ -1,5 +1,27 @@
 # RFC-013 · Control de concurrencia en préstamos simultáneos
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#13](https://github.com/nn-nnhub/BibliotecaPlus/issues/13) |
+| Pull request | [#21](https://github.com/nn-nnhub/BibliotecaPlus/pull/21) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Evitar dos préstamos activos simultáneos para el mismo libro.
+
+## Implementación e impacto
+
+Bloqueo pesimista por libro y tratamiento del timeout.
+
+## Pruebas y evidencias
+
+Regresiones de concurrencia, rollback y HTTP 409. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#13](https://github.com/nn-nnhub/BibliotecaPlus/issues/13) |
@@ -10,7 +32,7 @@
 | Base | `b710fdb`, extremo de `rfc-012-integridad-prestamos` al crear la rama |
 | Dependencia | RFC-012, PR #20 aún sin fusionar según el usuario |
 
-## Alcance y requisitos revisados
+### Alcance y requisitos revisados
 
 El Issue completo pide reproducir solicitudes simultáneas, permitir como máximo un préstamo activo del mismo libro, responder de forma controlada al rechazo, evitar estados parciales, justificar el mecanismo elegido, conservar préstamos de libros diferentes, compatibilidad H2 e historial y guardar pruebas y capturas. Depende de las transacciones de RFC-012.
 
@@ -18,13 +40,13 @@ El Issue consultado aún dice «Propuesta pendiente de revisión y aprobación. 
 
 La rama se creó desde RFC-012 después de comprobar que solo `AGENTS.md` estaba sin seguimiento. No se cambió `main`. Mientras RFC-012 no esté fusionado, esta rama incluye sus cuatro commits heredados; no son cuatro commits adicionales de RFC-013. Acumulado real al preparar esta fase: **4 de 30 commits propios**, todos de RFC-012. No se creó ningún commit en esta fase.
 
-## Análisis del código actual
+### Análisis del código actual
 
 `PrestamoService.registrar()` ya tiene `@Transactional` de RFC-012: lee el libro con `findById`, comprueba disponibilidad, valida, modifica el libro y guarda un préstamo. La atomicidad no impide por sí sola que dos transacciones lean simultáneamente `disponible=true`.
 
 `LibroRepository` hereda el `findById` de JPA sin bloqueo explícito. `Libro` no tiene `@Version`. La restricción única existente afecta al ISBN, no a los préstamos activos. `Prestamo` guarda `libroId` y `usuarioId`; `PrestamoRepository` no incorpora una exclusión de préstamos activos duplicados.
 
-## Metodología ANTES
+### Metodología ANTES
 
 Se añadió [ConcurrenciaPrestamosTest archivado](evidencias/rfc-013-antes/ConcurrenciaPrestamosTest.java). No se modificaron producción, las pruebas ni los documentos y evidencias de RFC-012.
 
@@ -43,7 +65,7 @@ Comando real:
 mvn -B "-Dtest=ConcurrenciaPrestamosTest" test
 ```
 
-## Resultados observados ANTES
+### Resultados observados ANTES
 
 | Escenario | Ejecuciones | Observación persistida | Resultado |
 |---|---|---|---|
@@ -56,7 +78,7 @@ La línea del informe de clase y el XML de Surefire registran **4 ejecuciones, 3
 
 [Salida real completa](evidencias/rfc-013-antes-despues.txt). No se ejecutó la suite completa en esta fase; la ejecución dirigida demuestra el fallo buscado. El informe temporal de Surefire puede sobrescribirse en ejecuciones futuras; la salida guardada contiene también el conteo por clase.
 
-## Captura auténtica ANTES
+### Captura auténtica ANTES
 
 Se verificó la imagen real `docs/capturas/rfc-013-antes.jpg`, incluida su extensión y su contenido visual.
 
@@ -64,7 +86,7 @@ Se verificó la imagen real `docs/capturas/rfc-013-antes.jpg`, incluida su exten
 
 La captura muestra la rama `rfc-013-concurrencia-prestamos`, la base `jdbc:h2:mem:rfc013`, tres repeticiones con dos éxitos y dos préstamos activos para el mismo libro, y el escenario correcto de libros diferentes. También muestra el informe de 4 ejecuciones individuales con 3 fallos, el resumen Maven de 2 pruebas con 1 fallo y BUILD FAILURE con código de salida 1. Corresponde a un extracto del registro de ejecución conservado, no a una nueva ejecución.
 
-## Solución implementada DESPUÉS
+### Solución implementada DESPUÉS
 
 Se añadió una consulta JPQL específica `LibroRepository.buscarPorIdConBloqueo(id)` con `@Lock(PESSIMISTIC_WRITE)`. `PrestamoService.registrar()` la usa antes de comprobar disponibilidad, conservando `@Transactional` del RFC-012. H2 ejecuta `SELECT ... FOR UPDATE`: el primer registro mantiene el bloqueo hasta commit o rollback y el siguiente comprueba la disponibilidad después de adquirirlo. No se cambiaron las entidades, el esquema, los IDs ni las tarifas.
 
@@ -74,7 +96,7 @@ La segunda solicitud que encuentra el libro ocupado recibe la `IllegalArgumentEx
 
 Las conexiones Hikari ejecutan `SET LOCK_TIMEOUT 2000` al crearse. Es un límite H2 de espera por adquisición, no un plazo total de toda solicitud ni de la transacción. Se comprueba el valor efectivo con `CALL LOCK_TIMEOUT()` en las pruebas. La configuración no abre ni modifica el esquema de la base local durante estas ejecuciones.
 
-### Problema real encontrado al vencer el bloqueo
+#### Problema real encontrado al vencer el bloqueo
 
 Con H2 2.2.224 y Hikari del proyecto, el timeout de bloqueo (`50200`, SQLState `HYT00`) hacía que Hikari expulsara la conexión antes del rollback JPA. El error final pasaba a ser `JpaSystemException: Unable to rollback against JDBC Connection`, ocultando el rechazo previsto.
 
@@ -82,7 +104,7 @@ Se añadió `H2LockTimeoutOverride`, registrado mediante `spring.datasource.hika
 
 La primera validación DESPUÉS también detectó dos problemas del arnés nuevo: comparación de un mensaje UTF-8 con decodificación incorrecta y una delegación `callRealMethod` no válida sobre un método abstracto del repositorio. Se corrigieron usando decodificación UTF-8 y delegación al guardado real `saveAndFlush` para la segunda solicitud del escenario de fallo. Un intento intermedio encontró un conflicto de nombres entre `@Override` y el enum `SQLExceptionOverride.Override`, corregido con `@java.lang.Override`. Todas las salidas fallidas se conservaron antes de las ejecuciones finales aprobadas.
 
-## Prueba DESPUÉS y conservación de ANTES
+### Prueba DESPUÉS y conservación de ANTES
 
 Nueva clase: [ConcurrenciaPrestamosDespuesTest](../src/test/java/com/bibliotecaplus/integration/ConcurrenciaPrestamosDespuesTest.java), con llamadas HTTP concurrentes mediante MockMvc y base `jdbc:h2:mem:rfc013-despues`. No necesita servidor ni datos locales.
 
@@ -99,7 +121,7 @@ Hashes SHA-256 originales:
 
 La evidencia original se conserva byte a byte como prefijo del archivo ampliado; el hash del archivo completo cambia al anexar las nuevas salidas. No se retocan ni se reemplazan los resultados ANTES.
 
-## Resultados reales DESPUÉS
+### Resultados reales DESPUÉS
 
 | Escenario | Ejecuciones | Resultado observado |
 |---|---|---|
@@ -118,7 +140,7 @@ Las seis ejecuciones DESPUÉS se cuentan individualmente en estas ejecuciones ap
 
 Todas las clases de integración usan URLs H2 en memoria. `IntegridadPrestamosTest.java`, los documentos, las capturas y las evidencias de RFC-012 no se modificaron. Fue necesario cambiar un único stub de `PrestamoServiceTest.prepararRegistro()` a la nueva consulta; sus aserciones y el flujo de devolución permanecen iguales. El servicio y el manejador compartidos se modificaron únicamente para implementar el RFC-013.
 
-## Revisión final del alcance HTTP 409
+### Revisión final del alcance HTTP 409
 
 Se añadieron dos pruebas a `PrestamoServiceTest`: los dos tipos de fallo al adquirir el bloqueo conservan su causa dentro de `ConflictoBloqueoLibroException`; un timeout al consultar el usuario mantiene la excepción original y no se etiqueta como conflicto del libro. La integración HTTP con timeout H2 real vuelve a comprobar el 409 específico y el rollback. No hay un manejador global para todas las QueryTimeoutException ni para todas las RuntimeException.
 
@@ -135,7 +157,7 @@ La dirigida contiene 6 ejecuciones de concurrencia DESPUÉS, 3 de integridad RFC
 
 La configuración Hikari sigue siendo necesaria en producción y pruebas H2: espera de bloqueo de 2000 ms por conexión y excepción de expulsión solo para el timeout H2 50200/HYT00, permitiendo el rollback. La exclusión Surefire de la validación inicial fue retirada posteriormente: el arnés ANTES está archivado fuera de `src/test/java`, sustituido en cobertura activa por seis ejecuciones DESPUÉS. Las nuevas ejecuciones con `clean` no dejan un XML antiguo de esa clase en `target/surefire-reports`. Todas las integraciones de la ejecución final registran conexiones H2 en memoria.
 
-## Captura auténtica DESPUÉS
+### Captura auténtica DESPUÉS
 
 Se comprobó la existencia y el contenido visual de `docs/capturas/rfc-013-despues.jpg`.
 
@@ -143,7 +165,7 @@ Se comprobó la existencia y el contenido visual de `docs/capturas/rfc-013-despu
 
 La imagen es evidencia auténtica de la ejecución histórica de 9 pruebas dirigidas y 90 de suite, anterior a la delimitación del HTTP 409. Muestra bloqueo, rollback, timeout 409 y ambos BUILD SUCCESS. Se conserva sin retocar y no se presenta como captura de las nuevas ejecuciones de 18 y 92 pruebas, cuyos resultados están en el archivo de evidencia.
 
-### Captura de la revisión final: 18/92 pruebas
+#### Captura de la revisión final: 18/92 pruebas
 
 Se verificó la existencia y el contenido visual de `docs/capturas/rfc-013-despues-final.jpg`.
 
@@ -151,14 +173,14 @@ Se verificó la existencia y el contenido visual de `docs/capturas/rfc-013-despu
 
 La imagen muestra la rama RFC-013 y un extracto del registro completo. Incluye el intento intermedio de 18 pruebas con 1 error de preparación del mock, seguido por los resultados finales de **18 y 92 pruebas, 0 fallos y 0 errores, BUILD SUCCESS**. Ese intento fallido se conserva como parte de la trazabilidad y no se presenta como aprobado. El extracto también incluye líneas de la validación anterior; la tabla de revisión final y las secciones del archivo de evidencia identifican los comandos y códigos de salida 0 correspondientes a las ejecuciones finales. Ambas capturas se conservan sin retocar.
 
-## Limitaciones y seguimiento
+### Limitaciones y seguimiento
 
 La exclusión garantiza el flujo de registro a través de este servicio; no añade una restricción de unicidad en base de datos para escrituras externas que lo omitan. No corrige duplicados previos. La devolución simultánea del mismo préstamo y otras carreras de edición/eliminación quedan fuera de los escenarios verificados aquí. Los bloqueos deben mantenerse cortos; la notificación actual solo escribe un log pero se ejecuta antes del commit. El tiempo de espera y el adaptador Hikari son específicos del entorno H2 actual y deben revisarse al cambiar de motor o versiones.
 
 La compatibilidad histórica se preserva por ausencia de cambios de entidades/esquema y por la regresión existente, no por haber abierto una copia de la base real ni ejecutado una migración sobre ella. No se accedió a `./data/bibliotecadb`. No se modificaron multas. La rama hereda RFC-012 y su integración con main sigue dependiendo de PR #20; no se hizo merge ni rebase.
 
 La implementación y pruebas DESPUÉS están registradas en `e672594`. Fotografía histórica al cierre de ese commit: cuatro commits RFC-012, `5e64e17` (ANTES RFC-013) y `e672594` (corrección funcional RFC-013), **6 de 30 commits propios**. La documentación y evidencia DESPUÉS siguen pendientes de commit. No se ejecutó push ni se abrió PR en esta fase.
-## Corrección del descubrimiento automático de pruebas
+### Corrección del descubrimiento automático de pruebas
 
 Después de la revisión de Ethan se trasladó el fuente ANTES sin modificar sus bytes a [su archivo documental](evidencias/rfc-013-antes/ConcurrenciaPrestamosTest.java). El SHA-256 sigue siendo `B08514CE0B6C970270F18493BDC4892AEF3E4EC9A020FF9BB4A5A747D17B708C`. La regla `.gitattributes` de esa carpeta impide la normalización de sus finales de línea. Las [instrucciones de reproducción](evidencias/rfc-013-antes/README.md) utilizan un checkout aislado de `5e64e17`, que ya contiene el arnés ejecutable y el servicio ANTES de la corrección.
 
