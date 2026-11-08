@@ -1,10 +1,33 @@
-# RFC 005 Mejora de información del usuario
+# RFC-005 · Información ampliada del usuario
 
-## Solicitud
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#5](https://github.com/nn-nnhub/BibliotecaPlus/issues/5) |
+| Pull request | Sin PR asociado en el historial consultado |
+| Commits de implementación | [`18c99c2`](https://github.com/nn-nnhub/BibliotecaPlus/commit/18c99c2) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Completar los datos de identificación y contacto.
+
+## Implementación e impacto
+
+Nombres, apellidos, DNI, correo y teléfono en registro e interfaz.
+
+## Pruebas y evidencias
+
+Capturas de formulario y ajuste visual. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
+### Solicitud
 
 Ampliar los datos de los usuarios de BibliotecaPlus para mejorar su identificación y comunicación.
 
-## Alcance
+### Alcance
 
 Cada usuario tendrá:
 
@@ -16,7 +39,7 @@ Cada usuario tendrá:
 
 La validación de DNI duplicado queda fuera de este RFC y será implementada en el RFC-006.
 
-## Archivos involucrados
+### Archivos involucrados
 
 - `Usuario.java`: agregó apellidos, DNI y teléfono.
 - `UsuarioService.java`: validó que los nuevos datos sean obligatorios.
@@ -24,7 +47,7 @@ La validación de DNI duplicado queda fuera de este RFC y será implementada en 
 - `index.html`: agregó campos y columnas de usuario.
 - `app.js`: envió, filtró y mostró los nuevos datos.
 
-## Buenas prácticas aplicadas
+### Buenas prácticas aplicadas
 
 - El modelo concentra los datos del usuario.
 - El servicio concentra las validaciones.
@@ -32,7 +55,7 @@ La validación de DNI duplicado queda fuera de este RFC y será implementada en 
 - La validación de duplicados se mantiene como una responsabilidad separada para RFC-006.
 - El DNI y el teléfono se manejan como texto para conservar ceros iniciales.
 
-## Pruebas previstas
+### Pruebas previstas
 
 1. Registrar un usuario con todos los campos completos.
 2. Verificar que los nuevos datos aparezcan en la tabla.
@@ -40,7 +63,7 @@ La validación de DNI duplicado queda fuera de este RFC y será implementada en 
 4. Intentar registrar un usuario incompleto y verificar el mensaje de validación.
 5. Confirmar que el préstamo muestre nombres y apellidos del usuario.
 
-## Evidencia visual
+### Evidencia visual
 
 ![Formulario de usuario antes del RFC-005](capturas/rfc-005-formulario-antes.png)
 
@@ -50,7 +73,7 @@ La captura anterior muestra que el formulario solo solicitaba nombre y correo.
 
 La captura posterior muestra los nuevos campos de nombres, apellidos, DNI, correo y teléfono.
 
-## Ajuste visual posterior
+### Ajuste visual posterior
 
 Después de ampliar la tabla de usuarios, la distribución en dos columnas comprimía el correo electrónico y el teléfono. Se corrigió reorganizando Usuarios y Préstamos en filas independientes dentro del dashboard. La captura del problema se conserva en `capturas/rfc-005-interfaz-antes-ajuste.png`.
 

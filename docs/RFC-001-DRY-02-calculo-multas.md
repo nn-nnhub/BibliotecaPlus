@@ -1,5 +1,11 @@
 # RFC-001 · DRY-02: Separación del cálculo de multas
 
+## Identificación y trazabilidad
+
+Anexo técnico del [RFC-001](RFC-001-refactorizacion.md) · [Issue #1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1) · Integrado en main.
+
+El registro conserva el diagnóstico, la solución aplicada y la validación del principio de diseño indicado en el título.
+
 ## Relación con RFC-001
 
 Este documento registra la segunda corrección de la refactorización exhaustiva RFC-001. Se separa el cálculo de multas para que no permanezca mezclado con el flujo de devolución de préstamos.

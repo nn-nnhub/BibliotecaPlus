@@ -1,5 +1,27 @@
 # RFC-014 · Búsqueda y filtrado del historial de préstamos
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#14](https://github.com/nn-nnhub/BibliotecaPlus/issues/14) |
+| Pull request | [#22](https://github.com/nn-nnhub/BibliotecaPlus/pull/22) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Consultar préstamos por libro, lector y estado.
+
+## Implementación e impacto
+
+Filtros en API e interfaz, con descarte de respuestas obsoletas.
+
+## Pruebas y evidencias
+
+Pruebas HTTP y JavaScript; capturas antes/después. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#14](https://github.com/nn-nnhub/BibliotecaPlus/issues/14) |
@@ -13,13 +35,13 @@ El usuario autorizó inicialmente la fase ANTES y, después del commit `a87c0aa`
 
 La base incorpora RFC-012. La rama no hereda los cuatro commits exclusivos del RFC-013 ni su configuración de bloqueo/Surefire; el PR #21 no se modificó. Fotografía del trabajo previo a esta fase: **8 de 30 commits propios** entre los tres RFC. Esta fotografía corresponde al momento anterior al primer commit RFC-014; tras a87c0aa y d87a32b, el acumulado histórico es 10 de 30.
 
-## Diagnóstico del código actual
+### Diagnóstico del código actual
 
 `PrestamoController.listarTodos()` no declara parámetros. Invoca `PrestamoService.listarTodos()` y este llama a `PrestamoRepository.findAll()`. Los parámetros enviados no participan en la consulta. `app.js` carga el historial completo en `estado.prestamos` y `mostrarPrestamos()` dibuja todas sus filas. `index.html` no contiene controles de usuario, libro o devolución para el historial.
 
 La tabla sí permite devolver préstamos y ofrece resumen y CSV, que deben mantener su comportamiento. La tarjeta global `totalPrestamos` se actualiza con la longitud del historial: el futuro filtrado no debe convertir ese total global en un conteo de coincidencias.
 
-## Contrato propuesto para DESPUÉS
+### Contrato propuesto para DESPUÉS
 
 - `GET /api/prestamos` sin parámetros: misma respuesta JSON y alcance completo.
 - `usuarioId` y `libroId`: IDs positivos representables como Long; coincidencia exacta. IDs válidos sin registros coincidentes producen `[]`, no 404.
@@ -28,7 +50,7 @@ La tabla sí permite devolver préstamos y ofrece resumen y CSV, que deben mante
 - IDs negativos, cero, valores no numéricos y estado inválido: HTTP 400 controlado. Todavía no se afirma que el código actual implemente estas validaciones.
 - La interfaz permitirá aplicar y limpiar filtros, recuperando el historial completo sin alterar reportes ni CSV.
 
-## Metodología de pruebas ANTES
+### Metodología de pruebas ANTES
 
 Se creó [FiltrosHistorialHttpTest](../src/test/java/com/bibliotecaplus/integration/FiltrosHistorialHttpTest.java). Es integración HTTP con MockMvc, servicio y repositorios reales. No se simulan respuestas y no se ejecuta contra la base local.
 
@@ -49,7 +71,7 @@ Los símbolos U1/L1 del registro se sustituyen por los IDs reales al construir l
 
 Las 21 ejecuciones se distribuyen en: 1 control sin filtros, 12 casos válidos y 8 inválidos. Se cubren filtros individuales, las tres parejas, los tres criterios juntos, true/false y ausencia de coincidencias.
 
-## Ejecuciones y resultados reales
+### Ejecuciones y resultados reales
 
 Se seleccionó explícitamente Temurin **17.0.20.1** mediante JAVA_HOME. Maven **3.10.0** confirmó ese JDK. Ambas ejecuciones comenzaron con `clean` para descartar compilados e informes de otras ramas. No se modificó producción entre ejecuciones ni se ajustaron las aserciones para fabricar resultados.
 
@@ -78,7 +100,7 @@ Resultado: **21 pruebas, 20 fallos, 0 errores, 0 omitidas; BUILD FAILURE; salida
 
 La causa comprobada es que el endpoint actual ignora esos parámetros y consulta todo el historial. Los errores son aserciones de contrato incumplidas, no fallos de contexto, Java, conexión ni compilación. [Salida literal de ambas ejecuciones](evidencias/rfc-014-antes-despues.txt). No se ejecutó la suite completa del proyecto en esta fase.
 
-## Captura auténtica de interfaz ANTES
+### Captura auténtica de interfaz ANTES
 
 ![Interfaz real ANTES: historial sin controles de filtrado](capturas/rfc-014-antes-interfaz.png)
 
@@ -86,7 +108,7 @@ Se obtuvo con Chrome en modo headless sobre la aplicación real sin modificar, e
 
 Los dos registros visibles se crearon por la API real: préstamo de libro 1/usuario 1 seguido de devolución, y préstamo activo de libro 2/usuario 2. Esta base es distinta de la matriz HTTP y no contiene datos reales. El registro de evidencia conserva el estado recibido por la API. La imagen muestra la tabla del historial y la ausencia de controles de filtros; no es un montaje. La captura inicial recortaba la tabla y fue sustituida por una captura real con altura 3200, inspeccionada visualmente.
 
-## Captura auténtica de terminal ANTES
+### Captura auténtica de terminal ANTES
 
 ![Terminal real ANTES del RFC-014: 21 pruebas, 20 fallos y 0 errores](capturas/rfc-014-antes-terminal.jpg)
 
@@ -94,7 +116,7 @@ Se verificaron la firma JPEG `FF-D8-FF`, la decodificación como JPEG y el conte
 
 La captura corresponde a la repetición real ejecutada por el usuario, cuya marca visible de finalización es `2026-10-18T02:38:11-05:00`. Coincide en resultados y ejemplos de IDs con la matriz registrada anteriormente; no se presenta como imagen de la ejecución original de las 02:34:02. El registro original se conserva íntegro, sin sustituir sus marcas ni sus resultados por los de esta repetición. No se modificaron las aserciones ni se editó la captura.
 
-## Plan acordado después de ANTES
+### Plan acordado después de ANTES
 
 1. Tras aprobación, añadir parámetros opcionales y validación al controlador, con una consulta parametrizada del repositorio que combine criterios por AND. Conservar el listado completo sin filtros.
 2. Añadir controles propios al historial y acciones Aplicar/Limpiar, conservando la selección al actualizar o devolver. Mantener el total global independiente de los resultados visibles.
@@ -103,7 +125,7 @@ La captura corresponde a la repetición real ejecutada por el usuario, cuya marc
 5. Ejecutar dirigida, suite completa Maven y pruebas JavaScript con Java 17 y H2 en memoria para integraciones. Registrar resultados reales DESPUÉS y capturas de terminal e interfaz filtrada/limpia.
 
 No se eligió una cantidad artificial de commits. Propuesta inicial para esta fase: `test(rfc-014): evidenciar ausencia de filtros del historial` con `Refs #14`, incluyendo prueba, documento, registro y capturas verificadas. Esperar autorización explícita antes de crear el commit o implementar filtros.
-## Implementación DESPUÉS sobre a87c0aa
+### Implementación DESPUÉS sobre a87c0aa
 
 `PrestamoController` recibe los tres parámetros opcionales como String para validar explícitamente su formato. Los IDs deben contener dígitos y ser positivos dentro del rango Long; vacío, negativos, cero, texto, fracciones y desbordamientos se rechazan. `devuelto` admite únicamente los literales exactos `true` y `false`; ausencia significa todos. Las validaciones lanzan IllegalArgumentException, que el manejador existente convierte a HTTP 400 con mensaje JSON.
 
@@ -111,13 +133,13 @@ No se eligió una cantidad artificial de commits. Propuesta inicial para esta fa
 
 No se modificaron `registrar()`, `devolver()`, sus anotaciones transaccionales, multas, entidades, servicio de reportes, controlador de reportes ni exportador CSV. El único añadido al servicio es el método de búsqueda. RFC-013 sigue separado y no se integró su bloqueo en esta rama.
 
-### Interfaz
+#### Interfaz
 
 El historial incorpora ID de usuario, ID de libro, estado Todos/Activos/Devueltos, Aplicar filtros y Limpiar filtros. Se usan controles distintos de los del formulario de registro. Los filtros se envían al backend y se guardan como criterios aplicados independientes; cargarDatos(), que se ejecuta al registrar, devolver o actualizar, vuelve a consultar el historial con ellos.
 
 `estado.prestamos` conserva el listado global y alimenta la tarjeta total; mostrarPrestamos() puede recibir un listado filtrado sin modificar ese total. Limpiar vacía controles y criterios y recupera el listado global cargado. Los errores y la ausencia de coincidencias se muestran con textContent; las filas mantienen escaparHtml(). Un identificador de solicitud evita que una respuesta anterior sustituya el resultado después de aplicar otros criterios o limpiar.
 
-### Pruebas ejecutadas y resultados reales
+#### Pruebas ejecutadas y resultados reales
 
 La prueba HTTP original permanece byte a byte intacta, SHA-256 `6BBAB1196FC6D32345B211F593E42E13C499D655084AFFC18539FAB8D11A4E65`. Sus aserciones no se cambiaron. La evidencia ANTES original se conserva íntegra como prefijo del registro ampliado; su hash previo era `CBA8DF2A067AE2FFA0F7705853F197B6E31A34F4533274AB58909D98DB3BC63A`.
 
@@ -149,7 +171,7 @@ Regresiones incluidas y aprobadas en la suite completa:
 
 Las pruebas previas JavaScript de XSS, escape y préstamos también pasan dentro de las 19. No se alteró la funcionalidad de resumen o descarga: siguen consultando el historial completo independientemente de los filtros visuales. Las salidas completas, incluidos los fallos intermedios, se anexaron al [registro ANTES/DESPUÉS](evidencias/rfc-014-antes-despues.txt).
 
-## Validación real de la instancia visual DESPUÉS (2026-10-18)
+### Validación real de la instancia visual DESPUÉS (2026-10-18)
 
 Implementación guardada en d87a32b. Aplicación iniciada con Temurin 17.0.20.1, escuchando en http://127.0.0.1:18014/, con URL explícita jdbc:h2:mem:rfc014-visual, create-drop y consola H2 desactivada. El log confirmó la conexión a esa URL y Started BibliotecaPlusApplication. El HTML HTTP 200 contiene formFiltrosHistorial y btnLimpiarFiltros.
 
@@ -169,7 +191,7 @@ Comprobaciones HTTP realmente ejecutadas:
 
 Nueva ejecución limpia de FiltrosHistorialHttpTest: 21 pruebas, 0 fallos, 0 errores, 0 omitidas, BUILD SUCCESS, salida Maven 0; finalización 2026-10-18T02:55:58-05:00. Un intento previo dentro del aislamiento no pudo crear el repositorio Maven C:\.m2\repository (salida 1); no llegó a ejecutar pruebas. El intento autorizado fuera del aislamiento sí pasó.
 
-### Alcance de la comprobación visual
+#### Alcance de la comprobación visual
 
 Abrir http://127.0.0.1:18014/ y desplazarse al historial. Deben aparecer ID de usuario, ID de libro, estado Todos/Activos/Devueltos, Aplicar filtros y Limpiar filtros. La tabla debe tener inicialmente tres registros y el total global debe permanecer en 3 durante las consultas de la tabla anterior.
 
@@ -197,7 +219,7 @@ Debe verse el resumen real de 21 pruebas, 0 fallos, 0 errores, 0 omitidas y BUIL
 
 Fotografía histórica tras d87a32b: 10 de 30 commits propios. No se hicieron commits ni push durante esta validación.
 
-## Capturas DESPUÉS verificadas
+### Capturas DESPUÉS verificadas
 
 ![Interfaz real DESPUÉS: usuario 3, libro 3, Devueltos y préstamo ID 1](capturas/rfc-014-despues-interfaz.png)
 

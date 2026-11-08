@@ -1,5 +1,27 @@
 # RFC-009 · Corrección de multas y reglas de préstamo
 
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#9](https://github.com/nn-nnhub/BibliotecaPlus/issues/9) |
+| Pull request | [#19](https://github.com/nn-nnhub/BibliotecaPlus/pull/19) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Aplicar las reglas de vencimiento y multa según modalidad.
+
+## Implementación e impacto
+
+Correcciones de tipos, validaciones y selección de tarifas.
+
+## Pruebas y evidencias
+
+Pruebas y capturas antes/después. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
 | Campo | Valor |
 |---|---|
 | Issue | [#9](https://github.com/nn-nnhub/BibliotecaPlus/issues/9) |
@@ -11,7 +33,7 @@
 | Fecha propuesta | 17/10/2026 |
 | Etiquetas | RFC · Alta · Refactor |
 
-## Relación con el RFC
+### Relación con el RFC
 
 Este RFC corrige el cálculo de multas según el tipo real de préstamo, valida las fechas de vencimiento y hace que la selección de tarifas no dependa del orden de los componentes. Aborda tres hallazgos verificados con pruebas en una base H2 aislada (sin tocar `./data`):
 
@@ -23,7 +45,7 @@ Este RFC corrige el cálculo de multas según el tipo real de préstamo, valida 
 
 También se retiró una variable sin uso (`diasPrestamo`) de `PrestamoService.devolver`.
 
-## Hallazgo
+### Hallazgo
 
 **H1 — multa según el cliente.** El préstamo no guardaba su tipo y `devolver` recibía el tipo como parámetro. La interfaz enviaba siempre `DOMICILIO`, de modo que un préstamo ESPECIAL con 10 días de retraso generaba S/ 10.00 en lugar de S/ 20.00.
 
@@ -31,7 +53,7 @@ También se retiró una variable sin uso (`diasPrestamo`) de `PrestamoService.de
 
 **H6 — dependencia del orden.** `CalculadorMulta` tomaba la primera tarifa que aplicara. `TarifaGeneral.aplicaA` devuelve `true` para cualquier tipo; con la lista `[General, Domicilio, Especial]`, `calcular("ESPECIAL")` devolvía 0.5 en lugar de 2.0. En ejecución normal funcionaba solo por el orden alfabético de los beans.
 
-## Código anterior
+### Código anterior
 
 `PrestamoService.devolver` (el tipo llega del cliente):
 
@@ -65,7 +87,7 @@ return tarifas.stream()
 await consultar(`/api/prestamos/${id}/devolver?tipoPrestamo=DOMICILIO`, { method: 'PUT' });
 ```
 
-## Solución aplicada
+### Solución aplicada
 
 - **`Prestamo.java`**: nuevo campo `tipoPrestamo`. `getTipoPrestamo()` devuelve `DOMICILIO` si el valor es nulo (`TIPO_POR_DEFECTO`).
 - **`PrestamoService.java`**: `registrar` guarda el tipo normalizado (`trim` y mayúsculas; vacío equivale a `DOMICILIO`) y `devolver(Long id)` calcula la multa con el tipo guardado.
@@ -85,7 +107,7 @@ private TarifaMulta seleccionarTarifa(String tipoPrestamo) {
 }
 ```
 
-### Justificación del tipo por defecto
+#### Justificación del tipo por defecto
 
 La Issue pide no asignar tipos por defecto sin justificarlo. Se usa `DOMICILIO` por tres razones comprobadas en el código original:
 
@@ -95,7 +117,7 @@ La Issue pide no asignar tipos por defecto sin justificarlo. Se usa `DOMICILIO` 
 
 El valor por defecto se aplica al leer (`getTipoPrestamo`); **no se escribe nada en la base de datos existente**. La columna nueva es opcional, por lo que `ddl-auto=update` la agrega sin alterar los datos. Limitación: un préstamo histórico que en realidad fue ESPECIAL o SALA no puede distinguirse, porque el dato nunca se almacenó.
 
-## Evidencias visuales
+### Evidencias visuales
 
 Las capturas disponibles muestran el historial de Git del RFC; no existen capturas de pruebas fallando. La evidencia real de los fallos y los resultados se conserva como salida literal en [`evidencias/rfc-009-antes-despues.txt`](evidencias/rfc-009-antes-despues.txt).
 
@@ -107,7 +129,7 @@ Las capturas disponibles muestran el historial de Git del RFC; no existen captur
 
 ![Historial con los tres commits de código del RFC-009 y los archivos en preparación](capturas/rfc-009-prueba-despues.png)
 
-## Resultado
+### Resultado
 
 - Un préstamo ESPECIAL con 10 días de retraso genera S/ 20.00 aunque el cliente envíe otro tipo al devolver.
 - DOMICILIO cobra S/ 1.00 por día, ESPECIAL S/ 2.00 y SALA (tarifa general) S/ 0.50; el tipo no distingue mayúsculas.
@@ -116,7 +138,7 @@ Las capturas disponibles muestran el historial de Git del RFC; no existen captur
 - Los vencimientos anteriores a hoy se rechazan y el libro no queda ocupado.
 - Los préstamos históricos se leen como `DOMICILIO` sin modificar la base.
 
-## Validación automatizada
+### Validación automatizada
 
 Pruebas relevantes:
 
@@ -146,7 +168,7 @@ Resultados reales:
 
 Las dos pruebas de `prestamos.test.js` también fallaron contra el `app.js` original; esa comprobación se hizo durante el desarrollo y no está archivada en el archivo de evidencia. El detalle de las ejecuciones archivadas está en `evidencias/rfc-009-antes-despues.txt`.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 - **Tipos desconocidos:** un tipo como `XYZ` se registra tal cual y se multa con la tarifa general (S/ 0.50). No existe una regla documentada que lo rechace; queda pendiente decidir si debe rechazarse.
 - **Contrato HTTP:** el parámetro `tipoPrestamo` de `PUT /devolver` se descarta sin error. Un cliente externo que lo enviara no recibe aviso.

@@ -20,6 +20,8 @@ function cargarApp({ fetch } = {}) {
             if (evento.type === 'cancel' && !evento.defaultPrevented) this.close();
             return !evento.defaultPrevented;
         },
+        attributes: {},
+        setAttribute(nombre, valor) { this.attributes[nombre] = valor; },
         addEventListener(tipo, accion) { this.listeners[tipo] = accion; }, reset() {}
     });
     const documento = { activeElement: null, querySelector: selector => (nodos[selector] ??= nodo()) };

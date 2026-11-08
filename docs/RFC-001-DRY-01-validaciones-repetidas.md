@@ -1,5 +1,11 @@
 # RFC-001 · DRY-01: Centralización de validaciones repetidas
 
+## Identificación y trazabilidad
+
+Anexo técnico del [RFC-001](RFC-001-refactorizacion.md) · [Issue #1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1) · Integrado en main.
+
+El registro conserva el diagnóstico, la solución aplicada y la validación del principio de diseño indicado en el título.
+
 ## Relación con el RFC-001
 
 Este documento detalla la primera corrección aplicada dentro de la refactorización exhaustiva RFC-001. El objetivo es evitar que varios servicios implementen de manera independiente la misma regla básica para determinar si un texto está vacío.
