@@ -1,4 +1,26 @@
-# RFC-020 · Pruebas automatizadas del modelo Prestamo
+# RFC-020 · Pruebas automatizadas del modelo Préstamo
+
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#18](https://github.com/nn-nnhub/BibliotecaPlus/issues/18) |
+| Pull request | [#26](https://github.com/nn-nnhub/BibliotecaPlus/pull/26) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Proteger los valores iniciales y el comportamiento del modelo.
+
+## Implementación e impacto
+
+Pruebas unitarias del modelo, no de PrestamoService.
+
+## Pruebas y evidencias
+
+Suite Maven y captura del resultado. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
 
 | Campo | Valor |
 |---|---|
@@ -11,11 +33,11 @@
 | Fecha propuesta | 17/10/2026 |
 | Etiquetas | RFC · Media · Mejora |
 
-## Relación con el RFC
+### Relación con el RFC
 
 Este RFC trata un único cambio: agregar pruebas unitarias directas para la entidad `Prestamo`. No modifica código de producción, interfaz ni la persistencia H2 (RFC-008), y no altera las pruebas de `PrestamoService` de otros RFC.
 
-## Descripción del cambio
+### Descripción del cambio
 
 Se agrega la clase `PrestamoModeloTest` en `src/test/java/com/bibliotecaplus/model/` con 7 pruebas:
 
@@ -29,17 +51,17 @@ Se agrega la clase `PrestamoModeloTest` en `src/test/java/com/bibliotecaplus/mod
 | `settersDeDevolucionYMultaActualizanElEstado` | Setters de devolución y multa. |
 | `settersDeIdsYFechasActualizanElPrestamo` | Setters de ids y fechas. |
 
-## Justificación
+### Justificación
 
 `Prestamo` concentra reglas que usan varios servicios: el tipo por defecto que protege a los préstamos históricos (RFC-009), el estado de devolución y la multa. No tenía pruebas propias, por lo que un cambio accidental solo se detectaba de forma indirecta en los servicios.
 
-## Impacto en el sistema
+### Impacto en el sistema
 
 - Se agrega un solo archivo en `src/test`.
 - No se modifica ningún archivo de `src/main` (ver evidencia).
 - No se toca `application.properties` ni la configuración de H2.
 
-## Criterios de aceptación
+### Criterios de aceptación
 
 1. Un préstamo nuevo queda sin devolver y con multa 0.
 2. Un préstamo sin tipo se lee como `DOMICILIO`.
@@ -47,23 +69,23 @@ Se agrega la clase `PrestamoModeloTest` en `src/test/java/com/bibliotecaplus/mod
 4. `mvn clean test` termina en `BUILD SUCCESS`.
 5. `git diff --stat main -- src/main` no muestra cambios.
 
-## Evidencias visuales
+### Evidencias visuales
 
-### Pruebas automatizadas
+#### Pruebas automatizadas
 
 ![Resultado de mvn clean test con PrestamoModeloTest: 7 pruebas y BUILD SUCCESS](capturas/rfc-020-pruebas.png)
 
-### Código de producción sin cambios
+#### Código de producción sin cambios
 
 ![git diff sin cambios en src/main](capturas/rfc-020-sin-cambios-produccion.png)
 
-## Resultado
+### Resultado
 
 - 7 pruebas nuevas, todas exitosas.
 - Suite completa: 91 pruebas, 0 fallos, 0 errores.
 - Código de producción sin cambios.
 
-## Validación automatizada
+### Validación automatizada
 
 Comandos ejecutados (PowerShell, desde la raíz del proyecto):
 
@@ -75,7 +97,7 @@ git diff --stat main -- src/main
 
 Resultado: `PrestamoModeloTest` con `Tests run: 7, Failures: 0, Errors: 0`; suite completa con `Tests run: 91, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`.
 
-## Riesgos y limitaciones
+### Riesgos y limitaciones
 
 - Las pruebas fijan el comportamiento actual de `Prestamo`. Si un RFC futuro lo cambia a propósito (por ejemplo, un campo `renovado`), habrá que ajustar o ampliar esta clase.
 - No prueba persistencia ni la API; eso corresponde a pruebas de integración de otros RFC.

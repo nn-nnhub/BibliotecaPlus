@@ -39,16 +39,9 @@ Si además se detecta un defecto, puede agregarse `Bug`, sin reemplazar las etiq
 7. Vincular los commits con el Issue usando `Refs #n` o `Closes #n`.
 8. Cerrar el Issue cuando la prueba y la documentación estén completas.
 
-## RFC existentes del proyecto
+## Índice y formato de los RFC
 
-- RFC-001: [Refactorización exhaustiva](https://github.com/nn-nnhub/BibliotecaPlus/issues/1).
-- RFC-002: [Validación de ISBN duplicado](https://github.com/nn-nnhub/BibliotecaPlus/issues/2).
-- RFC-003: [Reportes y exportación compatible con Excel](https://github.com/nn-nnhub/BibliotecaPlus/issues/3).
-- RFC-004: [Vencimientos y multas](https://github.com/nn-nnhub/BibliotecaPlus/issues/4).
-- RFC-005: [Información ampliada de usuarios](https://github.com/nn-nnhub/BibliotecaPlus/issues/5).
-- RFC-006: [Validación de DNI duplicado](https://github.com/nn-nnhub/BibliotecaPlus/issues/6).
-- RFC-007: [Instalación portable de Java y Maven](https://github.com/nn-nnhub/BibliotecaPlus/issues/7).
-- RFC-008: [Persistencia local de la base de datos](https://github.com/nn-nnhub/BibliotecaPlus/issues/8).
-- RFC-009: [Corrección de multas y reglas de préstamo](https://github.com/nn-nnhub/BibliotecaPlus/issues/9) — documento: [RFC-009](RFC-009.md).
-- RFC-010: [Validación de libros y usuarios](https://github.com/nn-nnhub/BibliotecaPlus/issues/10) — documento: [RFC-010](RFC-010.md).
-- RFC-011: [Seguridad y mejora de reportes](https://github.com/nn-nnhub/BibliotecaPlus/issues/11) — documento: [RFC-011](RFC-011.md).
+- [Índice de trazabilidad](indice-rfc.md).
+- [Formato para el documento Markdown](formato-documento-rfc.md).
+
+El cierre se verifica tras la fusión cuando hay PR. Los registros antiguos sin PR se enlazan a su issue y documento, sin inventar una fusión.

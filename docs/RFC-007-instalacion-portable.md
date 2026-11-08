@@ -1,48 +1,71 @@
-# RFC-007: Instalación portable de Java y Maven
+# RFC-007 · Instalación portable de Java y Maven
 
-## Solicitud de cambio (RFC)
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#7](https://github.com/nn-nnhub/BibliotecaPlus/issues/7) |
+| Pull request | Sin PR asociado en el historial consultado |
+| Commits de implementación | [`d5c6d8f`](https://github.com/nn-nnhub/BibliotecaPlus/commit/d5c6d8f), [`ce983fb`](https://github.com/nn-nnhub/BibliotecaPlus/commit/ce983fb) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Facilitar el arranque en Windows sin instalación global.
+
+## Implementación e impacto
+
+Preparación de herramientas locales e iniciador BAT.
+
+## Pruebas y evidencias
+
+El registro distingue implementación y limitaciones de la instalación. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
+### Solicitud de cambio (RFC)
 
 Título del cambio: preparar el iniciador para computadoras Windows sin Java ni Maven configurados.
 
-## Descripción del cambio
+### Descripción del cambio
 
 Modificar el proceso de inicio para detectar Java y Maven, utilizar herramientas locales cuando existan y ofrecer instalación automática mediante un administrador de paquetes cuando sea necesario.
 
-## Justificación
+### Justificación
 
 El `.bat` actual utiliza una ruta fija de Maven del equipo de desarrollo. En otra computadora, la aplicación no iniciará si Java o Maven no están instalados y configurados.
 
-## Impacto en el sistema
+### Impacto en el sistema
 
 `Iniciar-BibliotecaPlus.bat`, documentación de instalación y configuración del entorno Windows.
 
-## Tipo de mantenimiento
+### Tipo de mantenimiento
 
 Adaptativo / Perfectivo
 
-## Riesgo
+### Riesgo
 
 Medio, porque requiere Internet, permisos de instalación y compatibilidad con la política del equipo Windows.
 
-## Prioridad
+### Prioridad
 
 Media
 
-## Costo estimado
+### Costo estimado
 
 Bajo
 
-## Responsable
+### Responsable
 
 nn-nnhub
 
-## Fecha propuesta
+### Fecha propuesta
 
 15/10/2026
 
-## Consideración técnica
+### Consideración técnica
 
-## Implementación aprobada
+### Implementación aprobada
 
 La solución se implementó de forma portable:
 
@@ -56,7 +79,7 @@ La solución se implementó de forma portable:
 
 La primera ejecución requiere conexión a Internet. Las siguientes ejecuciones reutilizan las herramientas locales.
 
-## Archivos implementados
+### Archivos implementados
 
 - `Iniciar-BibliotecaPlus.bat`
 - `bootstrap-portable.ps1`

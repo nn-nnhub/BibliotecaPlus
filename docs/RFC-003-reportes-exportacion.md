@@ -1,17 +1,40 @@
-# RFC-003: Reportes y exportación de préstamos
+# RFC-003 · Reportes y exportación de préstamos
 
-## Solicitud
+## Identificación y trazabilidad
+
+| Campo | Referencia |
+|---|---|
+| Issue | [#3](https://github.com/nn-nnhub/BibliotecaPlus/issues/3) |
+| Pull request | Sin PR asociado en el historial consultado |
+| Commits de implementación | [`5ed3b80`](https://github.com/nn-nnhub/BibliotecaPlus/commit/5ed3b80) |
+| Estado | Integrado en `main`; issue cerrado |
+
+## Objetivo y justificación
+
+Consultar indicadores y exportar el historial.
+
+## Implementación e impacto
+
+Resumen de préstamos y descarga CSV compatible con Excel.
+
+## Pruebas y evidencias
+
+Pruebas funcionales del resumen y la exportación. Los resultados y capturas originales se conservan en el registro detallado.
+
+## Registro detallado
+
+### Solicitud
 
 Consultar los préstamos registrados, conocer los libros más prestados y exportar la información para abrirla en Excel.
 
-## Implementación
+### Implementación
 
 - `ReporteService.java`: concentra la generación del resumen y la conversión de préstamos a filas de reporte.
 - `ReporteController.java`: expone el resumen JSON y la descarga CSV.
 - `index.html`: agrega las acciones `Ver resumen` y `Exportar para Excel`.
 - `app.js`: muestra los indicadores principales en la interfaz.
 
-## Mejora visual posterior
+### Mejora visual posterior
 
 Inicialmente la acción de exportación se mostraba como un enlace de texto. Durante la verificación se comprobó que el resumen funcionaba correctamente, pero el enlace de descarga no respetaba el diseño visual del sistema. El motivo fue que los estilos generales de los enlaces sobrescribían el estilo de botón.
 
@@ -32,7 +55,7 @@ La prueba del resumen confirmó que los indicadores se muestran correctamente. T
 ![Exportación antes del ajuste final](capturas/rfc-003-exportacion-estilo-antes-ajuste.png)
 ![Exportación con diseño final corregido](capturas/rfc-003-exportacion-estilo-final.png)
 
-## Reportes disponibles
+### Reportes disponibles
 
 - Total de préstamos.
 - Préstamos activos.
@@ -41,15 +64,15 @@ La prueba del resumen confirmó que los indicadores se muestran correctamente. T
 - Libros más prestados.
 - Detalle de préstamos con libro, usuario, fechas, estado y multa.
 
-## Exportación
+### Exportación
 
 El archivo se descarga como `reporte-prestamos.csv`. Está codificado en UTF-8 y utiliza punto y coma como separador, por lo que puede abrirse directamente con Excel.
 
-## Buenas prácticas
+### Buenas prácticas
 
 La lógica de cálculo está separada en `ReporteService`; el controlador solo expone los endpoints y la vista únicamente inicia la consulta o descarga.
 
-## Prueba funcional
+### Prueba funcional
 
 1. Registrar o consultar préstamos existentes.
 2. Presionar `Ver resumen`.

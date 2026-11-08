@@ -1,5 +1,11 @@
 # RFC-001 · OCP: Estrategias para tarifas de multa
 
+## Identificación y trazabilidad
+
+Anexo técnico del [RFC-001](RFC-001-refactorizacion.md) · [Issue #1](https://github.com/nn-nnhub/BibliotecaPlus/issues/1) · Integrado en main.
+
+El registro conserva el diagnóstico, la solución aplicada y la validación del principio de diseño indicado en el título.
+
 ## Relación con RFC-001
 
 Este documento registra la corrección de OCP-01 y OCP-02 dentro de la refactorización exhaustiva RFC-001.
