@@ -4,7 +4,7 @@
 
 - Solicitud [#35](https://github.com/nn-nnhub/BibliotecaPlus/issues/35).
 - Propuesta del 08/11/2026. Mantenimiento perfectivo, prioridad baja y riesgo bajo.
-- Estado en revisión. Consultar el PR en el [índice de RFC](indice-rfc.md).
+- Validado por el usuario. Integración y cierre gestionados mediante el [PR #36](https://github.com/nn-nnhub/BibliotecaPlus/pull/36).
 
 ## Objetivo y justificación
 
@@ -18,7 +18,7 @@ Los buscadores y el selector comparten estilos de ancho, altura mínima y espaci
 
 - `node --test "src/test/js/*.test.js"` pasó 90 pruebas.
 - Se comprobó en el HTML que cada tarjeta tiene un destino único y enfocable y que ambos paneles usan el grupo de filtros compartido.
-- Comprobación visual pendiente. En escritorio y móvil, comparar el tamaño de los controles, probar cada tarjeta y comprobar que la cabecera deja visible el destino.
+- El usuario confirmó la alineación de los controles y el funcionamiento de los accesos rápidos. La captura posterior muestra los tres controles alineados a la derecha.
 
 ### Capturas del estado anterior
 
@@ -27,3 +27,7 @@ Los buscadores y el selector comparten estilos de ancho, altura mínima y espaci
 ![Diferencias de alineación entre catálogo y usuarios](evidencias/rfc-022/antes-alineacion.png)
 
 ![Accesos rápidos y catálogo](evidencias/rfc-022/antes-accesos.png)
+
+### Captura del estado posterior
+
+![Buscadores y selector de categoría alineados](evidencias/rfc-022/despues-filtros.png)
