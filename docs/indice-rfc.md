@@ -25,6 +25,7 @@
 | [RFC-019 · Registro de devolución y multa](RFC-019-notificaciones-devolucion-y-multa.md) | [#17](https://github.com/nn-nnhub/BibliotecaPlus/issues/17) | [#25](https://github.com/nn-nnhub/BibliotecaPlus/pull/25) | Integrado; issue cerrado |
 | [RFC-020 · Pruebas automatizadas del modelo Préstamo](RFC-020-pruebas-modelo-prestamo.md) | [#18](https://github.com/nn-nnhub/BibliotecaPlus/issues/18) | [#26](https://github.com/nn-nnhub/BibliotecaPlus/pull/26) | Integrado; issue cerrado |
 | [RFC-021 · Resumen y separación de filtros del historial](RFC-021-resumen-y-filtros-historial.md) | [#32](https://github.com/nn-nnhub/BibliotecaPlus/issues/32) | [#33](https://github.com/nn-nnhub/BibliotecaPlus/pull/33) | Integrado; issue cerrado |
+| [RFC-022 · Alineación de filtros y accesos rápidos del panel](RFC-022-filtros-y-accesos-del-panel.md) | [#35](https://github.com/nn-nnhub/BibliotecaPlus/issues/35) | [#36](https://github.com/nn-nnhub/BibliotecaPlus/pull/36) | En revisión |
 
 
 ## Cómo mantener el índice
